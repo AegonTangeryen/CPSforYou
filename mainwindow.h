@@ -60,9 +60,9 @@ private slots:
 
     void on_startcomp_pushButton_clicked();
     void clearCompBrowser();
-
     void on_closecomp_pushButton_clicked();
-    void showPreCompResult(double arya);
+    void showPreResult(double arya);
+    void showCompResult(int robert);
 
     void on_envlinkpushButton_clicked();
     void showEnvMsg(QString loveU, int loveMe);
@@ -80,6 +80,8 @@ signals:
 
 private:
     Ui::MainWindow *ui;
+
+private:
     QDir *lwfdir;
     QString rootPath;
     QString EverydayPath;    // 每日数据集的路径
@@ -98,6 +100,13 @@ private:
     long int taskTimeCnt;    // 各项任务的周期
     QMutex *globalLock;
     QLabel *statusbarCNCLabel,*statusbarDs18Label,*statusbarFBGLabel,*statusbarCCDLabel;
+    QString fbgSamplePath;
+    QString ds18SamplePath;
+    QString ds18No1SamplePath;
+    QString ds18No2SamplePath;
+    QString envSamplePath;
+    QString hncSamplePath;
+    QString laserSamplePath;
 };
 
 #endif // MAINWINDOW_H

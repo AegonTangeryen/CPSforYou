@@ -7,7 +7,7 @@ FBGSensos::FBGSensos() {}
 
 FBGSensos::FBGSensos(QString path)
 {
-    fbgIp = "192.168.0.118";
+    fbgIp = "192.168.0.119";
     fbgPort = 4010;
 //    fbgIp = "10.139.50.42";
 //    fbgPort = 1994;

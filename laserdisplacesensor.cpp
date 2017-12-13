@@ -14,11 +14,15 @@ LaserDisplaceSensor::LaserDisplaceSensor(QString path)
     ccdLock = new QMutex();
     ccdTimer = new QTimer(this);
     ccdDir = new QDir();
-    initSeialPort();
-    openSerial = false;
+
+    ccdTimer->setInterval(100);   // 高速采集，100ms一次
+    ccdTimer->setTimerType(Qt::PreciseTimer);   // 精确的定时器，尽量保持毫秒精度
     connect(ccdTimer,&QTimer::timeout, this,&LaserDisplaceSensor::timeIsUp);
-    ccdTimer->setInterval(100); // 高速采集，100ms一次
     ccdTimer->start();
+
+    MultiMediaTimer = new MMTimer(100,this);
+    connect(MultiMediaTimer,&MMTimer::timeout,this,&LaserDisplaceSensor::mmTimeIsUp);
+    //MultiMediaTimer->start();
 }
 
 LaserDisplaceSensor::~LaserDisplaceSensor()
@@ -26,6 +30,7 @@ LaserDisplaceSensor::~LaserDisplaceSensor()
     delete ccdLock;
     delete ccdTimer;
     delete ccdDir;
+    delete MultiMediaTimer;
     qDebug()<<"退出ccd线程,完成位移传感器析构函数";
 }
 
@@ -90,8 +95,7 @@ void LaserDisplaceSensor::getDisplaceData()
 // 记录示数
 void LaserDisplaceSensor::recordDisplacements(QString *wyl)
 {
-    QDateTime current_date_time =QDateTime::currentDateTime();
-    QString currentTime =current_date_time.toString("yyyy-MM-dd-hh:mm:ss");
+    QString currentTime =QDateTime::currentDateTime().toString("yyyy-MM-dd-hh:mm:ss");
     QString ccdContent, ccdfilename;
     ccdfilename = displacementDir+"/ccdx.csv";
     ccdContent = currentTime+","+wyl[0];
@@ -117,6 +121,7 @@ void LaserDisplaceSensor::clearDisplays()
     }
 }
 
+// 断开连接
 void LaserDisplaceSensor::closeDisplacementSensor()
 {
     RC rc = LKIF2_CloseDevice();	// 定义返回代码清单，并且关闭USB设备
@@ -127,31 +132,6 @@ void LaserDisplaceSensor::closeDisplacementSensor()
     else
     {
         qDebug("位移传感器关闭成功!成功代码是：0x%X",rc);
-    }
-}
-
-// 定时器中断处理函数
-void LaserDisplaceSensor::timeIsUp()
-{
-    time2ReadDispalcement = true;
-}
-
-// 强制退出线程
-void LaserDisplaceSensor::forceThread2Quit()
-{
-    time2CloseDispalcement = true;
-}
-
-// 创建新的一天的文件
-void LaserDisplaceSensor::niceNewDay(QString pandahi)
-{
-    QDateTime current_date_time = QDateTime::currentDateTime();
-    QString currentDate = current_date_time.toString("yyyy-MM-dd hh：mm：ss");
-    displacementDir = pandahi+ "/CCD位移数据"+"("+currentDate+")";
-    if(ccdDir->exists(displacementDir)) qDebug()<<"根目录已存在!";
-    else
-    {
-        if(ccdDir->mkdir(displacementDir)) qDebug()<<"根目录创建成功！";
     }
 }
 
@@ -183,47 +163,41 @@ QString LaserDisplaceSensor::getStringFromFloatValue(LKIF_FLOATVALUE_OUT value)
     return result;
 }
 
-// 初始化串口
-void LaserDisplaceSensor::initSeialPort()
+// 定时器中断处理函数
+void LaserDisplaceSensor::timeIsUp()
 {
-    connect(&serial,SIGNAL(readyRead()),this,&LaserDisplaceSensor::serialRead);   //连接槽
-    QList<QSerialPortInfo>  infos = QSerialPortInfo::availablePorts();
-    if(infos.isEmpty())
-    {
-        return;
-    }
+    time2ReadDispalcement = true;
 }
 
-bool LaserDisplaceSensor::serialPortLink()
+// 多媒体定时器中断处理函数
+void LaserDisplaceSensor::mmTimeIsUp()
 {
-    if(openSerial)
-    {
-        return true;
-    }
+    //time2ReadDispalcement = true;
+}
+
+// 强制退出线程
+void LaserDisplaceSensor::forceThread2Quit()
+{
+    time2CloseDispalcement = true;
+}
+
+// 创建新的一天的文件
+void LaserDisplaceSensor::niceNewDay(QString pandahi)
+{
+    QDateTime current_date_time = QDateTime::currentDateTime();
+    QString currentDate = current_date_time.toString("yyyy-MM-dd hh：mm：ss");
+    displacementDir = pandahi+ "/CCD位移数据"+"("+currentDate+")";
+    if(ccdDir->exists(displacementDir)) qDebug()<<"根目录已存在!";
     else
     {
-        QString selectSerialName = ui->comboBox->currentText();
-        QList<QSerialPortInfo> infos = QSerialPortInfo::availablePorts();
-        QSerialPortInfo info;
-        int i = 0;
-        foreach(info, infos)
-        {
-            if(info.portName() == selectSerialName)
-            {
-                break;
-            }
-            i++;
-        }
-        serial.setPort(info);
-        serial.open(QIODevice::ReadWrite);         //读写打开
-        openSerial = true;
+        if(ccdDir->mkdir(displacementDir)) qDebug()<<"根目录创建成功！";
     }
 }
 
 //子线程
 void LaserDisplaceSensor::run()
 {
-    //if(!link2Displacement()) return; //连接失败，退出线程
+    if(!link2Displacement()) return; //连接失败，退出线程
     while(1)
     {
         if(time2ReadDispalcement)

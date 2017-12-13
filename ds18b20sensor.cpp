@@ -183,6 +183,7 @@ DS18b20Sensor::DS18b20Sensor(QString ds18path)
     processCntNo2 = 0;
     dslinkport1 = "1001";
     dslinkport2 = "3003";
+    //dsHostIp = "192.168.0.50";
     dsHostIp = "10.141.51.70";
     dataALL.clear();
     dataAddALL.clear();
@@ -194,8 +195,7 @@ DS18b20Sensor::DS18b20Sensor(QString ds18path)
     ds18AddServer = new QTcpServer(this);
     ds18AddSocket = new QTcpSocket(this);
 
-    QDateTime current_date_time = QDateTime::currentDateTime();
-    QString currentDate = current_date_time.toString("yyyy-MM-dd hh：mm：ss");
+    QString currentDate = QDateTime::currentDateTime().toString("yyyy-MM-dd hh：mm：ss");
     dailyDir = ds18path+ "/WiFi温度数据"+"("+currentDate+")";
     dsNo1Dir = dailyDir+"/WiFi温度数据一号板"+"("+currentDate+")";
     dsNo2Dir = dailyDir+"/WiFi温度数据二号板"+"("+currentDate+")";
@@ -573,8 +573,7 @@ void DS18b20Sensor::deleteTcpServer()
 // 创建新的一天的文件
 void DS18b20Sensor::niceNewDay(QString path)
 {
-    QDateTime current_date_time = QDateTime::currentDateTime();
-    QString currentDate = current_date_time.toString("yyyy-MM-dd hh：mm：ss");
+    QString currentDate = QDateTime::currentDateTime().toString("yyyy-MM-dd hh：mm：ss");
     dailyDir = path+"/WiFi温度数据"+"("+currentDate+")";
     dsNo1Dir = dailyDir+"/WiFi温度数据一号板("+currentDate+")";
     dsNo2Dir = dailyDir+"/WiFi温度数据二号板("+currentDate+")";

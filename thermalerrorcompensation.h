@@ -5,7 +5,7 @@
 #include "ds18b20sensor.h"
 #include "fbgsensos.h"
 
-#define inputNum 8
+#define inputNum 4
 
 struct ModelParameter
 {
@@ -48,9 +48,9 @@ public:
     bool firstZero;
     bool uAreFree2Comp;
 
-
 signals:
     void replyPredictionResult(double sansa);
+    void replyAcutalCompensation(int);
 
 public slots:
     void timeisup();

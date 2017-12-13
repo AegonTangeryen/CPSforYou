@@ -7,11 +7,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-
-
     taskTimeCnt =0;
     globalLock = new QMutex();
-
 /*---------------------------------显示页面初始化--------------------------------------------------*/
     // 最下方状态栏初始化配置
     statusbarCNCLabel = new QLabel("数控系统提示");
@@ -49,7 +46,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->ds18seeallpushButton,&QPushButton::clicked,this,&MainWindow::ds18SeeAll);
     connect(ui->FBGseeallpushButton,&QPushButton::clicked,this,&MainWindow::fbgSeeAll);
 
-/*---------------------------------创建抽样数据文件夹--------------------------------------------------*/
+/*---------------------------------创建数据文件夹--------------------------------------------------*/
     QDateTime current_date_time =QDateTime::currentDateTime();// 获取当前时间
     currentday = current_date_time.toString("yyyyMMdd");
     currentDate = current_date_time.toString("yyyy-MM-dd hh：mm：ss");
@@ -320,6 +317,7 @@ void MainWindow::timeisup()
         {
             if(lwfdir->mkdir(samplePath)) qDebug()<<"抽样数据集创建成功！";
         }
+        emit createNewDayFolder(originalPath);
 
         FbgAllDataPath = samplePath+"/TCH.csv";
         QString csvHeader = "时间";
@@ -479,20 +477,82 @@ void MainWindow::timeisup()
             if(writeFile(laserAllDataPath,csvHeader))
             qDebug()<<"dragon5";
         }
-        emit createNewDayFolder(originalPath);
+
+        QString nowTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh：mm：ss");
+        if(fbgWorkingStatus)
+        {
+            fbgSamplePath = samplePath+"/FBG波长数据("+nowTime+")";
+            if(lwfdir->exists(fbgSamplePath)) qDebug()<<"!rose1";
+            else
+            {
+                if(lwfdir->mkdir(fbgSamplePath)) qDebug()<<"rose1";
+            }
+        }
+        if(ds18WorkingStatus || ds18No2WorkStatus)
+        {
+            ds18SamplePath = samplePath+"/WiFi数据("+nowTime+")";
+            ds18No1SamplePath = ds18SamplePath+"/DS18B20一号板("+nowTime+")";
+            ds18No2SamplePath = ds18SamplePath+"/DS18B20二号板("+nowTime+")";
+            if(lwfdir->exists(ds18SamplePath)) qDebug()<<"!rose2";
+            else
+            {
+                if(lwfdir->mkdir(ds18SamplePath)) qDebug()<<"rose2";
+            }
+            if(lwfdir->exists(ds18No1SamplePath)) qDebug()<<"!rose2.1";
+            else
+            {
+                if(lwfdir->mkdir(ds18No1SamplePath)) qDebug()<<"rose2.1";
+            }
+            if(lwfdir->exists(ds18No2SamplePath)) qDebug()<<"!rose2.2";
+            else
+            {
+                if(lwfdir->mkdir(ds18No2SamplePath)) qDebug()<<"rose2.2";
+            }
+        }
+        if(envWorkingStatus)
+        {
+            envSamplePath = samplePath+"/环境温度("+nowTime+")";
+            if(lwfdir->exists(envSamplePath)) qDebug()<<"!rose3";
+            else
+            {
+                if(lwfdir->mkdir(envSamplePath)) qDebug()<<"rose3";
+            }
+        }
+        if(cncWorkingStatus)
+        {
+            hncSamplePath = samplePath+"/CNC机床数据("+nowTime+")";
+            if(lwfdir->exists(hncSamplePath)) qDebug()<<"!rose4";
+            else
+            {
+                if(lwfdir->mkdir(hncSamplePath)) qDebug()<<"!rose4";
+            }
+        }
+        if(laserWorkingStatus)
+        {
+            laserSamplePath = samplePath+"/CCD位移数据("+nowTime+")";
+            if(lwfdir->exists(laserSamplePath)) qDebug()<<"!rose5";
+            else
+            {
+                if(lwfdir->mkdir(laserSamplePath)) qDebug()<<"!rose5";
+            }
+        }
     }
 
     taskTimeCnt++;
-    if(taskTimeCnt %10 == 0)   // 每5s抽样一次
+    if(taskTimeCnt %5 == 0)   // 每5s抽样一次
     {
         if(fbgWorkingStatus) recordAllFbg();
-        if(ds18WorkingStatus && ds18No2WorkStatus) recordAllDs18b20(DS18B20_ALL_Node,DS18B20_Channel_Max,DS18B20_ADD_Node,DS18B20_Channel_Max);
+        if(ds18No2WorkStatus) recordAllDs18b20(DS18B20_ALL_Node,DS18B20_Channel_Max,DS18B20_ADD_Node,DS18B20_Channel_Max);
         if(envWorkingStatus) recordAllEnvironmentt(ENV_ALL_Node,Env_Number_Max);
         if(cncWorkingStatus) recordAllCnc(CNCInfo);
         if(laserWorkingStatus) recordAllLaserSensors(ccdInfo);
     }
+
     ui->_1191_Browserlabel->clear();
     ui->_1191_Browserlabel->setText("1191状态第"+QString::number(taskTimeCnt)+"次："+QString::number(statusFor1191));
+    ui->x_lcdNumber->display(ccdInfo[0].toDouble());
+    ui->y_lcdNumber->display(ccdInfo[1].toDouble());
+    ui->z_lcdNumber->display(888888);
 
     if(taskTimeCnt == 19941008)   // 计数器清零
     {
@@ -535,7 +595,6 @@ void MainWindow::recordAllFbg()
     }
     writeFile(fbgAllTempPath,fbgContent);
 }
-
 
 // 记录电类温度传感器全部数据
 void MainWindow::recordAllDs18b20(DS18B20_Node (*a)[DS18B20_Index_Max], int nrow1,DS18B20_Node (*b)[DS18B20_Index_Max],int nrow2)
@@ -598,7 +657,7 @@ void MainWindow::recordAllLaserSensors(QString *gc)
     QDateTime current_date_time =QDateTime::currentDateTime();
     QString currentTime =current_date_time.toString("yyyy-MM-dd-hh:mm:ss");
     QString ccdContent = currentTime;
-    ccdContent = ccdContent+gc[0]+","+gc[1]+","+gc[2];
+    ccdContent = ccdContent+","+gc[0]+","+gc[1]+","+gc[2];
     writeFile(laserAllDataPath,ccdContent);
 }
 /**********************************************************************************************
@@ -609,14 +668,21 @@ void MainWindow::recordAllLaserSensors(QString *gc)
 // 点击"连接机床"
 void MainWindow::on_cnclink_pushButton_clicked()
 {
-    Hnc848System *hnc848c = new Hnc848System(originalPath); //将每日数据集路径送入对象
-    hnc848c->start(); //启动数控系统子线程
+    QString nowTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh：mm：ss");
+    hncSamplePath = samplePath+"/CNC机床数据("+nowTime+")";
+    if(lwfdir->exists(hncSamplePath)) qDebug()<<"数控机床抽样目录已存在";
+    else
+    {
+        if(lwfdir->mkdir(hncSamplePath)) qDebug()<<"数控机床抽样目录创建成功";
+    }
+    Hnc848System *hnc848c = new Hnc848System(originalPath); // 将每日数据集路径送入对象
     connect(hnc848c, &Hnc848System::sendMsg, this, &MainWindow::showCNCMsg);
     connect(hnc848c, &Hnc848System::sendInfo,this, &MainWindow::showCNCInfo);
     connect(hnc848c,&Hnc848System::sendPara,this,&MainWindow::showComp);
     connect(this,&MainWindow::createNewDayFolder,hnc848c,&Hnc848System::niceNewDay);
     connect(this,&MainWindow::closeHncSystem,hnc848c,&Hnc848System::forceThreadtoQuit);
     connect(hnc848c, &Hnc848System::finished, hnc848c, &QObject::deleteLater);
+    hnc848c->start(); // 启动数控系统子线程
 }
 
 //点击"断开机床"
@@ -687,6 +753,26 @@ void MainWindow::showComp(short _105, short _106, short _107, unsigned int c1, u
 // 点击监听电类温度传感器之后
 void MainWindow::on_ds18link_pushButton_clicked()
 {
+    QString nowTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh：mm：ss");
+    ds18SamplePath = samplePath+"/WiFi数据("+nowTime+")";
+    ds18No1SamplePath = ds18SamplePath+"/DS18B20一号板("+nowTime+")";
+    ds18No2SamplePath = ds18SamplePath+"/DS18B20二号板("+nowTime+")";
+    if(lwfdir->exists(ds18SamplePath)) qDebug()<<"!wolf2";
+    else
+    {
+        if(lwfdir->mkdir(ds18SamplePath)) qDebug()<<"wolf2";
+    }
+    if(lwfdir->exists(ds18No1SamplePath)) qDebug()<<"!wolf2.1";
+    else
+    {
+        if(lwfdir->mkdir(ds18No1SamplePath)) qDebug()<<"wolf2.1";
+    }
+    if(lwfdir->exists(ds18No2SamplePath)) qDebug()<<"!wolf2.2";
+    else
+    {
+        if(lwfdir->mkdir(ds18No2SamplePath)) qDebug()<<"wolf2.2";
+    }
+
     Ds18TcpThread *ds18Thread = new Ds18TcpThread(originalPath);
     ds18Thread->start(); //启动电类温度传感器子线程
     connect(ds18Thread, &Ds18TcpThread::relayMsg2Ui,this,&MainWindow::showDS18Msg);
@@ -736,13 +822,20 @@ void MainWindow::on_ds18dislink_pushButton_clicked()
 // 点击连接激光位移传感器之后
 void MainWindow::on_linkccd_pushButton_clicked()
 {
+    QString nowTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh：mm：ss");
+    laserSamplePath = samplePath+"/CCD位移数据("+nowTime+")";
+    if(lwfdir->exists(laserSamplePath)) qDebug()<<"!wolf5";
+    else
+    {
+        if(lwfdir->mkdir(laserSamplePath)) qDebug()<<"wolf5";
+    }
+
     LaserDisplaceSensor *ccdSensor = new LaserDisplaceSensor(originalPath);
-    ccdSensor->start();
-    connect(ccdSensor, &LaserDisplaceSensor::sendPara,this,&MainWindow::showCCDResults);
     connect(this,&MainWindow::closeLaserSensors,ccdSensor,&LaserDisplaceSensor::forceThread2Quit);
     connect(ccdSensor, &LaserDisplaceSensor::sendMsg,this,&MainWindow::ccdUiOperation);
     connect(this,&MainWindow::createNewDayFolder,ccdSensor,&LaserDisplaceSensor::niceNewDay);
     connect(ccdSensor, &LaserDisplaceSensor::finished, ccdSensor, &QObject::deleteLater);
+    ccdSensor->start();
     ui->linkccd_pushButton->setEnabled(false);
     ui->closeccd_pushButton->setEnabled(false);
 }
@@ -790,12 +883,20 @@ void MainWindow::ccdUiOperation(QString joffery)
 // 连接FBG解调仪
 void MainWindow::on_FBGlink_pushButton_clicked()
 {
+    QString nowTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh：mm：ss");
+    fbgSamplePath = samplePath+"/FBG波长数据("+nowTime+")";
+    if(lwfdir->exists(fbgSamplePath)) qDebug()<<"!wolf1";
+    else
+    {
+        if(lwfdir->mkdir(fbgSamplePath)) qDebug()<<"wolf1";
+    }
+
     FBGUdpThread *fbgThread = new FBGUdpThread(originalPath);
-    fbgThread->start();
     connect(fbgThread,&FBGUdpThread::passUdpInfo,this,&MainWindow::showFbgResults);
     connect(this,&MainWindow::createNewDayFolder,fbgThread,&FBGUdpThread::newDayforYou);
     connect(this,&MainWindow::closeFbgSocket,fbgThread,&FBGUdpThread::forceThread2Quit);
     connect(fbgThread,&FBGUdpThread::finished,fbgThread,&FBGUdpThread::deleteLater);
+    fbgThread->start();
 }
 
 // 关闭连接
@@ -868,17 +969,19 @@ void MainWindow::on_startcomp_pushButton_clicked()
         ui->comp_textBrowser->append("请连接电类温度传感器");
         return;
     }
-    if(!fbgWorkingStatus)
-    {
-        ui->comp_textBrowser->append("请连接FBG解调仪");
-        return;
-    }
-    if(cncWorkingStatus && ds18WorkingStatus && fbgWorkingStatus)
+//    if(!fbgWorkingStatus)
+//    {
+//        ui->comp_textBrowser->append("请连接FBG解调仪");
+//        return;
+//    }
+    if(cncWorkingStatus && ds18WorkingStatus)
     {
         ThermalErrorCompensation *reduceError = new ThermalErrorCompensation(originalPath);
         reduceError->start();
         connect(reduceError,&ThermalErrorCompensation::replyPredictionResult,
-                this,&MainWindow::showPreCompResult);
+                this,&MainWindow::showPreResult);
+        connect(reduceError,&ThermalErrorCompensation::replyAcutalCompensation,
+                this,&MainWindow::showCompResult);
         connect(this,&MainWindow::closeCompensation,reduceError,&ThermalErrorCompensation::forceThread2Quit);
         connect(this,&MainWindow::createNewDayFolder,reduceError,&ThermalErrorCompensation::niceNewDay);
         connect(reduceError,&ThermalErrorCompensation::finished,
@@ -901,12 +1004,16 @@ void MainWindow::clearCompBrowser()
 }
 
 //显示预测或补偿结果
-void MainWindow::showPreCompResult(double arya)
+void MainWindow::showPreResult(double arya)
 {
-    ui->comp_textBrowser->clear();
+    //ui->comp_textBrowser->clear();
     ui->comp_textBrowser->append("预测结果："+QString::number(arya,10,8));
 }
 
+void MainWindow::showCompResult(int robert)
+{
+    ui->comp_textBrowser->append("实际补偿："+QString::number(robert,10));
+}
 /**********************************************************************************************
 
                                     7.环境温度部分
@@ -915,6 +1022,14 @@ void MainWindow::showPreCompResult(double arya)
 // 监听
 void MainWindow::on_envlinkpushButton_clicked()
 {
+    QString nowTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh：mm：ss");
+    envSamplePath = samplePath+"/环境温度("+nowTime+")";
+    if(lwfdir->exists(envSamplePath)) qDebug()<<"!wolf1";
+    else
+    {
+        if(lwfdir->mkdir(envSamplePath)) qDebug()<<"wolf1";
+    }
+
     EnviThread *airEnv = new EnviThread(originalPath);
     airEnv->start();
     connect(airEnv, &EnviThread::relayMsg2Ui,this,&MainWindow::showEnvMsg);

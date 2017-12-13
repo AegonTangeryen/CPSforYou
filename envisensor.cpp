@@ -15,7 +15,8 @@ EnviSensor::EnviSensor()    {}
 
 EnviSensor::EnviSensor(QString path)
 {
-    envHostIp = "10.141.51.70";
+    envHostIp = "192.168.0.50";
+    //envHostIp = "10.139.50.42";
     envPort = 2002;
     envNewFullFragment = false;
     errCnt = 0;
@@ -26,8 +27,7 @@ EnviSensor::EnviSensor(QString path)
     envServer = new QTcpServer(this);
     envSocket = new QTcpSocket(this);
 
-    QDateTime current_date_time = QDateTime::currentDateTime();
-    QString currentDate = current_date_time.toString("yyyy-MM-dd hh：mm：ss");
+    QString currentDate = QDateTime::currentDateTime().toString("yyyy-MM-dd hh：mm：ss");
     environmentPath = path+"/环境温度总集"+"("+currentDate+")";
     if(envDir->exists(environmentPath)) qDebug()<<"环境温度总集已存在!";
     else

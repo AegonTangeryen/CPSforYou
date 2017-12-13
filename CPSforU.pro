@@ -8,6 +8,7 @@ QT       += core gui
 QT       += xml
 QT       += network
 QT       += serialport
+RC_ICONS += Panda.ico
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -41,8 +42,9 @@ SOURCES += \
         laserdisplacesensor.cpp \
         thermalerrorcompensation.cpp \
         tools.cpp \
-    envisensor.cpp \
-    envithread.cpp
+        envisensor.cpp \
+        envithread.cpp \
+        mmtimer.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -58,8 +60,9 @@ HEADERS += \
         laserdisplacesensor.h \
         thermalerrorcompensation.h \
         tools.h \
-    envisensor.h \
-    envithread.h
+        envisensor.h \
+        envithread.h \
+        mmtimer.h
 
 FORMS += \
         mainwindow.ui
@@ -68,4 +71,5 @@ INCLUDEPATH += ./IncludesRely
 
 LIBS += $$PWD/HncNetDll.lib \
         $$PWD/LKIF2.lib \
-        -lpthread libwsock32 libws2_32
+        -lpthread libwsock32 libws2_32 \
+        -lwinmm

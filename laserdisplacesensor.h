@@ -13,6 +13,7 @@
 #include <QSerialPortInfo>
 #include "LKIF2.h"
 #include "tools.h"
+#include "mmtimer.h"
 
 extern bool time2ClearDispalcement;
 extern bool laserWorkingStatus;
@@ -32,14 +33,11 @@ public:
     QString displacementDir;
     QMutex *ccdLock;
     QTimer *ccdTimer;
+    MMTimer *MultiMediaTimer;
     QDir *ccdDir;
     bool time2ReadDispalcement;
     bool time2CloseDispalcement;
-    QSerialPort serial;
-    bool openSerial;
 
-    void initSeialPort();                            // 初始化串口
-    bool serialPortLink();
     bool link2Displacement();
     void getDisplaceData();
     void recordDisplacements(QString *wyl);
@@ -50,14 +48,12 @@ public:
 
 public slots:
     void timeIsUp();
+    void mmTimeIsUp();
     void niceNewDay(QString pandahi);
     void forceThread2Quit();
-    void sendOrder2Sensor();                        // 发送数据到串口
-    void serialRead();                              // 串口收到数据
 
 signals:
     void sendMsg(QString);
-    void sendPara(QString*);                        //返回三轴示数
 };
 
 #endif // LASERDISPLACESENSOR_H

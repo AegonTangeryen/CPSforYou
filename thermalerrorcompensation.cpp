@@ -10,24 +10,14 @@ ThermalErrorCompensation::ThermalErrorCompensation(QString path)
     time2Quit = false;
     uAreFree2Comp = false;
 
-    duketimer = new QTimer(this);
-    connect(duketimer,&QTimer::timeout, this,&ThermalErrorCompensation::timeisup);
-    duketimer->setInterval(2000);         // 每2s中断一次
-    duketimer->start();
-
-    ModelParameter foryou0(16,1,NULL),foryou1(16,1,NULL),foryou2(16,1,NULL),foryou3(16,1,NULL);
-    ModelParameter foryou4(16,1,NULL),foryou5(16,1,NULL),foryou6(16,1,NULL),foryou7(16,1,NULL);
+    // 设置关键温度测点
+    ModelParameter foryou0(7,1,NULL),foryou1(7,2,NULL),foryou2(7,3,NULL),foryou3(7,4,NULL);
     paraVector.append(foryou0);
     paraVector.append(foryou1);
     paraVector.append(foryou2);
     paraVector.append(foryou3);
-    paraVector.append(foryou4);
-    paraVector.append(foryou5);
-    paraVector.append(foryou6);
-    paraVector.append(foryou7);
 
-    QDateTime current_date_time = QDateTime::currentDateTime();
-    QString currentDate = current_date_time.toString("yyyyMMdd");
+    QString currentDate = QDateTime::currentDateTime().toString("yyyyMMdd");
     compenPath = compenPath+"/预测和补偿记录"+currentDate+".csv";
     QString csvHeader = "时间,次数,当前预测值,上一次预测值,当前补偿值";
     if(QFile::exists(compenPath)) qDebug()<<"预测和补偿记录文件已存在";
@@ -36,6 +26,12 @@ ThermalErrorCompensation::ThermalErrorCompensation(QString path)
         writeFile(compenPath,csvHeader);
         qDebug()<<"预测和补偿记录文件创建成功";
     }
+
+    duketimer = new QTimer(this);
+    connect(duketimer,&QTimer::timeout, this,&ThermalErrorCompensation::timeisup);
+    duketimer->setInterval(5000);
+    duketimer->setTimerType(Qt::PreciseTimer);
+    duketimer->start();
 }
 
 ThermalErrorCompensation::~ThermalErrorCompensation()
@@ -50,20 +46,19 @@ void ThermalErrorCompensation::timeisup()
 }
 
 //模型预测
-QVector<QString> last_sent_FBG(inputNum);               // 初次的FBG
-QVector<QString> sent_FBG(inputNum);					// 本次的FBG
+QVector<QString> last_sent_FBG(inputNum);                 // 初次的FBG
+QVector<QString> sent_FBG(inputNum);                        // 本次的FBG
 double ThermalErrorCompensation::predictionModels()
 {
     int columns = inputNum+1;                           // 参数个数
     int i = 0;
     for (i = 1; i < paraVector.size(); i++)             // 读取关键温度测点实时温度数据
     {
-        sent_FBG[i - 1] = FBG_ALL[paraVector[i].md_channel - 1][paraVector[i].md_indx - 1];
+        sent_FBG[i - 1] = DS18B20_ALL_Node[paraVector[i].md_channel - 1][paraVector[i].md_indx - 1].temperature;
     }
     QVector<double> delta_FBG(inputNum);					// 本次与初次的FBG差值
     if (last_sent_FBG[0].length() == 0)                 // 如果是初次计算
     {
-        qDebug()<<"初次计算，请多关照";
         for (int i = 0; i<inputNum; i++)
         {
             last_sent_FBG[i] = sent_FBG[i];             // 仅存储当前的FBG，作为下一次计算的基准
@@ -76,12 +71,8 @@ double ThermalErrorCompensation::predictionModels()
         delta_FBG[i] = (sent_FBG[i].toDouble() - last_sent_FBG[i].toDouble()) * 95.238095238095;
     }
 
-    double forU[9]={ 0.00461,-0.02555,-0.01610,-0.04940,0.02111,-0.00981,0.01518,0.00790,0.05584 };
+    double forU[5]={-0.014174801,0.008462905,0.003952930,-0.002877171,0.001796639};
     QVector<double> Answerz(columns);
-//    for (i = 0; i < columns; i++)
-//    {
-//        Answerz[i] = paraVector[i].md_para.toDouble();
-//    }
     for (i = 0; i < columns; i++)
     {
         Answerz[i] = forU[i];
@@ -167,8 +158,7 @@ void ThermalErrorCompensation::compensationStrategy(double xAxis,double yAxis,do
         compPermission = true;
     }
 
-    QDateTime current_date_time =QDateTime::currentDateTime();
-    QString currentTime =current_date_time.toString("yyyy-MM-dd-hh:mm:ss");
+    QString currentTime =QDateTime::currentDateTime().toString("yyyy-MM-dd-hh:mm:ss");
     QString compenContent = currentTime+","+QString::number(compenCnt,10,6)+","+QString::number(LastZPredict,10,6)
                             +","+QString::number(zPredict,10,6)+","+"";
     writeFile(compenPath,compenContent);
@@ -183,8 +173,7 @@ void ThermalErrorCompensation::forceThread2Quit()
 // 创建新的一天的文件夹
 void ThermalErrorCompensation::niceNewDay(QString gaintPanda)
 {
-    QDateTime current_date_time = QDateTime::currentDateTime();
-    QString currentDate = current_date_time.toString("yyyyMMdd");
+    QString currentDate = QDateTime::currentDateTime().toString("yyyyMMdd");
     compenPath = gaintPanda+"/预测和补偿记录"+currentDate+".csv";
     QString csvHeader = "时间,次数,当前预测值,上一次预测值,当前补偿值";
     if(QFile::exists(compenPath)) qDebug()<<"预测和补偿记录文件已存在";
@@ -200,12 +189,13 @@ void ThermalErrorCompensation::run()
 {
     while (1)
     {
-        if(cncWorkingStatus == false || ds18WorkingStatus == false || fbgWorkingStatus == false) return;
+        if(cncWorkingStatus == false || ds18WorkingStatus == false) return;
         if(uAreFree2Comp)
         {
             uAreFree2Comp = false;
             compensationStrategy(0,0,predictionModels());
         }
+
         if(compPermission && (statusFor1191 == 7)) // 补偿许可+到达补偿G代码段+补偿值未传送
         {
             compPermission = false;
@@ -217,8 +207,8 @@ void ThermalErrorCompensation::run()
             clearFlag = true;                      // 累加补偿值可以清空
             firstZero = false;
             time2WriteRegisters = 2;         // 寄存器清零
-            QDateTime current_date_time =QDateTime::currentDateTime();
-            QString currentTime =current_date_time.toString("yyyy-MM-dd-hh:mm:ss");
+            emit replyAcutalCompensation(compValue[2]);
+            QString currentTime = QDateTime::currentDateTime().toString("yyyy-MM-dd-hh:mm:ss");
             QString comptext = currentTime+", "+", "+", ,"+QString::number(compValue[2]);
             writeFile(compenPath,comptext);
         }
