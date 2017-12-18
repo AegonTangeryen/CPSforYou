@@ -29,7 +29,7 @@ ThermalErrorCompensation::ThermalErrorCompensation(QString path)
 
     duketimer = new QTimer(this);
     connect(duketimer,&QTimer::timeout, this,&ThermalErrorCompensation::timeisup);
-    duketimer->setInterval(5000);
+    duketimer->setInterval(5000);         // 5s计算一次补偿值
     duketimer->setTimerType(Qt::PreciseTimer);
     duketimer->start();
 }
@@ -52,10 +52,11 @@ double ThermalErrorCompensation::predictionModels()
 {
     int columns = inputNum+1;                           // 参数个数
     int i = 0;
-    for (i = 1; i < paraVector.size(); i++)             // 读取关键温度测点实时温度数据
+    for (i = 0; i < paraVector.size(); i++)             // 读取关键温度测点实时温度数据
     {
-        sent_FBG[i - 1] = DS18B20_ALL_Node[paraVector[i].md_channel - 1][paraVector[i].md_indx - 1].temperature;
+        sent_FBG[i] = DS18B20_ALL_Node[paraVector[i].md_channel - 1][paraVector[i].md_indx - 1].temperature;
     }
+
     QVector<double> delta_FBG(inputNum);					// 本次与初次的FBG差值
     if (last_sent_FBG[0].length() == 0)                 // 如果是初次计算
     {
@@ -68,7 +69,7 @@ double ThermalErrorCompensation::predictionModels()
 
     for (int i = 0; i<inputNum; i++)                    // 如果不是初次计算，计算FBG增量，并转换为温度
     {
-        delta_FBG[i] = (sent_FBG[i].toDouble() - last_sent_FBG[i].toDouble()) * 95.238095238095;
+        delta_FBG[i] = sent_FBG[i].toDouble() - last_sent_FBG[i].toDouble();
     }
 
     double forU[5]={-0.014174801,0.008462905,0.003952930,-0.002877171,0.001796639};
@@ -80,7 +81,7 @@ double ThermalErrorCompensation::predictionModels()
     double Z = Answerz[0];
     for (int i = 0; i<inputNum; i++)
     {
-        Z += Answerz[i + 1] * delta_FBG[i];
+        Z += Answerz[i + 1] * delta_FBG[i];       // 计算预测值，单位：mm
     }
     emit replyPredictionResult(Z);
     compenCnt++;
@@ -90,7 +91,7 @@ double ThermalErrorCompensation::predictionModels()
 
 //补偿策略
 double LastXPredict,LastYPredict,LastZPredict;
-int XSum=0,YSum=0,ZSum=0;
+double XSum=0,YSum=0,ZSum=0;
 void ThermalErrorCompensation::compensationStrategy(double xAxis,double yAxis,double zAxis)
 {
     double xPredict,yPredict,zPredict;
@@ -118,6 +119,7 @@ void ThermalErrorCompensation::compensationStrategy(double xAxis,double yAxis,do
 
         if(clearFlag)             // 前面的补偿值已经传送，覆盖
         {
+            clearFlag=false;
             XSum = xGap;
             YSum = yGap;
             ZSum = zGap;
@@ -136,16 +138,16 @@ void ThermalErrorCompensation::compensationStrategy(double xAxis,double yAxis,do
         if(ZSum<=0) {zComp = abs(ZSum);}
         else {zComp = ZSum +128;}
 
-        if(XSum<-25) {xComp = 25;}          // 阈值保护一
-        else if(XSum>25) {xComp = 25+128;}  // 如果累加量超出阈值，按最大阈值算
-        if(YSum<-25) {yComp = 25;}
-        else if(YSum>25) {yComp = 25+128;}  // 阈值是正负25um (2017.9.14)
-        if(ZSum<-25) {zComp = 25;}
-        else if(ZSum>25) {zComp = 25+128;}
+        if(XSum<=-25) {xComp = 25;}          // 阈值保护一
+        else if(XSum>=25) {xComp = 25+128;}  // 如果累加量超出阈值，按最大阈值算
+        if(YSum<=-25) {yComp = 25;}
+        else if(YSum>=25) {yComp = 25+128;}  // 阈值是正负25um (2017.9.14)
+        if(ZSum<=-25) {zComp = 25;}
+        else if(ZSum>=25) {zComp = 25+128;}
 
-        if(xComp>255) xComp = 0;            // 阈值保护二
-        if(yComp>255) yComp = 0;            // 如果累加量超出范围，则此次不补偿
-        if(zComp>255) zComp = 0;
+        if(xComp>255 || xComp ==128) xComp = 0;            // 阈值保护二
+        if(yComp>255 || yComp ==128) yComp = 0;            // 如果累加量超出范围，则此次不补偿
+        if(zComp>255 || zComp ==128) zComp = 0;
 
         compValue[0] = xComp;
         compValue[1] = yComp;
@@ -160,7 +162,7 @@ void ThermalErrorCompensation::compensationStrategy(double xAxis,double yAxis,do
 
     QString currentTime =QDateTime::currentDateTime().toString("yyyy-MM-dd-hh:mm:ss");
     QString compenContent = currentTime+","+QString::number(compenCnt,10,6)+","+QString::number(LastZPredict,10,6)
-                            +","+QString::number(zPredict,10,6)+","+"";
+            +","+QString::number(zPredict,10,6)+", ";
     writeFile(compenPath,compenContent);
 }
 
@@ -190,23 +192,23 @@ void ThermalErrorCompensation::run()
     while (1)
     {
         if(cncWorkingStatus == false || ds18WorkingStatus == false) return;
-        if(uAreFree2Comp)
+        if(uAreFree2Comp)                  // 预测，并转化为补偿值
         {
             uAreFree2Comp = false;
-            compensationStrategy(0,0,predictionModels());
+            compensationStrategy(0,0,1000*predictionModels());
         }
 
         if(compPermission && (statusFor1191 == 7)) // 补偿许可+到达补偿G代码段+补偿值未传送
         {
             compPermission = false;
-            time2WriteRegisters = 1;          // 可以写入补偿值
-            firstZero = true;                       // 补偿值已传送
+            time2WriteRegisters = 1;                             // 可以写入补偿值
+            firstZero = true;                                          // 补偿值已传送，可以清零寄存器
         }
-        if(firstZero && (statusFor1191 == 0))
+        if(firstZero && (statusFor1191 == 0))            // 可以清零+补偿完毕
         {
-            clearFlag = true;                      // 累加补偿值可以清空
+            clearFlag = true;                                        // 累加补偿值可以清空
             firstZero = false;
-            time2WriteRegisters = 2;         // 寄存器清零
+            time2WriteRegisters = 2;                             // 寄存器清零
             emit replyAcutalCompensation(compValue[2]);
             QString currentTime = QDateTime::currentDateTime().toString("yyyy-MM-dd-hh:mm:ss");
             QString comptext = currentTime+", "+", "+", ,"+QString::number(compValue[2]);

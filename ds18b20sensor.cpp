@@ -1,7 +1,7 @@
 #include "ds18b20sensor.h"
 
-DS18B20_Node DS18B20_ALL_Node[DS18B20_Channel_Max][DS18B20_Index_Max];//DS18B20一号板数据集合
-DS18B20_Node DS18B20_ADD_Node[DS18B20_Channel_Max][DS18B20_Index_Max];//DS18B20二号板数据集合
+DS18B20_Node DS18B20_ALL_Node[DS18B20_Channel_Max][DS18B20_Index_Max];// DS18B20一号板数据集合
+DS18B20_Node DS18B20_ADD_Node[DS18B20_Channel_Max][DS18B20_Index_Max];// DS18B20二号板数据集合
 bool ds18WorkingStatus = false;
 bool ds18No2WorkStatus = false;
 
@@ -142,14 +142,14 @@ QString dsNo2Map[8][8] =            // 二号板ID列表
         "28ff2f3c54170483"
     },
     {								// 通道6
-        "28fff7d953170451",
-        "28ff5af1531704e2",
-        "28ffe04e54170461",
-        "28ff6f33541704f0",
         "28ff6524541704f3",
-        "28ff582554170414",
+        "28ff59025417042f",
         "28ff56ef531704ee",
-        "28ff59025417042f"
+        "28ff582554170414",
+        "28ff1ff053170456",
+        "28ff6f33541704f0",
+        "28ffe04e54170461",
+        "28ff5af1531704e2"
     },
     {								// 通道7
         "28ffcded5317042e",
@@ -178,15 +178,10 @@ DS18b20Sensor::~DS18b20Sensor() {}
 
 DS18b20Sensor::DS18b20Sensor(QString ds18path)
 {
-    processCnt = 0;
     errDS18B20Cnt = 0;
-    processCntNo2 = 0;
     dslinkport1 = "1001";
     dslinkport2 = "3003";
-    //dsHostIp = "192.168.0.50";
-    dsHostIp = "10.141.51.70";
-    dataALL.clear();
-    dataAddALL.clear();
+    dsHostIp = getHostIpAddress();  // 获取本地IP
     ds18Dir = new QDir();
     newFullFragment = false;
     addNewFullFragment = false;
@@ -200,19 +195,16 @@ DS18b20Sensor::DS18b20Sensor(QString ds18path)
     dsNo1Dir = dailyDir+"/WiFi温度数据一号板"+"("+currentDate+")";
     dsNo2Dir = dailyDir+"/WiFi温度数据二号板"+"("+currentDate+")";
 
-    if(ds18Dir->exists(dailyDir)) qDebug()<<"根目录已存在!";
-    else
+    if(!ds18Dir->exists(dailyDir))  // 如果不存在此文件夹
     {
-        if(ds18Dir->mkdir(dailyDir)) qDebug()<<"根目录创建成功！";
+        ds18Dir->mkdir(dailyDir);
     }
 
     ds18ErrPath = dailyDir +"/DS18b20错误记录"+currentDate+".csv";
     QString errHeader = "时间,设备号,通道号,传感器号,ID号,当前温度,上次温度,错误计数,错误原因";
-    if(QFile::exists(ds18ErrPath)) qDebug()<<"文件已存在！";
-    else
+    if(!QFile::exists(ds18ErrPath))  // 如果不存在此文件
     {
-        if(writeFile(ds18ErrPath,errHeader))
-        qDebug()<<"DS18b20错误记录文件创建成功";
+        writeFile(ds18ErrPath,errHeader);
     }
 
     if(listenDS18b20()) qDebug()<<endl<<"1001端口监听成功";
@@ -251,10 +243,9 @@ bool DS18b20Sensor::listenDS18b20()
         return false;
     }
 
-    if(ds18Dir->exists(dsNo1Dir)) qDebug()<<"电类传感器一号板目录已存在!";
-    else
+    if(!ds18Dir->exists(dsNo1Dir))
     {
-        if(ds18Dir->mkdir(dsNo1Dir)) qDebug()<<"电类传感器一号板目录创建成功！";
+        ds18Dir->mkdir(dsNo1Dir);
     }
 
     return true;
@@ -263,10 +254,9 @@ bool DS18b20Sensor::listenDS18b20()
 // 当传感器一号板连接到补偿器
 void DS18b20Sensor::newClientConnection()
 {
-    ds18Socket = ds18Server->nextPendingConnection();  //获取客户端连接
+    ds18Socket = ds18Server->nextPendingConnection();  // 获取客户端连接
     ds18WorkingStatus = true;
-    qDebug() << "DS18b20一号板已连接!";
-    emit sendMsg("DS18b20一号板已连接",1);
+    emit sendMsg(NULL,1);                              // 一号板连接成功
     connect(ds18Socket, &QTcpSocket::readyRead, this, &DS18b20Sensor::readDS18Data);
     connect(ds18Socket, &QTcpSocket::disconnected, this, &DS18b20Sensor::socketDisconnected);
 }
@@ -276,8 +266,6 @@ void DS18b20Sensor::readDS18Data()
 {
     QByteArray buffer;
     buffer = ds18Socket->readAll();                  // 读取本次全部数据
-    qDebug()<<"一号板收到:"<<endl<<buffer;
-
     dataALL+=buffer;                                 // 存入数据队列
     buffer.clear();                                  // 缓存清空
     if(!newFullFragment)                             // 开始接收后,检测有没有“S0,00”这5个字节
@@ -286,13 +274,13 @@ void DS18b20Sensor::readDS18Data()
         if(dataALL.size()<5) return;                 // 如果不够5个字节,退出
         else
         {
-          headerIndex = dataALL.indexOf("S0,00");    // 检索第一次出现“S0,00”的位置
-          if(headerIndex == -1)  return;             // 还没有收到“S0,00”,退出
-          else                                       // 收到了，表明新一轮发送开始
-          {
-              newFullFragment = true;
-              dataALL = dataALL.mid(headerIndex);    // 丢弃“S0,00”之前的部分
-          }
+            headerIndex = dataALL.indexOf("S0,00");    // 检索第一次出现“S0,00”的位置
+            if(headerIndex == -1)  return;             // 还没有收到“S0,00”,退出
+            else                                       // 收到了，表明新一轮发送开始
+            {
+                newFullFragment = true;
+                dataALL = dataALL.mid(headerIndex);    // 丢弃“S0,00”之前的部分
+            }
         }
     }
 
@@ -301,10 +289,9 @@ void DS18b20Sensor::readDS18Data()
     if(itemNum == 1) return;                         // 不足一帧（没有'\n'）,退出，下次再来
     if(itemNum == 2)                                 // 一帧多一点
     {
-        processData(nodeList[0],1);
+        processData(nodeList[0],1);                  // 处理一次
         dataALL.clear();
         dataALL = nodeList[1];
-        processCnt+=1;                               // 处理一次
     }
     if(itemNum > 2)                                  // 多帧
     {
@@ -314,20 +301,13 @@ void DS18b20Sensor::readDS18Data()
         }
         dataALL.clear();
         dataALL = nodeList[itemNum-1];
-        processCnt+=(itemNum-1);
-    }
-
-    if(processCnt >= 52)
-    {
-        processCnt =0;
     }
 }
 
 // 传感器一号板socket连接断开
 void DS18b20Sensor::socketDisconnected()
 {
-    qDebug() << "DS18b20一号板连接断开!";
-    emit sendMsg("DS18b20一号板连接断开",-1);
+    emit sendMsg(NULL,-1);
     ds18Socket->abort();
     ds18WorkingStatus = false;
 }
@@ -342,10 +322,9 @@ bool DS18b20Sensor::listenDS18Add()
         return false;
     }
 
-    if(ds18Dir->exists(dsNo2Dir)) qDebug()<<"电类传感器2号板目录已存在!";
-    else
+    if(!ds18Dir->exists(dsNo2Dir))
     {
-        if(ds18Dir->mkdir(dsNo2Dir)) qDebug()<<"电类传感器2号板目录创建成功！";
+        ds18Dir->mkdir(dsNo2Dir);
     }
 
     return true;
@@ -356,8 +335,7 @@ void DS18b20Sensor::addNewClientConnection()
 {
     ds18AddSocket = ds18AddServer->nextPendingConnection();  //获取客户端连接
     ds18No2WorkStatus = true;
-    qDebug() << "DS18b20二号板已连接!";
-    emit sendMsg("DS18b20二号板已连接",2);
+    emit sendMsg(NULL,2);
     connect(ds18AddSocket, &QTcpSocket::readyRead, this, &DS18b20Sensor::readDS18AddData);
     connect(ds18AddSocket, &QTcpSocket::disconnected, this, &DS18b20Sensor::addSocketDisconnected);
 }
@@ -366,36 +344,33 @@ void DS18b20Sensor::addNewClientConnection()
 void DS18b20Sensor::readDS18AddData()
 {
     QByteArray buffer;
-    buffer = ds18AddSocket->readAll();                  // 读取本次全部数据
-    qDebug()<<"二号板收到:"<<endl<<buffer;
-
-    dataAddALL+=buffer;                                 // 存入数据队列
-    if(!addNewFullFragment)                             // 开始接收后,检测有没有“S0,00”这5个字节
+    buffer = ds18AddSocket->readAll();                      // 读取本次全部数据
+    dataAddALL+=buffer;                                     // 存入数据队列
+    if(!addNewFullFragment)                                 // 开始接收后,检测有没有“S0,00”这5个字节
     {
         int headerIndex;
-        if(dataAddALL.size()<5) return;                 // 如果不够5个字节,退出
+        if(dataAddALL.size()<5) return;                     // 如果不够5个字节,退出
         else
         {
-          headerIndex = dataAddALL.indexOf("S0,00");    // 检索第一次出现“S0,00”的位置
-          if(headerIndex == -1)  return;             // 还没有收到“S0,00”,退出
-          else                                       // 收到了，表明新一轮发送开始
-          {
-              addNewFullFragment = true;
-              dataAddALL = dataAddALL.mid(headerIndex);    // 丢弃“S0,00”之前的部分
-          }
+            headerIndex = dataAddALL.indexOf("S0,00");      // 检索第一次出现“S0,00”的位置
+            if(headerIndex == -1)  return;                  // 还没有收到“S0,00”,退出
+            else                                            // 收到了，表明新一轮发送开始
+            {
+                addNewFullFragment = true;
+                dataAddALL = dataAddALL.mid(headerIndex);   // 丢弃“S0,00”之前的部分
+            }
         }
     }
-    QList<QByteArray> nodeList = dataAddALL.split('\n');// 按‘\n’拆分
-    int itemNum = nodeList.size();                   // 拆分后的项数
-    if(itemNum == 1) return;                         // 不足一帧（没有'\n'）,退出，下次再来
-    if(itemNum == 2)                                 // 一帧多一点
+    QList<QByteArray> nodeList = dataAddALL.split('\n');    // 按‘\n’拆分
+    int itemNum = nodeList.size();                          // 拆分后的项数
+    if(itemNum == 1) return;                                // 不足一帧（没有'\n'）,退出，下次再来
+    if(itemNum == 2)                                        // 一帧多一点
     {
         processData(nodeList[0],2);
         dataAddALL.clear();
         dataAddALL = nodeList[1];
-        processCntNo2+=1;                               // 处理一次
     }
-    if(itemNum > 2)                                  // 多帧
+    if(itemNum > 2)                                         // 多帧
     {
         for(int i=0; i<itemNum-1; i++)
         {
@@ -403,35 +378,28 @@ void DS18b20Sensor::readDS18AddData()
         }
         dataAddALL.clear();
         dataAddALL = nodeList[itemNum-1];
-        processCntNo2+=(itemNum-1);
-    }
-    if(processCntNo2 >= 64)
-    {
-        processCntNo2 = 0;
     }
 }
 
 // 传感器二号板socket连接断开
 void DS18b20Sensor::addSocketDisconnected()
 {
-    qDebug() << "DS18b20二号板连接断开!";
-    emit sendMsg("DS18b20二号板连接断开",-2);
+    emit sendMsg(NULL,-2);
     ds18AddSocket->abort();
     ds18No2WorkStatus = false;
 }
 
-// 解析每个通道
+// 单节点字符串解析方法  字符串格式示例：S0,00,28ff7eeda0160301,1,0.00\r
 void DS18b20Sensor::processData(QByteArray a,int clientNo)
 {
-    //字符串格式示例：S0,00,28ff7eeda0160301,1,0.00\r
     if(a.size()<30 || a.size()>32)                              // 异常帧
     {
-        qDebug()<<"数据帧大小不在正常范围内";
+        emit sendMsg("数据帧大小不在正常范围内",clientNo);
         return;
     }
     if(a[0]!='S' || a[a.size()-1]!='\r')
     {
-        qDebug()<<"不符合规定格式";
+        emit sendMsg("不符合规定格式",clientNo);
         return;
     }
     a = a.mid(1);                                               // 去除首部'S'
@@ -444,45 +412,57 @@ void DS18b20Sensor::processData(QByteArray a,int clientNo)
     ID = paragraph[2];                                          // id号
     sign = paragraph[3].toInt();                                // 正负号
     int signIndex = paragraph[4].indexOf('\r');
-    temperature = paragraph[4].left(signIndex);                  // 温度
-    if(sign == 0){temperature = "-"+temperature;}
+    temperature = paragraph[4].left(signIndex);                 // 温度
+    if(sign == 0){temperature = "-"+temperature;}               // 此项为0代表负数
 
     if(((channel >= 0) && (channel <= 7)) && ((indx >= 0) && (indx <= 7)))
     {
         int IDseries = checkDchIDInList(ID, channel,clientNo);
-        if (IDseries == -1)  return;            // 如果数据库中找不到ID，退出
+        if (IDseries == -1)  return;                            // 如果数据库中找不到此ID，退出
         else
         {
-            double nowdat = temperature.toDouble();
-            if (nowdat >= -10 && nowdat <= 80) 	                    // 正常情况
+            if(clientNo == 1)
             {
-                if(clientNo == 1)
-                {
-                    DS18B20_ALL_Node[channel][IDseries].temperature = temperature;
-                    DS18B20_ALL_Node[channel][IDseries].ID = ID;
-                    recordSingleSensor(1,channel,ID,temperature);
-                }
-                else if(clientNo == 2)
-                {
-                    DS18B20_ADD_Node[channel][IDseries].temperature = temperature;
-                    DS18B20_ADD_Node[channel][IDseries].ID = ID;
-                    recordSingleSensor(2,channel,ID,temperature);
-                }
+                DS18B20_ALL_Node[channel][IDseries].temperature = temperature;
+                DS18B20_ALL_Node[channel][IDseries].ID = ID;
+                recordSingleSensor(1,channel,ID,temperature);
             }
-            else                                                    // 异常情况
+            else if(clientNo == 2)
+            {
+                DS18B20_ADD_Node[channel][IDseries].temperature = temperature;
+                DS18B20_ADD_Node[channel][IDseries].ID = ID;
+                recordSingleSensor(2,channel,ID,temperature);
+            }
+
+            double nowdat = temperature.toDouble();
+            unsigned int errtype;
+            if ( (nowdat<-10) || (nowdat>80) ) 	                // 异常情况
             {
                 errDS18B20Cnt++;
-                if (errDS18B20Cnt >= 100000){ errDS18B20Cnt = 0;}
-                recordErrors(clientNo,channel,IDseries,temperature,ID,errDS18B20Cnt);
-                temperature = QString::number(85,10,6);            // 异常值默认为85度
                 if(clientNo == 1)
                 {
-                    DS18B20_ALL_Node[channel][IDseries].temperature = temperature;
+                    if(abs(nowdat-DS18B20_ALL_Node[channel][IDseries].temperature.toDouble())>=20)
+                    {
+                        errtype=2;
+                    }
+                    else
+                    {
+                        errtype=1;
+                    }
                 }
                 else if(clientNo == 2)
                 {
-                    DS18B20_ADD_Node[channel][IDseries].temperature = temperature;
+                    if(abs(nowdat-DS18B20_ADD_Node[channel][IDseries].temperature.toDouble())>=20)
+                    {
+                        errtype=2;
+                    }
+                    else
+                    {
+                        errtype=1;
+                    }
                 }
+                recordErrors(clientNo,channel,IDseries,temperature,ID,errDS18B20Cnt,errtype);
+                if (errDS18B20Cnt >= 19941008){ errDS18B20Cnt = 0;}
             }
         }
     }
@@ -492,8 +472,7 @@ void DS18b20Sensor::processData(QByteArray a,int clientNo)
 void DS18b20Sensor::recordSingleSensor(int clientNo, unsigned int chan, QString id, QString temper)
 {
     QString fileName,content;
-    QDateTime current_date_time = QDateTime::currentDateTime();
-    QString currentDate = current_date_time.toString("yyyy-MM-dd-hh:mm:ss");
+    QString currentDate = QDateTime::currentDateTime().toString("yyyy-MM-dd-hh:mm:ss");
     if(clientNo == 1)
     {
         fileName = dsNo1Dir+"/通道"+QString::number(chan+1,10);
@@ -515,7 +494,7 @@ void DS18b20Sensor::recordSingleSensor(int clientNo, unsigned int chan, QString 
     }
     else if(clientNo == 2)
     {
-        fileName = dsNo2Dir+"/通道"+QString::number(chan,10);
+        fileName = dsNo2Dir+"/通道"+QString::number(chan+1,10);
         if(ds18Dir->exists(fileName))
         {
             fileName = fileName+"/"+id+".csv";
@@ -535,23 +514,32 @@ void DS18b20Sensor::recordSingleSensor(int clientNo, unsigned int chan, QString 
 }
 
 // 记录错误情况
-void DS18b20Sensor::recordErrors(int client,unsigned int chan, unsigned int ind, QString temper, QString id, unsigned long count)
+void DS18b20Sensor::recordErrors(int client,unsigned int chan, unsigned int ind, QString temper, QString id, unsigned long count,unsigned int errType)
 {
-    QDateTime current_date_time =QDateTime::currentDateTime();
-    QString currentTime =current_date_time.toString("yyyy-MM-dd-hh:mm:ss"); //当前时间
-    QString errContent; //这一次的错误内容
-    errContent = currentTime+",传感器"+QString::number(client)+"号板,"
+    QString currentTime = QDateTime::currentDateTime().toString("yyyy-MM-dd-hh:mm:ss");
+    QString errContent; // 这一次的错误内容
+    QString errHint;    // 错误提示
+    errContent = currentTime+",电类传感器"+QString::number(client)+"号板,"
             +QString::number(chan,10)+","+QString::number(ind,10)
             +","+id+","+temper+",";
+    switch (errType)
+    {
+        case 1: errHint = "温度不在正常范围";
+               break;
+        case 2: errHint = "温度跳变过大";
+        default: break;
+    }
+
     if(client == 1)
     {
+
         errContent = errContent+DS18B20_ALL_Node[chan][ind].temperature+","
-                +QString::number(count,10)+",温度不在正常范围";
+                +QString::number(count,10)+","+errHint;
     }
     if(client == 2)
     {
         errContent = errContent+DS18B20_ADD_Node[chan][ind].temperature+","
-                +QString::number(count,10)+",温度不在正常范围";
+                +QString::number(count,10)+","+errHint;
     }
     writeFile(ds18ErrPath,errContent);
 }
@@ -567,7 +555,7 @@ void DS18b20Sensor::deleteTcpServer()
     ds18AddSocket->close();
     delete ds18Server;
     delete ds18AddServer;
-    qDebug() << "DS18b20传感器一号板和二号板TCP server关闭";
+    emit sendMsg("电类温度传感器服务端关闭",0);
 }
 
 // 创建新的一天的文件
@@ -577,27 +565,22 @@ void DS18b20Sensor::niceNewDay(QString path)
     dailyDir = path+"/WiFi温度数据"+"("+currentDate+")";
     dsNo1Dir = dailyDir+"/WiFi温度数据一号板("+currentDate+")";
     dsNo2Dir = dailyDir+"/WiFi温度数据二号板("+currentDate+")";
-    if(ds18Dir->exists(dailyDir)) qDebug()<<"最美的不是下雨天";
-    else
-    {
-        if(ds18Dir->mkdir(dailyDir)) qDebug()<<"而是与你一起躲雨的屋檐";
-    }
     ds18ErrPath = dailyDir +"/DS18b20错误记录"+currentDate+".csv";
     QString errHeader = "时间,设备号,通道号,传感器号,ID号,当前温度,上次温度,错误计数,错误原因";
-    if(QFile::exists(ds18ErrPath)) qDebug()<<"文件已存在！";
-    else
+    if(!ds18Dir->exists(dailyDir))  // 新建电类传感器总目录
     {
-        if(writeFile(ds18ErrPath,errHeader))
-        qDebug()<<"DS18b20错误记录文件创建成功";
+        ds18Dir->mkdir(dailyDir);
     }
-    if(ds18Dir->exists(dsNo1Dir)) qDebug()<<"最美的不是下雨天";
-    else
+    if(!QFile::exists(ds18ErrPath)) // 新建错误记录csv文件
     {
-        if(ds18Dir->mkdir(dsNo1Dir)) qDebug()<<"而是与你一起躲雨的屋檐";
+        writeFile(ds18ErrPath,errHeader);
     }
-    if(ds18Dir->exists(dsNo2Dir)) qDebug()<<"最美的不是下雨天";
-    else
+    if(!ds18Dir->exists(dsNo1Dir))  // 新建一号板文件夹
     {
-        if(ds18Dir->mkdir(dsNo2Dir)) qDebug()<<"而是与你一起躲雨的屋檐";
+        ds18Dir->mkdir(dsNo1Dir);
+    }
+    if(!ds18Dir->exists(dsNo2Dir))  // 新建二号板文件夹
+    {
+        ds18Dir->mkdir(dsNo2Dir);
     }
 }

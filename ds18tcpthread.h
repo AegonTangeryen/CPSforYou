@@ -1,7 +1,6 @@
 #ifndef DS18TCPTHREAD_H
 #define DS18TCPTHREAD_H
 
-#include <QThread>
 #include "ds18b20sensor.h"
 
 class Ds18TcpThread: public QThread

@@ -23,7 +23,9 @@ public:
     ~MainWindow();
 
     void recordAllFbg();
-    void recordAllDs18b20(DS18B20_Node (*a)[DS18B20_Index_Max], int nrow, DS18B20_Node (*b)[DS18B20_Index_Max], int nrow2);
+    void recordAllDs18b20(DS18B20_Node (*a)[DS18B20_Index_Max], int nrow1, DS18B20_Node (*b)[DS18B20_Index_Max], int nrow2);
+    void recordNo1Ds18b20(DS18B20_Node (*a)[DS18B20_Index_Max], int nrow);
+    void recordNo2Ds18b20(DS18B20_Node (*b)[DS18B20_Index_Max], int nrow);
     void recordAllEnvironmentt(Env_Node *a, int nrow);
     void recordAllCnc(CNCInfoReg CNCInfo);
     void recordAllLaserSensors(QString *gc);
@@ -35,8 +37,6 @@ private slots:
     void on_cncdislink_pushButton_clicked();
     void showCNCMsg(QString msg, bool result);
     void showComp(short _105,short _106,short _107,unsigned int c1,unsigned int c2,unsigned int c3);
-    void showCNCInfo(long cnc_ch,double x_pos,double y_pos,double z_pos,double speed,
-                     double x_pwr,double y_pwr,double z_pwr,double main_pwr,QString cncstatu);
 
     void on_ds18link_pushButton_clicked();
     void on_ds18dislink_pushButton_clicked();
@@ -51,12 +51,12 @@ private slots:
 
     void on_FBGlink_pushButton_clicked();
     void on_FBGclose_pushButton_clicked();
-    void showFbgResults(QString);
+    void showFbgResults(int tywin);
     void fbgSeeAll();
 
     void on_lincloud_pushButton_clicked();
     void on_dislinkcloud_pushButton_clicked();
-    void showCloudInfo(QString tully);
+    void showCloudInfo(QString tully, int blackfish);
 
     void on_startcomp_pushButton_clicked();
     void clearCompBrowser();
@@ -104,6 +104,8 @@ private:
     QString ds18SamplePath;
     QString ds18No1SamplePath;
     QString ds18No2SamplePath;
+    QString dsNo1DataPath;
+    QString dsNo2DataPath;
     QString envSamplePath;
     QString hncSamplePath;
     QString laserSamplePath;

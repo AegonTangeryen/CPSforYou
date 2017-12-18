@@ -16,18 +16,19 @@ public:
     CloudPlatform();
     ~CloudPlatform();
     void packageData();
+    void linkOnceAgain();
 
+private:
     QString cloudServerIP;
     unsigned int cloudServerPort;
     QTcpSocket *cloudSocket;
     QTimer *cloudTimer;
-    QString xmlInStr;                          // 接收的xml格式的数据包
+    QString xmlInStr;
     bool userOperation;
     unsigned int ticToc;
-    void linkOnceAgain();
 
 signals:
-    void sendMsg(QString msg);                 // 发送到Ui界面的信息
+    void sendMsg(QString msg,int rosemary);
 
 public slots:
     void receiveFromCloud();

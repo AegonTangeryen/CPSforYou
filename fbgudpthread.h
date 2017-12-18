@@ -1,7 +1,6 @@
 #ifndef FBGUDPTHREAD_H
 #define FBGUDPTHREAD_H
 
-#include <QThread>
 #include "fbgsensos.h"
 
 class FBGUdpThread: public QThread
@@ -18,13 +17,13 @@ public:
     QString fbgPath;
 
 signals:
-    void passUdpInfo(QString);
+    void passUdpInfo(int);
     void sendNewDay(QString);
     void destroyUdp();
 
 public slots:
     void forceThread2Quit();
-    void relayUdpInfo(QString tywin);
+    void relayUdpInfo(int tywin);
     void newDayforYou(QString davos);
 };
 

@@ -1,19 +1,8 @@
 #ifndef LASERDISPLACESENSOR_H
 #define LASERDISPLACESENSOR_H
 
-#include <QString>
-#include <QVector>
-#include <QFile>
-#include <QDir>
-#include <QDebug>
-#include <QDateTime>
-#include <QThread>
-#include <QMutexLocker>
-#include <QSerialPort>
-#include <QSerialPortInfo>
 #include "LKIF2.h"
 #include "tools.h"
-#include "mmtimer.h"
 
 extern bool time2ClearDispalcement;
 extern bool laserWorkingStatus;

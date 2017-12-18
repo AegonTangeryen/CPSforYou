@@ -10,17 +10,18 @@ Hnc848System::Hnc848System() {}
 
 Hnc848System::~Hnc848System()
 {
-    cncWorkingStatus = false;
+    HNC_NetExit();
     delete cncLock;
     delete cncTimer;
     delete cncDir;
-    qDebug()<<"完成HNC析构函数";
 }
 
 Hnc848System::Hnc848System(QString cncpath)
 {
    cncFileDir = cncpath;
    clientNo = 256;
+   CNCPORT_Init = 5555;
+   hncIp = "192.168.0.113";
    alarmHisRecCnt = 0;
    time2ReadCNCData = false;
    quitThread = false;
@@ -33,7 +34,7 @@ Hnc848System::Hnc848System(QString cncpath)
    cncTimer->start();
 }
 
-//调整报警时间的格式
+// 调整报警时间的格式
 QString Hnc848System::getAlarmTimetoStr(nctime_t t)
 {
     QString text;
@@ -45,8 +46,8 @@ QString Hnc848System::getAlarmTimetoStr(nctime_t t)
     return text;
 }
 
-//写寄存器：可选X105，X106，X107，X108。reg:寄存器号 client_num：设备连接号
-//返回0：写入成功；返回其他：失败
+// 写寄存器：可选X105，X106，X107，X108。reg:寄存器号 client_num：设备连接号
+// 返回0：写入成功；返回其他：失败
 short Hnc848System::setHncReg(unsigned short reg, Bit8 value, short client_num)
 {
 
@@ -54,70 +55,58 @@ short Hnc848System::setHncReg(unsigned short reg, Bit8 value, short client_num)
     return ret;
 }
 
-//读取寄存器：可选Y100。reg:寄存器号 client_num：设备连接号
-//成功返回读取的内容；失败返回-1
+// 读取寄存器：可选Y100。reg:寄存器号 client_num：设备连接号
+// 成功返回读取的内容；失败返回-1
 Bit8 Hnc848System::readHncReg(unsigned short reg, short client_num)
 {
     Bit8 temp = 0;
     Bit32 ret = HNC_RegGetValue(REG_TYPE_Y, reg, &temp, client_num);
-    if(ret == 0)  return temp; //读取成功
+    if(ret == 0)  return temp; // 读取成功
     else return -1;
 }
 
 
-// 连接机床：若成功返回true，失败返回false
+// 连接机床：成功返回true，失败返回false
 bool Hnc848System::connect2CNC()
 {
-/*--------------------------第1步：网络初始化--------------------------*/
     short ret = 0;
-    char CNCIP_Init[20]="192.168.0.50";
-    unsigned int CNCPORT_Init = 5555;
-
-    ret = HNC_NetInit(CNCIP_Init, CNCPORT_Init);
-    if (ret != 0)
+    QString hostIp = getHostIpAddress();
+    ret = HNC_NetInit(hostIp.toLocal8Bit().data(), CNCPORT_Init);
+    if (ret != 0) // 重新初始化
     {
-        ret = HNC_NetInit("192.168.0.50", CNCPORT_Init); // 重新初始化
+        ret = HNC_NetInit(hostIp.toLocal8Bit().data(), CNCPORT_Init);
     }
     if (ret != 0)
     {
-        qDebug()<<endl<<"数控系统网络初始化失败";
         emit sendMsg("数控系统网络初始化失败",false);
         return false;
     }
 
-/*--------------------------第2步：连接数控系统--------------------------*/
     char connect_ip[20] = "192.168.0.113";       //获得输入的连接IP地址
     clientNo = HNC_NetConnect(connect_ip, CNCPORT_Init);
     if (clientNo >= 0 && clientNo < 256)   // 连接成功
     {
-        qDebug()<<endl<<"数控系统连接成功";
         emit sendMsg("数控系统连接成功", true);
     }
     else
     {
-        qDebug()<<endl<<"数控系统连接失败";
         HNC_NetExit();
         emit sendMsg("数控系统连接失败",false);
         return false;
     }
-/*--------------------------第3步：创建cnc的csv文件--------------------------*/
-    QDateTime current_date_time = QDateTime::currentDateTime();// 获取当前时间
-    QString currentDate = current_date_time.toString("yyyy-MM-dd hh：mm：ss");
+
+    QString currentDate = QDateTime::currentDateTime().toString("yyyy-MM-dd hh：mm：ss");
     cncFileDir = cncFileDir+"/CNC机床数据"+"("+currentDate+")";    // cnc专属文件夹
     cncAlarmPath = cncFileDir+"/报警历史"+".csv";
     QString alarmHeader = "出现时间,报警号,报警文本内容";
 
-    if(cncDir->exists(cncFileDir)) qDebug()<<"CNC根目录已存在!";
-    else
+    if(!cncDir->exists(cncFileDir))
     {
-        if(cncDir->mkdir(cncFileDir)) qDebug()<<"CNC根目录创建成功！";
+        cncDir->mkdir(cncFileDir);
     }
-
-    if(QFile::exists(cncAlarmPath)) qDebug()<<"文件已存在！";
-    else
+    if(!QFile::exists(cncAlarmPath))
     {
-        if(writeFile(cncAlarmPath,alarmHeader))
-        qDebug()<<"CNC报警文件创建成功";
+        writeFile(cncAlarmPath,alarmHeader);
     }
 
     return true;
@@ -127,15 +116,13 @@ bool Hnc848System::connect2CNC()
 bool Hnc848System::getCNCData()
 {
     int ret = 0;
-    ret = HNC_NetIsConnect(clientNo); //是否保持连接
-    if(ret != 0)                    // 非正常状态下连接中断
+    ret = HNC_NetIsConnect(clientNo);   //是否保持连接
+    if(ret != 0)                        // 非正常状态下连接中断,重连
     {
-        char connect_ip[20] = "192.168.0.113";
-        clientNo = HNC_NetConnect(connect_ip, 5555);// 重连
+        clientNo = HNC_NetConnect(hncIp.toLocal8Bit().data(), CNCPORT_Init);
         if (clientNo < 0)       // 连接失败
         {
             HNC_NetExit();
-            qDebug()<<endl<<"数控系统连接中断，读取数据失败";
             emit sendMsg("数控系统连接中断，读取数据失败",false);
             return false;
         }
@@ -249,9 +236,7 @@ bool Hnc848System::getCNCData()
 //记录数据到CSV文件
 void Hnc848System::recordCNC(CNCInfoReg CNCInfo)
 {
-    QDateTime current_date_time =QDateTime::currentDateTime();
-    QString currentTime =current_date_time.toString("yyyy-MM-dd-hh:mm:ss");    // 当前时间
-
+    QString currentTime = QDateTime::currentDateTime().toString("yyyy-MM-dd-hh:mm:ss");
     // 把各个参数分别写入对应的文件
     QString paraFileName, paraContent;
     paraFileName = cncFileDir+"/通道.csv";
@@ -350,23 +335,19 @@ void Hnc848System::forceThreadtoQuit()
 // 创建新的一天的文件
 void Hnc848System::niceNewDay(QString panda)
 {
-    QDateTime current_date_time = QDateTime::currentDateTime();
-    QString currentDate = current_date_time.toString("yyyy-MM-dd hh：mm：ss");
+    QString currentDate = QDateTime::currentDateTime().toString("yyyy-MM-dd hh：mm：ss");
     cncFileDir = panda+"/CNC机床数据"+"("+currentDate+")";                                  // cnc专属文件夹
     cncAlarmPath = cncFileDir+"/报警历史"+".csv";
     QString alarmHeader = "出现时间,报警号,报警文本内容";
 
-    if(cncDir->exists(cncFileDir)) qDebug()<<"CNC根目录已存在!";
-    else
+    if(!cncDir->exists(cncFileDir))
     {
-        if(cncDir->mkdir(cncFileDir)) qDebug()<<"CNC根目录创建成功！";
+        cncDir->mkdir(cncFileDir);
     }
 
-    if(QFile::exists(cncAlarmPath)) qDebug()<<"文件已存在！";
-    else
+    if(!QFile::exists(cncAlarmPath))
     {
-        if(writeFile(cncAlarmPath,alarmHeader))
-        qDebug()<<"CNC报警文件创建成功";
+        writeFile(cncAlarmPath,alarmHeader);
     }
 }
 
@@ -389,7 +370,7 @@ void Hnc848System::run()
             recordCNC(CNCInfo);            // 记录数据到CSV文件中
         }
 
-        if(time2WriteRegisters)
+        if(time2WriteRegisters)              // 补偿线程要求写入数控系统寄存器
         {
             if(time2WriteRegisters == 1)  // 写入补偿值
             {
@@ -411,9 +392,8 @@ void Hnc848System::run()
 
         if(quitThread)
         {
-            qDebug()<<"退出hnc线程";
             cncWorkingStatus = false;
-            emit sendMsg(NULL,false);
+            emit sendMsg("退出hnc线程",false);
             return;
         }
     }

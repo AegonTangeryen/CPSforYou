@@ -9,13 +9,14 @@ FBGSensos::FBGSensos(QString path)
 {
     fbgIp = "192.168.0.119";
     fbgPort = 4010;
-//    fbgIp = "10.139.50.42";
+//    fbgIp = getHostIpAddress();
 //    fbgPort = 1994;
     fbgfileDir = path;
     fbgSocket = new QUdpSocket(this);
     fbgLock = new QMutex();
     fbgDir = new QDir();
     fbgSocket->bind(QHostAddress(fbgIp), fbgPort);
+    qDebug()<<fbgSocket->errorString();
     linkFbg();
     connect(fbgSocket, &QUdpSocket::readyRead, this,&FBGSensos::readFbgData);
 }
@@ -30,13 +31,11 @@ void FBGSensos::linkFbg()
     fbgSocket->writeDatagram(connectOrder,2,QHostAddress(fbgIp),fbgPort);     // 连接解调仪
     fbgSocket->writeDatagram(startOrder,4,QHostAddress(fbgIp),fbgPort);       // 启动解调仪
 
-    QDateTime current_date_time = QDateTime::currentDateTime();
-    QString currentDate = current_date_time.toString("yyyy-MM-dd hh：mm：ss");
+    QString currentDate = QDateTime::currentDateTime().toString("yyyy-MM-dd hh：mm：ss");
     fbgfileDir = fbgfileDir+"/FBG波长数据"+"("+currentDate+")";
-    if(fbgDir->exists(fbgfileDir)) qDebug()<<"lannister!";
-    else
+    if(!fbgDir->exists(fbgfileDir))
     {
-        if(fbgDir->mkdir(fbgfileDir)) qDebug()<<"not lannister";
+        fbgDir->mkdir(fbgfileDir);
     }
     fbgWorkingStatus = true;
 }
@@ -47,7 +46,19 @@ void FBGSensos::readFbgData()
     char recBuf[1000];
     while (fbgSocket->hasPendingDatagrams())
     {
-        fbgSocket->readDatagram(recBuf,999); //数据接收在recBuff里
+        fbgSocket->readDatagram(recBuf,999); // 数据接收在recBuff里
+    }
+
+    if(strlen(recBuf) == 0)                  // 如果啥也没有收到，判定udp断开
+    {
+        fbgWorkingStatus = false;
+        emit sendPara2Ui(0);
+        return;
+    }
+    else
+    {
+        fbgWorkingStatus = true;
+        emit sendPara2Ui(1);
     }
 
     if (recBuf[0] == '0' || recBuf[1] == 'E')   return;
@@ -64,12 +75,12 @@ void FBGSensos::readFbgData()
             double fbgw = 1520.0 + (256.0 * lowInfo + highInfo) / 1000.0;	// fbg转换公式
             if (fbgw<1500)
             {
-                printf("Blood and fire");
+                qDebug("Blood and fire");
             }
             if (j < FBG_Index_Max)											// 只保存20个点
             {
                 if (j >= idxNum) fbgw = 0.0;
-                QString fbgDataStr = QString::number(fbgw,10,8);
+                QString fbgDataStr = QString::number(fbgw,10,3);            // 3位小数
                 int channel = i + currentSignal * 16;
                 FBG_ALL[channel][j] = fbgDataStr;
                 recordSingleSensor(channel,j,fbgDataStr);
@@ -85,18 +96,16 @@ void FBGSensos::niceNewDay(QString path)
     QDateTime current_date_time = QDateTime::currentDateTime();
     QString currentDate = current_date_time.toString("yyyy-MM-dd hh：mm：ss");
     fbgfileDir = path+"/FBG波长数据"+"("+currentDate+")";
-    if(fbgDir->exists(fbgfileDir)) qDebug()<<"lannister!";
-    else
+    if(!fbgDir->exists(fbgfileDir))
     {
-        if(fbgDir->mkdir(fbgfileDir)) qDebug()<<"not lannister";
+        fbgDir->mkdir(fbgfileDir);
     }
 }
 
-// 迫于大哥(@fjc)淫威，为每个通道的每个点建立一个文件
+// 迫于大哥(@fjc)压力，为每个通道的每个点建立一个文件
 void FBGSensos::recordSingleSensor(unsigned int channel, unsigned int index, QString FBGwave)
 {
-    QDateTime current_date_time = QDateTime::currentDateTime();
-    QString currentDate = current_date_time.toString("yyyy-MM-dd-hh:mm:ss");
+    QString currentDate = QDateTime::currentDateTime().toString("yyyy-MM-dd-hh:mm:ss");
     QString furtherFileName,content;
     furtherFileName = fbgfileDir+"/通道"+QString::number(channel+1,10);
     if(fbgDir->exists(furtherFileName))
@@ -124,6 +133,6 @@ void FBGSensos::deleteUdpSocket()
     delete fbgLock;
     delete fbgSocket;
     delete fbgDir;
-    qDebug()<<"FBG disconnected，UDPsocket已删除";
+    emit sendPara2Ui(-1);
 }
 

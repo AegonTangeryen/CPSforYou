@@ -20,11 +20,11 @@ public:
     void run();
 
 signals:
-    void passCloudInfo(QString);
+    void passCloudInfo(QString,int);
     void destroyTcpClient();
 
 public slots:
-    void relayCloudInfo(QString jamie);
+    void relayCloudInfo(QString jamie, int jack);
     void closeThread();
 };
 

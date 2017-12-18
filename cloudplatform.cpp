@@ -4,7 +4,8 @@ bool cloudLinkStatus = false;  //云平台连接状态
 
 CloudPlatform::CloudPlatform()
 {
-    cloudServerIP = "59.69.101.206";
+    //cloudServerIP = "59.69.101.206";
+    cloudServerIP = getHostIpAddress();
     cloudServerPort = 3690;
     cloudSocket = new QTcpSocket(this);
     cloudTimer = new QTimer(this);
@@ -17,23 +18,20 @@ CloudPlatform::CloudPlatform()
         qDebug()<<cloudSocket->errorString();
     }
     connect(cloudTimer,&QTimer::timeout, this,&CloudPlatform::onTimeIsUp);
-    cloudTimer->setInterval(5000); //每5s中断一次
+    cloudTimer->setTimerType(Qt::PreciseTimer);
+    cloudTimer->setInterval(5000);
     cloudTimer->start();
 }
 
-CloudPlatform::~CloudPlatform()
-{
-    qDebug("退出cloudplatform，删除了定时器和socket客户端");
-}
+CloudPlatform::~CloudPlatform() {}
 
 // 连接上云服务平台后
 void CloudPlatform::afterConnected()
 {
-    emit sendMsg("云平台已连接");
+    emit sendMsg("云平台已连接",1);
     cloudLinkStatus = true;
     connect(cloudSocket,&QTcpSocket::readyRead,this,&CloudPlatform::receiveFromCloud);
     connect(cloudSocket,&QTcpSocket::disconnected,this,&CloudPlatform::afterDisconnected);
-    //connect(cloudSocket,&QTcpSocket::disconnected,this,&CloudPlatform::deleteLater);
 }
 
 // 从云平台接收
@@ -54,7 +52,7 @@ void CloudPlatform::afterDisconnected()
     cloudSocket->connectToHost(QHostAddress(cloudServerIP), cloudServerPort);
     if(!cloudSocket->waitForConnected(5000))
     {
-        emit sendMsg("云平台已断开");
+        emit sendMsg("云平台已断开",-1);
     }
     cloudLinkStatus = false;
 }
@@ -67,7 +65,7 @@ void CloudPlatform::deleteTcpClient()
     cloudSocket->close();
     delete cloudTimer;
     cloudSocket->deleteLater();
-    qDebug("已删除cloudsocket");
+    emit sendMsg("已删除cloudsocket",0);
 }
 
 // 定时器中断
@@ -76,7 +74,7 @@ void CloudPlatform::onTimeIsUp()
     packageData();
     QString xmlOutStr = dataXML::xmlStrCreat(dataInfo);
     xmlOutStr += "end\n";
-    int sendlen = cloudSocket->write(xmlOutStr.toLatin1());
+    cloudSocket->write(xmlOutStr.toLatin1());
     cloudSocket->flush();
     ticToc++;
     if((!cloudLinkStatus) && (ticToc == 6)) linkOnceAgain();
@@ -87,7 +85,7 @@ void CloudPlatform::linkOnceAgain()
 {
     ticToc = 0;
     cloudSocket->connectToHost(QHostAddress(cloudServerIP), cloudServerPort);
-    if(!cloudSocket->waitForConnected(5000)) emit sendMsg("本次云平台尝试连接失败");
+    if(!cloudSocket->waitForConnected(5000)) emit sendMsg("本次云平台尝试连接失败",3);
     else    cloudLinkStatus = true;
 }
 
@@ -97,28 +95,30 @@ void CloudPlatform::packageData()
     QDateTime current_date_time =QDateTime::currentDateTime();
     QString currentTime =current_date_time.toString("yyyyMMddhhmmsszzz");
     dataInfo.headInfo.time = currentTime;
-    dataInfo.headInfo.macId = "54EE75A6E578";
-    dataInfo.headInfo.msg = "Wuhan Heavy-duty machine tools ZK5540A";
+    dataInfo.headInfo.macId = getHostMacAddress();// 获取本机Mac地址
+    dataInfo.headInfo.macId.replace(QString("-"),QString(""));
+    dataInfo.headInfo.macId.replace(QString(":"),QString(""));
+    dataInfo.headInfo.msg = "Wuhan Heavy-duty machine tool ZK5540A";
 
     for(int i = 0; i < CCD_DIMENSION; i++){
         dataInfo.ccdInfo.CCDdata.insert(dataInfo.ccdInfo.CCDkey[i],ccdInfo[i]);
     }
 
-    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[0], QString::number(CNCInfo.ch,10,6));
-    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[1], QString::number(CNCInfo.AXIS_X_POS,10,10));
-    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[2], QString::number(CNCInfo.AXIS_Y_POS,10,10));
-    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[3], QString::number(CNCInfo.AXIS_Z_POS,10,10));
-    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[4], QString::number(CNCInfo.AXIS_MA_POS,10,10));
+    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[0], QString::number(CNCInfo.ch,10,4));
+    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[1], QString::number(CNCInfo.AXIS_X_POS,10,4));
+    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[2], QString::number(CNCInfo.AXIS_Y_POS,10,4));
+    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[3], QString::number(CNCInfo.AXIS_Z_POS,10,4));
+    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[4], QString::number(CNCInfo.AXIS_MA_POS,10,4));
     dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[5], QString::number(CNCInfo.AXIS_X_PWR,10,4));
     dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[6], QString::number(CNCInfo.AXIS_Y_PWR,10,4));
     dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[7], QString::number(CNCInfo.AXIS_Z_PWR,10,4));
-    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[8], QString::number(CNCInfo.AXIS_MA_PWR,10,10));
-    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[9], QString::number(CNCInfo.AXIS_X_FUHE,10,6));
-    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[10],QString::number(CNCInfo.AXIS_Z_FUHE,10,6));
-    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[11],QString::number(CNCInfo.AXIS_Y_FUHE,10,6));
-    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[12],QString::number(CNCInfo.AXIS_MA_FUHE,10,6));
-    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[13],QString::number(CNCInfo.feedrate,10,6));
-    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[14],QString::number(CNCInfo.speed,10,6));
+    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[8], QString::number(CNCInfo.AXIS_MA_PWR,10,4));
+    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[9], QString::number(CNCInfo.AXIS_X_FUHE,10,4));
+    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[10],QString::number(CNCInfo.AXIS_Z_FUHE,10,4));
+    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[11],QString::number(CNCInfo.AXIS_Y_FUHE,10,4));
+    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[12],QString::number(CNCInfo.AXIS_MA_FUHE,10,4));
+    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[13],QString::number(CNCInfo.feedrate,10,4));
+    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[14],QString::number(CNCInfo.speed,10,4));
     dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[15],CNCInfo.PauseStatus);
 
     for(int i = 0; i < 6; i++)   //一号板前6个通道

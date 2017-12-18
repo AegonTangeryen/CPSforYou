@@ -74,3 +74,37 @@ bool writeFile(QString fileName, QString text)
     f.close();
     return true;
 }
+
+//获取本机IP
+QString getHostIpAddress()
+{
+    QString ipAddr;
+    QHostInfo info = QHostInfo::fromName(QHostInfo::localHostName());
+    info.addresses();                                                  // QHostInfo的address函数获取本机ip地址
+    foreach(QHostAddress address,info.addresses()) // 如果存在多条ip地址ipv4和ipv6：
+    {
+        if(address.protocol()==QAbstractSocket::IPv4Protocol){  // 只取ipv4协议的地址
+            qDebug()<<address.toString();
+            ipAddr = address.toString();
+        }
+    }
+    return ipAddr;
+}
+
+// 获取本机Mac地址
+QString getHostMacAddress()
+{
+    QList<QNetworkInterface> nets = QNetworkInterface::allInterfaces();// 获取所有网络接口列表
+    int nCnt = nets.count();
+    QString strMacAddr = "";
+    for(int i = 0; i < nCnt; i ++)
+    {
+        // 如果此网络接口被激活并且正在运行并且不是回环地址，则就是我们需要找的Mac地址
+        if(nets[i].flags().testFlag(QNetworkInterface::IsUp) && nets[i].flags().testFlag(QNetworkInterface::IsRunning) && !nets[i].flags().testFlag(QNetworkInterface::IsLoopBack))
+        {
+            strMacAddr = nets[i].hardwareAddress();
+            break;
+        }
+    }
+    return strMacAddr;
+}

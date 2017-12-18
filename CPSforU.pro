@@ -8,6 +8,8 @@ QT       += core gui
 QT       += xml
 QT       += network
 QT       += serialport
+QT       += charts
+
 RC_ICONS += Panda.ico
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets

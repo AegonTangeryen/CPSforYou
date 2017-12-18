@@ -1,22 +1,19 @@
 #include "fbgudpthread.h"
 
-FBGUdpThread::FBGUdpThread() {}
+FBGUdpThread::FBGUdpThread()  {}
+
+FBGUdpThread::~FBGUdpThread() {}
 
 FBGUdpThread::FBGUdpThread(QString path)
 {
     fbgPath = path;
 }
 
-FBGUdpThread::~FBGUdpThread()
-{
-    qDebug()<<endl<<"FBG的udp通信子线程退出";
-}
-
+// 子线程
 void FBGUdpThread::run()
 {
     FBGSensos *farewellSensors = new FBGSensos(fbgPath);
-    qDebug()<<"进入FBG专属UDP socket通信子线程";
-    connect(farewellSensors,&FBGSensos::sendMsg2Ui,this,&FBGUdpThread::relayUdpInfo);
+    connect(farewellSensors,&FBGSensos::sendPara2Ui,this,&FBGUdpThread::relayUdpInfo);
     connect(this,&FBGUdpThread::destroyUdp,farewellSensors,&FBGSensos::deleteUdpSocket);
     connect(this,&FBGUdpThread::sendNewDay,farewellSensors,&FBGSensos::niceNewDay);
     exec();
@@ -37,7 +34,8 @@ void FBGUdpThread::newDayforYou(QString davos)
     emit sendNewDay(davos);
 }
 
-void FBGUdpThread::relayUdpInfo(QString tywin)
+// 中转消息
+void FBGUdpThread::relayUdpInfo(int tywin)
 {
     emit passUdpInfo(tywin);
 }

@@ -11,15 +11,6 @@ extern "C" { //华中数控api相关头文件
 #include "hncreg.h"
 }
 
-#include <QString>
-#include <QVector>
-#include <QFile>
-#include <QDir>
-#include <QDebug>
-#include <QDateTime>
-#include <QThread>
-#include <QMutexLocker>
-#include <QTimer>
 #include "tools.h"
 
 enum HNC_AXIS_SELECT					// 机床数据轴选择
@@ -111,14 +102,16 @@ public:
     ~Hnc848System();
 
 private:
-    short clientNo;                                           // 机床通信的网络号
+    short clientNo;                                     // 机床通信的网络号
     long alarmHisRecCnt;
-    QString cncFileDir;                                  // 机床数据csv文件存放路径
-    QString cncAllPath;                                   // 总表
-    QString cncAlarmPath;                              // 机床报警信息CSV文件存放路径
-    QMutex *cncLock;                                   // 互斥锁
+    QString cncFileDir;                                 // 机床数据csv文件存放路径
+    QString cncAllPath;                                 // 总表
+    QString cncAlarmPath;                               // 机床报警信息CSV文件存放路径
+    QMutex *cncLock;                                    // 互斥锁
     QTimer *cncTimer;
     QDir *cncDir;
+    unsigned int CNCPORT_Init;
+    QString hncIp;
     bool time2ReadCNCData;
     bool quitThread;
 
@@ -127,9 +120,9 @@ public:
     bool getCNCData();                                 // 采集数控系统参数
     QString getAlarmTimetoStr(nctime_t t);             // 转换报警记录的时间为字符串
     void recordCNC(CNCInfoReg CNCInfo);                // 记录数据到csv文件
-    short setHncReg(unsigned short reg, Bit8 value, short client_num);    // 将数值写入寄存器中
-    Bit8 readHncReg(unsigned short reg, short client_num);                // 读取指定的寄存器
-    void run();                                        //子线程
+    short setHncReg(unsigned short reg, Bit8 value, short client_num); // 将数值写入寄存器中
+    Bit8 readHncReg(unsigned short reg, short client_num);             // 读取指定的寄存器
+    void run();
 
 public slots:
     void timeIsup();
@@ -137,10 +130,7 @@ public slots:
     void forceThreadtoQuit();
 
 signals:
-    // 显示提示消息
     void sendMsg(QString msg, bool result);
-    // 返回信息，依次是通道号，X坐标，Y坐标，Z坐标，主轴转速，X功率，Y功率，Z功率，工作状态
-    void sendInfo(long,double,double,double,double,double,double,double,double,QString);
     void sendPara(short,short,short,unsigned int,unsigned int,unsigned int);
 };
 

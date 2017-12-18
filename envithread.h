@@ -1,7 +1,6 @@
 #ifndef ENVITHREAD_H
 #define ENVITHREAD_H
 
-#include <QThread>
 #include "envisensor.h"
 
 class EnviThread: public QThread

@@ -1,15 +1,6 @@
 #ifndef FBGSENSOS_H
 #define FBGSENSOS_H
 
-#include <QString>
-#include <QVector>
-#include <QFile>
-#include <QDir>
-#include <QDebug>
-#include <QDateTime>
-#include <QObject>
-#include <QtNetwork>
-#include <QMutexLocker>
 #include "tools.h"
 
 #define FBG_Channel_Max 32 				// FBG最大容纳的通道数
@@ -47,8 +38,7 @@ public slots:
     void niceNewDay(QString path);
 
 signals:
-    void sendPara2Ui();
-    void sendMsg2Ui(QString);
+    void sendPara2Ui(int);
 };
 
 #endif // FBGSENSOS_H
