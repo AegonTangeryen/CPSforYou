@@ -34,17 +34,110 @@ MainWindow::MainWindow(QWidget *parent) :
     statusBar()->addWidget(statusbarFBGLabel);
     statusBar()->addWidget(statusbarCCDLabel);
 
-    /*选项卡“数控系统信息”页面初始化配置*/
+    // 选项卡“首页”初始化配置
     ui->cncdislink_pushButton->setEnabled(false);
-//    ui->cnclinkstatus_label->setFont(QFont("Timers",18,QFont::Bold));
-//    ui->cnclinkstatus_label->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-//    ui->cnclinkstatus_label->setStyleSheet("color:red");
+    ui->ds18dislink_pushButton->setEnabled(false);
+    ui->FBGclose_pushButton->setEnabled(false);
+    ui->closeccd_pushButton->setEnabled(false);
+    ui->envdislinkpushButton->setEnabled(false);
+    ui->dislinkcloud_pushButton->setEnabled(false);
 
-    /*选项卡“电类温度传感器”页面初始化配置*/
-    connect(ui->ds18seeallpushButton,&QPushButton::clicked,this,&MainWindow::ds18SeeAll);
+    // 选项卡“数控系统信息”页面初始化配置
+
+    // 选项卡“FBG传感器”页面初始化配置
+    fbgChart = new QChart();
+    fbgChart->setTitle("FBG传感器关键点展示");
+    fbgChart->legend()->setAlignment(Qt::AlignRight);     // 图例放在右方
+    fbgChart->setAnimationOptions(QChart::AllAnimations); // 图形伸缩时有动画效果
+    fbgChart->setTheme(QChart::ChartThemeBlueCerulean);
+
+    fbgSeriesCh1600 = new QSplineSeries(fbgChart);
+    QPen red(Qt::red);
+    red.setWidth(3);
+    fbgSeriesCh1600->setPen(red);
+    fbgSeriesCh1600->setName("CH16-1");
+
+    fbgXaxis = new QDateTimeAxis();                      // 横轴是时间轴
+    fbgXaxis->setTickCount(10);
+    fbgXaxis->setFormat("hh:mm:ss");
+    fbgXaxis->setLabelsAngle(20);
+    fbgXaxis->setTitleFont(QFont("Timers",10,QFont::Bold));
+    fbgXaxis->setTitleText("Time(hh:mm:ss)");
+
+    fbgYaxis = new QValueAxis();
+    fbgYaxis->setTickCount(10);
+    fbgYaxis->setLabelFormat("%g");
+    fbgYaxis->setMinorTickCount(5);
+    fbgYaxis->setRange(1500,1600);
+    fbgYaxis->setTitleText("Wave length(um)");
+    fbgYaxis->setTitleFont(QFont("Timers",10,QFont::Bold));
+
+    fbgChart->addSeries(fbgSeriesCh1600);                   // 添加这一条线到图中
+    fbgChart->createDefaultAxes();
+    fbgChart->setAxisX(fbgXaxis, fbgSeriesCh1600);
+    fbgChart->setAxisY(fbgYaxis, fbgSeriesCh1600);
+
+    ui->fbgchartview->setRenderHint(QPainter::Antialiasing); // 抗锯齿
+    ui->fbgchartview->setChart(fbgChart);
     connect(ui->FBGseeallpushButton,&QPushButton::clicked,this,&MainWindow::fbgSeeAll);
+
+    // 选项卡“电类温度传感器”页面初始化配置
+    connect(ui->ds18seeallpushButton,&QPushButton::clicked,this,&MainWindow::ds18SeeAll);
+
+    // 选项卡“数控系统信息”页面初始化配置
+
+    // 选项卡“位移传感器”页面初始化配置
+    laserSensorChart = new QChart();
+    laserSensorChart->setTitle("FBG传感器关键点展示");
+    laserSensorChart->legend()->setAlignment(Qt::AlignRight);     // 图例放在右方
+    laserSensorChart->setAnimationOptions(QChart::AllAnimations); // 图形伸缩时有动画效果
+    laserSensorChart->setTheme(QChart::ChartThemeBlueCerulean);
+
+    laserSensorX = new QSplineSeries();
+    red.setColor(Qt::red);
+    red.setWidth(3);
+    laserSensorX->setPen(red);
+    laserSensorX->setName("X轴");
+    laserSensorY = new QSplineSeries();
+    red.setColor(Qt::darkBlue);
+    laserSensorY->setPen(red);
+    laserSensorY->setName("Y轴");
+    laserSensorZ = new QSplineSeries();
+    red.setColor(Qt::darkGreen);
+    laserSensorZ->setPen(red);
+    laserSensorZ->setName("Z轴");
+
+    laserSensorXaxis = new QDateTimeAxis();                      // 横轴是时间轴
+    laserSensorXaxis->setTickCount(10);
+    laserSensorXaxis->setFormat("hh:mm:ss");
+    laserSensorXaxis->setLabelsAngle(20);
+    laserSensorXaxis->setTitleFont(QFont("Timers",10,QFont::Bold));
+    laserSensorXaxis->setTitleText("Time(hh:mm:ss)");
+
+    laserSensorYaxis = new QValueAxis();
+    laserSensorYaxis->setTickCount(10);
+    laserSensorYaxis->setLabelFormat("%g");
+    laserSensorYaxis->setMinorTickCount(5);
+    laserSensorYaxis->setRange(1500,1600);
+    laserSensorYaxis->setTitleText("Displacement(mm)");
+    laserSensorYaxis->setTitleFont(QFont("Timers",10,QFont::Bold));
+
+    laserSensorChart->addSeries(laserSensorX);
+    laserSensorChart->addSeries(laserSensorY);
+    laserSensorChart->addSeries(laserSensorZ);
+    laserSensorChart->createDefaultAxes();
+    laserSensorChart->setAxisX(laserSensorXaxis, laserSensorX);
+    laserSensorChart->setAxisY(laserSensorYaxis, laserSensorX);
+
+    ui->laserchartview->setRenderHint(QPainter::Antialiasing); // 抗锯齿
+    ui->laserchartview->setChart(laserSensorChart);
+
+    // 选项卡“云服务平台”页面初始化配置
+
+    // 选项卡“热误差补偿”页面初始化配置
     connect(ui->clearcomp_pushButton,&QPushButton::clicked,this,&MainWindow::clearCompBrowser);
-/*-------------------------------创建数据文件夹-------------------------------------*/
+
+/*-------------------------------创建数据存储文件夹-------------------------------------*/
     currentday = QDateTime::currentDateTime().toString("yyyyMMdd");
     currentDate = QDateTime::currentDateTime().toString("yyyy-MM-dd hh：mm：ss");
     lwfdir = new QDir();
@@ -453,7 +546,6 @@ void MainWindow::timeisup()
     taskTimeCnt++;
     if(taskTimeCnt %5 == 0)         // 每5s抽样一次
     {
-        ui->FBG_textBrowser->clear();
         if(fbgWorkingStatus) recordAllFbg();
         if(ds18WorkingStatus && ds18No2WorkStatus) recordAllDs18b20(DS18B20_ALL_Node,DS18B20_Channel_Max,DS18B20_ADD_Node,DS18B20_Channel_Max);
         if(ds18WorkingStatus) recordNo1Ds18b20(DS18B20_ALL_Node,DS18B20_Channel_Max);
@@ -465,10 +557,9 @@ void MainWindow::timeisup()
 
     ui->_1191_Browserlabel->clear();
     ui->_1191_Browserlabel->setText("1191状态第"+QString::number(taskTimeCnt)+"次："+QString::number(statusFor1191));
-    ui->x_lcdNumber->display(ccdInfo[0].toDouble());
-    ui->y_lcdNumber->display(ccdInfo[1].toDouble());
-    ui->z_lcdNumber->display(888888);
-    ui->FBG_textBrowser->append(FBG_ALL[0][0]);
+    ui->x_lcdNumber->setText(ccdInfo[0]);
+    ui->y_lcdNumber->setText(ccdInfo[1]);
+    ui->z_lcdNumber->setText(ccdInfo[2]);
 
     if(taskTimeCnt == 19941008)    // 计数器清零
     {
@@ -750,17 +841,16 @@ void MainWindow::on_FBGclose_pushButton_clicked()
 // 显示
 void MainWindow::showFbgResults(int tywin)
 {
-    ui->FBG_textBrowser->clear();
-    switch (tywin)
-    {
-        case -1: ui->FBG_textBrowser->append("FBG线程已关闭，内存释放");
-            break;
-        case 0:  ui->FBG_textBrowser->append("FBG暂时断开");
-            break;
-        case 1:  ui->FBG_textBrowser->append("FBG保持连接");
-            break;
-        default: break;
-    }
+//    switch (tywin)
+//    {
+//        case -1: ui->FBG_textBrowser->append("FBG线程已关闭，内存释放");
+//            break;
+//        case 0:  ui->FBG_textBrowser->append("FBG暂时断开");
+//            break;
+//        case 1:  ui->FBG_textBrowser->append("FBG保持连接");
+//            break;
+//        default: break;
+//    }
 
 }
 
@@ -1085,7 +1175,7 @@ void MainWindow::showComp(short _105, short _106, short _107, unsigned int c1, u
 
 /**********************************************************************************************
 
-                                                           5.激光位移传感器部分
+                                            5.激光位移传感器部分
 
 ***********************************************************************************************/
 // 点击连接激光位移传感器之后
@@ -1127,9 +1217,9 @@ void MainWindow::on_zeroccd_pushButton_clicked()
 // 显示位移传感器测量结果
 void MainWindow::showCCDResults(QString *yt)
 {
-    ui->x_lcdNumber->display(yt[0].toDouble());
-    ui->y_lcdNumber->display(yt[1].toDouble());
-    ui->z_lcdNumber->display(yt[2].toDouble());
+    ui->x_lcdNumber->setText(yt[0]);
+    ui->y_lcdNumber->setText(yt[1]);
+    ui->z_lcdNumber->setText(yt[2]);
 }
 
 // 关闭位移传感器
@@ -1156,7 +1246,7 @@ void MainWindow::ccdUiOperation(QString joffery)
 
 /**********************************************************************************************
 
-                                                              6.云服务平台部分
+                                                6.云服务平台部分
 
 ***********************************************************************************************/
 // 点击连接
@@ -1187,7 +1277,7 @@ void MainWindow::on_dislinkcloud_pushButton_clicked()
 
 /**********************************************************************************************
 
-                                                             7.热误差补偿部分
+                                                7.热误差补偿部分
 
 ***********************************************************************************************/
 //开始补偿

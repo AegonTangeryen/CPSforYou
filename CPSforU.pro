@@ -75,3 +75,6 @@ LIBS += $$PWD/HncNetDll.lib \
         $$PWD/LKIF2.lib \
         -lpthread libwsock32 libws2_32 \
         -lwinmm
+
+RESOURCES += \
+    rc.qrc

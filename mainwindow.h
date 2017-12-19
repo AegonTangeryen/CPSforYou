@@ -4,11 +4,34 @@
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QFont>
+#include <QChart>
+#include <QChartView>
+#include <QSplineSeries>
+#include <QScatterSeries>
+#include "QLineSeries"
+#include "QChartView"
+#include "QValueAxis"
+#include <QtMath>
+#include <QPointF>
+#include <QDateTimeAxis>
+#include <QPieSeries>
+#include <QPieSlice>
+#include <QAbstractBarSeries>
+#include <QPercentBarSeries>
+#include <QStackedBarSeries>
+#include <QBarSeries>
+#include <QBarSet>
+#include <QAreaSeries>
+#include <QLegend>
+#include <QBarCategoryAxis>
+
 #include "ds18tcpthread.h"
 #include "fbgudpthread.h"
 #include "cloudtcpthread.h"
 #include "thermalerrorcompensation.h"
 #include "envithread.h"
+
+QT_CHARTS_USE_NAMESPACE  // 此句与头文件<QChart>放在同一文件
 
 namespace Ui {
 class MainWindow;
@@ -94,12 +117,6 @@ private:
     QString envAllDataPath;
     QString hncAllDataPath;
     QString laserAllDataPath;
-    QString currentDate;
-    QString currentday;
-    QTimer *kingTimer;       // 主定时器
-    long int taskTimeCnt;    // 各项任务的周期
-    QMutex *globalLock;
-    QLabel *statusbarCNCLabel,*statusbarDs18Label,*statusbarFBGLabel,*statusbarCCDLabel;
     QString fbgSamplePath;
     QString ds18SamplePath;
     QString ds18No1SamplePath;
@@ -109,6 +126,32 @@ private:
     QString envSamplePath;
     QString hncSamplePath;
     QString laserSamplePath;
+
+    QLabel *statusbarFBGLabel;
+    QLabel *statusbarDs18Label;
+    QLabel *statusbarEnvLabel;
+    QLabel *statusbarCNCLabel;
+    QLabel *statusbarCCDLabel;
+    QString currentday;
+    QString currentDate;
+    QTimer *kingTimer;       // 主定时器
+    long int taskTimeCnt;    // 各项任务的周期
+    QMutex *globalLock;
+
+    QChart *fbgChart;
+    QSplineSeries *fbgSeriesCh1600;
+    //QValueAxis *fbgXaxis;
+    QValueAxis *fbgYaxis;
+    QDateTimeAxis *fbgXaxis;
+    qreal fbgx;
+    qreal fbgy;
+
+    QChart *laserSensorChart;
+    QSplineSeries *laserSensorX;
+    QSplineSeries *laserSensorY;
+    QSplineSeries *laserSensorZ;
+    QDateTimeAxis *laserSensorXaxis;
+    QValueAxis *laserSensorYaxis;
 };
 
 #endif // MAINWINDOW_H
