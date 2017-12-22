@@ -42,7 +42,7 @@ public slots:
     void forceThread2Quit();
 
 signals:
-    void sendMsg(QString);
+    void sendMsg(QString,int);
 };
 
 #endif // LASERDISPLACESENSOR_H

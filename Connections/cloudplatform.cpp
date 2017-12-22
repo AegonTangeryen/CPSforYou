@@ -85,7 +85,7 @@ void CloudPlatform::linkOnceAgain()
 {
     ticToc = 0;
     cloudSocket->connectToHost(QHostAddress(cloudServerIP), cloudServerPort);
-    if(!cloudSocket->waitForConnected(5000)) emit sendMsg("本次云平台尝试连接失败",3);
+    if(!cloudSocket->waitForConnected(5000)) emit sendMsg("本次云平台尝试连接失败",2);
     else    cloudLinkStatus = true;
 }
 

@@ -20,7 +20,7 @@ LaserDisplaceSensor::LaserDisplaceSensor(QString path)
     connect(ccdTimer,&QTimer::timeout, this,&LaserDisplaceSensor::timeIsUp);
     ccdTimer->start();
 
-    MultiMediaTimer = new MMTimer(100,this);
+    //MultiMediaTimer = new MMTimer(100,this);
     //connect(MultiMediaTimer,&MMTimer::timeout,this,&LaserDisplaceSensor::mmTimeIsUp);
     //MultiMediaTimer->start();
 }
@@ -30,8 +30,7 @@ LaserDisplaceSensor::~LaserDisplaceSensor()
     delete ccdLock;
     delete ccdTimer;
     delete ccdDir;
-    delete MultiMediaTimer;
-    emit sendMsg("完成位移传感器析构函数");
+    //delete MultiMediaTimer;
 }
 
 // 连接传感器
@@ -39,22 +38,22 @@ bool LaserDisplaceSensor::link2Displacement()
 {
     char ccdIp[20] = "192.168.0.53";
     LKIF_OPENPARAM_ETHERNET paramEther;
-    paramEther.IPAddress.S_un.S_addr = inet_addr(ccdIp);
-    if (paramEther.IPAddress.S_un.S_addr == INADDR_NONE)
-    {
-        emit sendMsg("Ethernet port open failed!");
-        return false;
-    }
-    //RC rc = LKIF2_OpenDeviceETHER(&paramEther);   // 打开网口
+//    paramEther.IPAddress.S_un.S_addr = inet_addr(ccdIp);
+//    if (paramEther.IPAddress.S_un.S_addr == INADDR_NONE)
+//    {
+//        emit sendMsg("Ethernet port open failed!");
+//        return false;
+//    }
+//    RC rc = LKIF2_OpenDeviceETHER(&paramEther);   // 打开网口
     RC rc = LKIF2_OpenDeviceUsb();              // 打开USB口
     rc = LKIF2_StartMeasure();                                        // 开始测量
     if(rc==RC_NAK_INVALID_STATE || rc==RC_OK)
     {
-        emit sendMsg("连接成功");
+        emit sendMsg("ok",1);
     }
     else
     {
-        emit sendMsg("连接失败");
+        emit sendMsg("failed",-1);
         return false;
     }
 
@@ -119,14 +118,8 @@ void LaserDisplaceSensor::clearDisplays()
 void LaserDisplaceSensor::closeDisplacementSensor()
 {
     RC rc = LKIF2_CloseDevice();	// 定义返回代码清单，并且关闭USB设备
-    if(rc == RC_OK)			        // 测试关闭是否成功
-    {
-        sendMsg("位移传感器关闭成功!成功代号是:"+QString::number(rc,16));
-    }
-    else
-    {
-        sendMsg("位移传感器关闭失败!失败代号是:"+QString::number(rc,16));
-    }
+    if(rc != RC_OK)			        // 未能成功关闭
+    sendMsg("关闭失败!失败代号是:0x"+QString::number(rc,16),2);
 }
 
 // 根据读取情况确定返回值
@@ -190,7 +183,6 @@ void LaserDisplaceSensor::niceNewDay(QString pandahi)
 void LaserDisplaceSensor::run()
 {
     if(!link2Displacement()) return; //连接失败，退出线程
-    emit sendMsg("OK");
     while(1)
     {
         if(time2ReadDispalcement)
@@ -209,6 +201,7 @@ void LaserDisplaceSensor::run()
         if(time2CloseDispalcement)
         {
             laserWorkingStatus = false;
+            emit sendMsg("deleted",0);
             return;
         }
     }

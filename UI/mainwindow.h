@@ -31,10 +31,15 @@
 #include "cloudtcpthread.h"
 #include "thermalerrorcompensation.h"
 #include "envithread.h"
-#include "configurationui.h"   // 参数配置页面
-#include "chartthemeoption.h"  // 风格配置页面
-#include "fbgalldataui.h"      // fbg全部数据页面
-#include "ds18seeallui.h"      // ds18b20全部数据页面
+#include "configurationui.h"            // 参数配置页面
+#include "chartthemeoption.h"           // 风格配置页面
+#include "fbgalldataui.h"               // fbg全部数据页面
+#include "ds18seeallui.h"               // ds18b20全部数据页面
+#include "contactusui.h"                // 联系我们页面
+#include "aboutcpsui.h"                 // CPS简介页面
+#include "animationintroductionui.h"    // 动漫推荐页面
+#include "musicintrductionui.h"         // 音乐推荐页面
+#include "seriesintroductionui.h"       // 电视剧推荐页面
 
 QT_CHARTS_USE_NAMESPACE  // 此句与头文件<QChart>放在同一文件
 
@@ -81,8 +86,7 @@ private slots:
     void on_linkccd_pushButton_clicked();
     void on_zeroccd_pushButton_clicked();
     void on_closeccd_pushButton_clicked();
-    void showCCDResults(QString *yt);
-    void ccdUiOperation(QString joffery);
+    void ccdUiOperation(QString joffery, int tommen);
 
     void on_FBGlink_pushButton_clicked();
     void on_FBGclose_pushButton_clicked();
@@ -104,8 +108,12 @@ private slots:
     void on_envdislinkpushButton_clicked();
 
     void on_actionConfigure_triggered();
-
     void on_actionAppearence_triggered();
+    void on_actionContacts_triggered();
+    void on_actionAbout_CPS_triggered();
+    void on_actionmusic_triggered();
+    void on_actionTV_Series_triggered();
+    void on_actionAnimation_triggered();
 
 signals:
     void closeHncSystem();
@@ -123,7 +131,7 @@ private:
 private:
     QDir *lwfdir;
     QString rootPath;
-    QString EverydayPath;    // 每日数据集的路径
+    QString EverydayPath;
     QString originalPath;
     QString samplePath;
     QString FbgAllDataPath;

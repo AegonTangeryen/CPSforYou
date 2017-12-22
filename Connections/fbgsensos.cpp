@@ -7,10 +7,10 @@ FBGSensos::FBGSensos() {}
 
 FBGSensos::FBGSensos(QString path)
 {
-    fbgIp = "192.168.0.119";
-    fbgPort = 4010;
-//    fbgIp = getHostIpAddress();
-//    fbgPort = 1994;
+//    fbgIp = "192.168.0.119";
+//    fbgPort = 4010;
+    fbgIp = getHostIpAddress();
+    fbgPort = 1994;
     fbgfileDir = path;
     fbgSocket = new QUdpSocket(this);
     fbgLock = new QMutex();

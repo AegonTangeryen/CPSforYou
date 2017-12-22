@@ -17,6 +17,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = CPSforU
 TEMPLATE = app
 
+CONFIG += resources_big
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
@@ -31,7 +32,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-        UI/mainwindow.cpp \
         Connections/cloudplatform.cpp \
         Connections/cloudtcpthread.cpp \
         Auxiliary/dataxml.cpp \
@@ -47,13 +47,19 @@ SOURCES += \
         Connections/envisensor.cpp \
         Connections/envithread.cpp \
         Auxiliary/mmtimer.cpp \
+        UI/mainwindow.cpp \
         UI/configurationui.cpp \
         UI/chartthemeoption.cpp \
         UI/fbgalldataui.cpp \
         UI/ds18seeallui.cpp \
+        UI/contactusui.cpp \
+        UI/aboutcpsui.cpp \
+        UI/musicintrductionui.cpp \
+        UI/seriesintroductionui.cpp \
+        UI/animationintroductionui.cpp \
+        UI/loginui.cpp
 
 HEADERS += \
-        UI/mainwindow.h \
         Connections/cloudplatform.h \
         Connections/cloudtcpthread.h \
         Auxiliary/dataxml.h \
@@ -69,10 +75,17 @@ HEADERS += \
         Connections/envisensor.h \
         Connections/envithread.h \
         Auxiliary/mmtimer.h \
+        UI/mainwindow.h \
         UI/configurationui.h \
         UI/chartthemeoption.h \
         UI/fbgalldataui.h \
         UI/ds18seeallui.h \
+        UI/contactusui.h \
+        UI/aboutcpsui.h \
+        UI/musicintrductionui.h \
+        UI/seriesintroductionui.h \
+        UI/animationintroductionui.h \
+        UI/loginui.h \
         IncludesRely/autotestncu.h \
         IncludesRely/devdict.h \
         IncludesRely/eventdef.h \
@@ -117,14 +130,20 @@ HEADERS += \
         IncludesRely/passwd.h \
         IncludesRely/smplcalc.h \
         IncludesRely/temp.h \
-        IncludesRely/trspack.h \
+        IncludesRely/trspack.h
 
 FORMS += \
         mainwindow.ui \
         configurationui.ui \
         chartthemeoption.ui \
         fbgalldataui.ui \
-        ds18seeallui.ui
+        ds18seeallui.ui \
+        contactusui.ui \
+        aboutcpsui.ui \
+        musicintrductionui.ui \
+        seriesintroductionui.ui \
+        animationintroductionui.ui \
+        loginui.ui
 
 INCLUDEPATH += ./IncludesRely \
                ./Auxiliary \
