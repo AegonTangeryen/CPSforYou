@@ -30,15 +30,14 @@
        </size>
       </property>
       <property name="styleSheet">
-       <string notr="true"/>
+       <string notr="true">font: 75 12pt &quot;微软雅黑&quot;;</string>
       </property>
       <property name="currentIndex">
-       <number>4</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab">
        <property name="styleSheet">
-        <string notr="true">
-</string>
+        <string notr="true"/>
        </property>
        <attribute name="title">
         <string>首页</string>
@@ -67,7 +66,7 @@
              <enum>Qt::RichText</enum>
             </property>
             <property name="pixmap">
-             <pixmap resource="rc.qrc">:/whut.jpg</pixmap>
+             <pixmap resource="rc.qrc">:/img/whut.jpg</pixmap>
             </property>
             <property name="scaledContents">
              <bool>true</bool>
@@ -357,7 +356,7 @@ background-image: url(:/pure2.jpg);</string>
            <item>
             <layout class="QVBoxLayout" name="verticalLayout_4">
              <item>
-              <widget class="QLabel" name="cnclink_label_2">
+              <widget class="QLabel" name="hnclink_label">
                <property name="minimumSize">
                 <size>
                  <width>360</width>
@@ -645,54 +644,131 @@ background-image: url(:/pure2.jpg);</string>
        <attribute name="title">
         <string>FBG传感器</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_7">
+       <layout class="QVBoxLayout" name="verticalLayout_11">
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <layout class="QHBoxLayout" name="horizontalLayout_15">
           <item>
-           <widget class="QLabel" name="label_19">
-            <property name="maximumSize">
-             <size>
-              <width>121</width>
-              <height>81</height>
-             </size>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="pixmap">
-             <pixmap resource="rc.qrc">:/cute2.jpg</pixmap>
-            </property>
-            <property name="scaledContents">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_13">
+           <widget class="QGroupBox" name="groupBox_4">
             <property name="minimumSize">
              <size>
-              <width>481</width>
-              <height>81</height>
+              <width>670</width>
+              <height>80</height>
              </size>
             </property>
-            <property name="styleSheet">
-             <string notr="true">background-color: rgb(0, 0, 0);</string>
+            <property name="title">
+             <string>统计分析</string>
             </property>
-            <property name="text">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:18pt; font-weight:600; color:#ffffff;&quot;&gt;光纤光栅传感器关键点变化&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_13">
+             <item>
+              <widget class="QLabel" name="label_21">
+               <property name="minimumSize">
+                <size>
+                 <width>71</width>
+                 <height>51</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>to</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_22">
+               <property name="minimumSize">
+                <size>
+                 <width>71</width>
+                 <height>51</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>最高温：</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="fbgmaxtemp">
+               <property name="minimumSize">
+                <size>
+                 <width>110</width>
+                 <height>51</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>be</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_24">
+               <property name="minimumSize">
+                <size>
+                 <width>71</width>
+                 <height>51</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>最低温：</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_25">
+               <property name="minimumSize">
+                <size>
+                 <width>110</width>
+                 <height>51</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>updated</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_26">
+               <property name="minimumSize">
+                <size>
+                 <width>71</width>
+                 <height>51</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>平均温度：</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_27">
+               <property name="minimumSize">
+                <size>
+                 <width>110</width>
+                 <height>51</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>sooooooon!</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
           <item>
            <widget class="QPushButton" name="FBGseeallpushButton">
             <property name="minimumSize">
              <size>
-              <width>100</width>
+              <width>75</width>
               <height>60</height>
              </size>
             </property>
+            <property name="maximumSize">
+             <size>
+              <width>150</width>
+              <height>100</height>
+             </size>
+            </property>
             <property name="styleSheet">
-             <string notr="true">font: 75 16pt &quot;微软雅黑&quot;;
+             <string notr="true">font: 75 12pt &quot;微软雅黑&quot;;
 </string>
             </property>
             <property name="text">
@@ -710,7 +786,7 @@ background-image: url(:/pure2.jpg);</string>
           <property name="minimumSize">
            <size>
             <width>0</width>
-            <height>598</height>
+            <height>390</height>
            </size>
           </property>
          </widget>
@@ -721,49 +797,210 @@ background-image: url(:/pure2.jpg);</string>
        <attribute name="title">
         <string>电类温度传感器</string>
        </attribute>
-       <widget class="QPushButton" name="ds18seeallpushButton">
-        <property name="geometry">
-         <rect>
-          <x>670</x>
-          <y>30</y>
-          <width>100</width>
-          <height>60</height>
-         </rect>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>100</width>
-          <height>60</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>查看全部</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_18">
-        <property name="geometry">
-         <rect>
-          <x>530</x>
-          <y>10</y>
-          <width>131</width>
-          <height>121</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="rc.qrc">:/cute1.jpeg</pixmap>
-        </property>
-        <property name="scaledContents">
-         <bool>true</bool>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayout_12">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_10">
+          <item>
+           <widget class="QChartView" name="ds18no1chartview" native="true">
+            <property name="minimumSize">
+             <size>
+              <width>360</width>
+              <height>240</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QChartView" name="ds18no2chartview" native="true">
+            <property name="minimumSize">
+             <size>
+              <width>360</width>
+              <height>240</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_13">
+          <item>
+           <widget class="QChartView" name="envchartview" native="true">
+            <property name="minimumSize">
+             <size>
+              <width>360</width>
+              <height>240</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupBox_3">
+            <property name="minimumSize">
+             <size>
+              <width>360</width>
+              <height>240</height>
+             </size>
+            </property>
+            <property name="title">
+             <string>统计分析</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_9">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_4">
+               <item>
+                <widget class="QLabel" name="label_19">
+                 <property name="minimumSize">
+                  <size>
+                   <width>121</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>最高温：</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="DSmaxtemplabel">
+                 <property name="minimumSize">
+                  <size>
+                   <width>190</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>To be continued</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_8">
+               <item>
+                <widget class="QLabel" name="label_20">
+                 <property name="minimumSize">
+                  <size>
+                   <width>121</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>最低温：</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="DSmintemplabel">
+                 <property name="minimumSize">
+                  <size>
+                   <width>190</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>To be continued</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_11">
+               <item>
+                <layout class="QVBoxLayout" name="verticalLayout_7">
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_9">
+                   <item>
+                    <widget class="QLabel" name="label_13">
+                     <property name="minimumSize">
+                      <size>
+                       <width>121</width>
+                       <height>40</height>
+                      </size>
+                     </property>
+                     <property name="text">
+                      <string>通道7平均温度:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="DSchan7mean">
+                     <property name="minimumSize">
+                      <size>
+                       <width>110</width>
+                       <height>40</height>
+                      </size>
+                     </property>
+                     <property name="text">
+                      <string>To be continued</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_10">
+                   <item>
+                    <widget class="QLabel" name="label_18">
+                     <property name="minimumSize">
+                      <size>
+                       <width>121</width>
+                       <height>40</height>
+                      </size>
+                     </property>
+                     <property name="text">
+                      <string>环境平均温度:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="DSenvmean">
+                     <property name="minimumSize">
+                      <size>
+                       <width>110</width>
+                       <height>40</height>
+                      </size>
+                     </property>
+                     <property name="text">
+                      <string>To be continued</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <widget class="QPushButton" name="ds18seeallpushButton">
+                 <property name="minimumSize">
+                  <size>
+                   <width>75</width>
+                   <height>60</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>150</width>
+                   <height>100</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>查看全部</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </widget>
       <widget class="QWidget" name="tab_2">
-       <property name="styleSheet">
-        <string notr="true">background-image: url(:/pure2.jpg);</string>
-       </property>
        <attribute name="title">
         <string>数控系统信息</string>
        </attribute>
@@ -797,7 +1034,7 @@ background-image: url(:/pure2.jpg);</string>
                 </size>
                </property>
                <property name="text">
-                <string>TextLabel</string>
+                <string/>
                </property>
               </widget>
              </item>
@@ -817,7 +1054,7 @@ background-image: url(:/pure2.jpg);</string>
                 </size>
                </property>
                <property name="text">
-                <string>TextLabel</string>
+                <string/>
                </property>
               </widget>
              </item>
@@ -837,7 +1074,7 @@ background-image: url(:/pure2.jpg);</string>
                 </size>
                </property>
                <property name="text">
-                <string>TextLabel</string>
+                <string/>
                </property>
               </widget>
              </item>
@@ -857,6 +1094,9 @@ background-image: url(:/pure2.jpg);</string>
               <width>200</width>
               <height>16777215</height>
              </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: 75 14pt &quot;微软雅黑&quot;;</string>
             </property>
             <property name="text">
              <string>归零</string>
@@ -881,34 +1121,11 @@ background-image: url(:/pure2.jpg);</string>
        <attribute name="title">
         <string>云服务平台</string>
        </attribute>
-       <widget class="QTextBrowser" name="textBrowser">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>170</y>
-          <width>361</width>
-          <height>291</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_7">
-        <property name="geometry">
-         <rect>
-          <x>140</x>
-          <y>120</y>
-          <width>101</width>
-          <height>41</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:18pt;&quot;&gt;本次接收&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-       </widget>
        <widget class="QTextBrowser" name="cloud_textBrowser">
         <property name="geometry">
          <rect>
-          <x>390</x>
-          <y>170</y>
+          <x>10</x>
+          <y>60</y>
           <width>391</width>
           <height>291</height>
          </rect>
@@ -917,14 +1134,14 @@ background-image: url(:/pure2.jpg);</string>
        <widget class="QLabel" name="label_8">
         <property name="geometry">
          <rect>
-          <x>520</x>
-          <y>120</y>
+          <x>150</x>
+          <y>10</y>
           <width>101</width>
           <height>41</height>
          </rect>
         </property>
         <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:18pt;&quot;&gt;本次发送&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:16pt;&quot;&gt;连接提示&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </widget>
@@ -932,76 +1149,105 @@ background-image: url(:/pure2.jpg);</string>
        <attribute name="title">
         <string>热误差补偿</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_12">
-        <item>
-         <layout class="QVBoxLayout" name="verticalLayout_11">
-          <item>
-           <widget class="QTextBrowser" name="comp_textBrowser"/>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_14">
-            <item>
-             <widget class="QLabel" name="label_9">
-              <property name="text">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:18pt;&quot;&gt;#1191数值：&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="_1191_Browserlabel">
-              <property name="text">
-               <string>TextLabel</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_7">
-            <item>
-             <widget class="QPushButton" name="startcomp_pushButton">
-              <property name="minimumSize">
-               <size>
-                <width>75</width>
-                <height>60</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>开启</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="closecomp_pushButton">
-              <property name="minimumSize">
-               <size>
-                <width>75</width>
-                <height>60</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>关闭</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="clearcomp_pushButton">
-              <property name="minimumSize">
-               <size>
-                <width>75</width>
-                <height>60</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>清空</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </item>
-       </layout>
+       <widget class="QTextBrowser" name="comp_textBrowser">
+        <property name="geometry">
+         <rect>
+          <x>80</x>
+          <y>20</y>
+          <width>531</width>
+          <height>311</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QWidget" name="layoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>230</x>
+          <y>360</y>
+          <width>239</width>
+          <height>62</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_7">
+         <item>
+          <widget class="QPushButton" name="startcomp_pushButton">
+           <property name="minimumSize">
+            <size>
+             <width>75</width>
+             <height>60</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>开启</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="closecomp_pushButton">
+           <property name="minimumSize">
+            <size>
+             <width>75</width>
+             <height>60</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>关闭</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="clearcomp_pushButton">
+           <property name="minimumSize">
+            <size>
+             <width>75</width>
+             <height>60</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>清空</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="layoutWidget_2">
+        <property name="geometry">
+         <rect>
+          <x>170</x>
+          <y>440</y>
+          <width>358</width>
+          <height>33</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_14">
+         <item>
+          <widget class="QLabel" name="label_9">
+           <property name="minimumSize">
+            <size>
+             <width>150</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:18pt;&quot;&gt;#1191数值：&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="_1191_Browserlabel">
+           <property name="minimumSize">
+            <size>
+             <width>200</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
       </widget>
      </widget>
     </item>
@@ -1020,6 +1266,7 @@ background-image: url(:/pure2.jpg);</string>
     <property name="title">
      <string>云上的日子</string>
     </property>
+    <addaction name="actionWhut_cloudplatrm"/>
    </widget>
    <widget class="QMenu" name="menu_2">
     <property name="title">
@@ -1027,18 +1274,22 @@ background-image: url(:/pure2.jpg);</string>
     </property>
     <addaction name="actionConfigure"/>
     <addaction name="actionAppearence"/>
+    <addaction name="actionCustom"/>
    </widget>
    <widget class="QMenu" name="menu_3">
     <property name="title">
-     <string>联系我们</string>
+     <string>帮助</string>
     </property>
     <addaction name="actionContacts"/>
-    <addaction name="actionDonate"/>
+    <addaction name="actionAbout_CPS"/>
    </widget>
    <widget class="QMenu" name="menu_4">
     <property name="title">
      <string>推荐</string>
     </property>
+    <addaction name="actionmusic"/>
+    <addaction name="actionUSA_Series"/>
+    <addaction name="actionAnimation"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menu_2"/>
@@ -1047,23 +1298,85 @@ background-image: url(:/pure2.jpg);</string>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionConfigure">
+   <property name="icon">
+    <iconset resource="rc.qrc">
+     <normaloff>:/img/setting.jpg</normaloff>:/img/setting.jpg</iconset>
+   </property>
    <property name="text">
     <string>Configure</string>
    </property>
+   <property name="statusTip">
+    <string>配置相关参数</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
+   </property>
   </action>
   <action name="actionAppearence">
+   <property name="icon">
+    <iconset resource="rc.qrc">
+     <normaloff>:/img/cute3.jpg</normaloff>
+     <normalon>:/img/cute4.jpg</normalon>:/img/cute3.jpg</iconset>
+   </property>
    <property name="text">
-    <string>Appearence</string>
+    <string>Change Appearence</string>
+   </property>
+   <property name="statusTip">
+    <string>修改界面主题</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+W</string>
    </property>
   </action>
   <action name="actionContacts">
    <property name="text">
-    <string>Contacts</string>
+    <string>Contact  us</string>
    </property>
   </action>
   <action name="actionDonate">
    <property name="text">
     <string>Donate</string>
+   </property>
+  </action>
+  <action name="actionmusic">
+   <property name="text">
+    <string>Music</string>
+   </property>
+  </action>
+  <action name="actionUSA_Series">
+   <property name="text">
+    <string>USA Series</string>
+   </property>
+  </action>
+  <action name="actionAnimation">
+   <property name="text">
+    <string>Animation</string>
+   </property>
+  </action>
+  <action name="actionWhut_cloudplatrm">
+   <property name="text">
+    <string>Whut cloudplatrm</string>
+   </property>
+  </action>
+  <action name="actionAbout_CPS">
+   <property name="text">
+    <string>About CPS</string>
+   </property>
+  </action>
+  <action name="actionCustom">
+   <property name="icon">
+    <iconset>
+     <normalon>:/img/pikachu.jpg</normalon>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Custom</string>
+   </property>
+   <property name="statusTip">
+    <string>功能还没有想好</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F</string>
    </property>
   </action>
  </widget>

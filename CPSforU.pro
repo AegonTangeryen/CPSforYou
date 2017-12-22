@@ -31,48 +31,108 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp \
-        cloudplatform.cpp \
-        cloudtcpthread.cpp \
-        dataxml.cpp \
-        devallinfo.cpp \
-        ds18b20sensor.cpp \
-        ds18tcpthread.cpp \
-        fbgsensos.cpp \
-        fbgudpthread.cpp \
-        hnc848system.cpp \
-        laserdisplacesensor.cpp \
-        thermalerrorcompensation.cpp \
-        tools.cpp \
-        envisensor.cpp \
-        envithread.cpp \
-        mmtimer.cpp
+        UI/mainwindow.cpp \
+        Connections/cloudplatform.cpp \
+        Connections/cloudtcpthread.cpp \
+        Auxiliary/dataxml.cpp \
+        Auxiliary/devallinfo.cpp \
+        Connections/ds18b20sensor.cpp \
+        Connections/ds18tcpthread.cpp \
+        Connections/fbgsensos.cpp \
+        Connections/fbgudpthread.cpp \
+        Connections/hnc848system.cpp \
+        Connections/laserdisplacesensor.cpp \
+        Auxiliary/thermalerrorcompensation.cpp \
+        Auxiliary/tools.cpp \
+        Connections/envisensor.cpp \
+        Connections/envithread.cpp \
+        Auxiliary/mmtimer.cpp \
+        UI/configurationui.cpp \
+        UI/chartthemeoption.cpp \
+        UI/fbgalldataui.cpp \
+        UI/ds18seeallui.cpp \
 
 HEADERS += \
-        mainwindow.h \
-        cloudplatform.h \
-        cloudtcpthread.h \
-        dataxml.h \
-        devallinfo.h \
-        ds18b20sensor.h \
-        ds18tcpthread.h \
-        fbgsensos.h \
-        fbgudpthread.h \
-        hnc848system.h \
-        laserdisplacesensor.h \
-        thermalerrorcompensation.h \
-        tools.h \
-        envisensor.h \
-        envithread.h \
-        mmtimer.h
+        UI/mainwindow.h \
+        Connections/cloudplatform.h \
+        Connections/cloudtcpthread.h \
+        Auxiliary/dataxml.h \
+        Auxiliary/devallinfo.h \
+        Connections/ds18b20sensor.h \
+        Connections/ds18tcpthread.h \
+        Connections/fbgsensos.h \
+        Connections/fbgudpthread.h \
+        Connections/hnc848system.h \
+        Connections/laserdisplacesensor.h \
+        Auxiliary/thermalerrorcompensation.h \
+        Auxiliary/tools.h \
+        Connections/envisensor.h \
+        Connections/envithread.h \
+        Auxiliary/mmtimer.h \
+        UI/configurationui.h \
+        UI/chartthemeoption.h \
+        UI/fbgalldataui.h \
+        UI/ds18seeallui.h \
+        IncludesRely/autotestncu.h \
+        IncludesRely/devdict.h \
+        IncludesRely/eventdef.h \
+        IncludesRely/fcompen.h \
+        IncludesRely/ftpsock.h \
+        IncludesRely/hncactivation.h \
+        IncludesRely/hncalarm.h \
+        IncludesRely/hncaxis.h \
+        IncludesRely/hncchan.h \
+        IncludesRely/hnccrds.h \
+        IncludesRely/hncdatadef.h \
+        IncludesRely/hncdatatype.h \
+        IncludesRely/hncevent.h \
+        IncludesRely/hncfileverify.h \
+        IncludesRely/hncfprogman.h \
+        IncludesRely/hncinfo.h \
+        IncludesRely/hnckeygen.h \
+        IncludesRely/hnclad.h \
+        IncludesRely/hncmath.h \
+        IncludesRely/hncmodal.h \
+        IncludesRely/hncmount.h \
+        IncludesRely/hncmst.h \
+        IncludesRely/hncnet.h \
+        IncludesRely/hncparaman.h \
+        IncludesRely/hncreg.h \
+        IncludesRely/hncsmpl.h \
+        IncludesRely/hncsys.h \
+        IncludesRely/hncsysctrl.h \
+        IncludesRely/hnctool.h \
+        IncludesRely/hncupdate.h \
+        IncludesRely/hncvar.h \
+        IncludesRely/hncverify.h \
+        IncludesRely/lad_def.h \
+        IncludesRely/lad_file.h \
+        IncludesRely/ladtbl.h \
+        IncludesRely/ladwork.h \
+        IncludesRely/LKIF2.h \
+        IncludesRely/loadsave.h \
+        IncludesRely/ncassert.h \
+        IncludesRely/neterrcode.h \
+        IncludesRely/osdepend.h \
+        IncludesRely/passwd.h \
+        IncludesRely/smplcalc.h \
+        IncludesRely/temp.h \
+        IncludesRely/trspack.h \
 
 FORMS += \
-        mainwindow.ui
+        mainwindow.ui \
+        configurationui.ui \
+        chartthemeoption.ui \
+        fbgalldataui.ui \
+        ds18seeallui.ui
 
-INCLUDEPATH += ./IncludesRely
+INCLUDEPATH += ./IncludesRely \
+               ./Auxiliary \
+               ./Connections \
+               ./UI \
 
-LIBS += $$PWD/HncNetDll.lib \
-        $$PWD/LKIF2.lib \
+LIBS += $$PWD/Libs/HncNetDll.lib \
+        $$PWD/Libs/LKIF2.lib \
         -lpthread libwsock32 libws2_32 \
         -lwinmm
 

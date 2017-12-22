@@ -58,8 +58,7 @@ bool LaserDisplaceSensor::link2Displacement()
         return false;
     }
 
-    QDateTime current_date_time = QDateTime::currentDateTime();
-    QString currentDate = current_date_time.toString("yyyy-MM-dd hh：mm：ss");
+    QString currentDate = QDateTime::currentDateTime().toString("yyyy-MM-dd hh：mm：ss");
     displacementDir = displacementDir+ "/CCD位移数据"+"("+currentDate+")";
     if(!ccdDir->exists(displacementDir))
     {
@@ -80,7 +79,6 @@ void LaserDisplaceSensor::getDisplaceData()
         outNo = i;
         LKIF_FLOATVALUE_OUT value;
         RC rc = LKIF2_GetCalcDataSingle((outNo),&value);
-        if((outNo)!=value.OutNo) qDebug()<<endl<<"位移传感器读取错误！轴号对不上啊大兄弟！";
         if(rc == RC_OK)
         {
             ccdInfo[i] = getStringFromFloatValue(value);
@@ -192,6 +190,7 @@ void LaserDisplaceSensor::niceNewDay(QString pandahi)
 void LaserDisplaceSensor::run()
 {
     if(!link2Displacement()) return; //连接失败，退出线程
+    emit sendMsg("OK");
     while(1)
     {
         if(time2ReadDispalcement)

@@ -8,9 +8,9 @@
 #include <QChartView>
 #include <QSplineSeries>
 #include <QScatterSeries>
-#include "QLineSeries"
-#include "QChartView"
-#include "QValueAxis"
+#include <QLineSeries>
+#include <QChartView>
+#include <QValueAxis>
 #include <QtMath>
 #include <QPointF>
 #include <QDateTimeAxis>
@@ -24,12 +24,17 @@
 #include <QAreaSeries>
 #include <QLegend>
 #include <QBarCategoryAxis>
+#include <QColor>
 
 #include "ds18tcpthread.h"
 #include "fbgudpthread.h"
 #include "cloudtcpthread.h"
 #include "thermalerrorcompensation.h"
 #include "envithread.h"
+#include "configurationui.h"   // 参数配置页面
+#include "chartthemeoption.h"  // 风格配置页面
+#include "fbgalldataui.h"      // fbg全部数据页面
+#include "ds18seeallui.h"      // ds18b20全部数据页面
 
 QT_CHARTS_USE_NAMESPACE  // 此句与头文件<QChart>放在同一文件
 
@@ -52,9 +57,16 @@ public:
     void recordAllEnvironmentt(Env_Node *a, int nrow);
     void recordAllCnc(CNCInfoReg CNCInfo);
     void recordAllLaserSensors(QString *gc);
+    void rePlotFbg();
+    void rePlotDs18No1();
+    void rePlotDs18No2();
+    void rePlotEnvironment();
+    void rePlotHnc();
+    void rePlotLaserSensors();
 
 private slots:
-    void timeisup();
+    void timeisup();     // 主定时器中断处理函数
+    void plotTimePoll(); // 定时重新绘图
 
     void on_cnclink_pushButton_clicked();
     void on_cncdislink_pushButton_clicked();
@@ -90,6 +102,10 @@ private slots:
     void on_envlinkpushButton_clicked();
     void showEnvMsg(QString loveU, int loveMe);
     void on_envdislinkpushButton_clicked();
+
+    void on_actionConfigure_triggered();
+
+    void on_actionAppearence_triggered();
 
 signals:
     void closeHncSystem();
@@ -135,23 +151,67 @@ private:
     QString currentday;
     QString currentDate;
     QTimer *kingTimer;       // 主定时器
-    long int taskTimeCnt;    // 各项任务的周期
+    qint64 taskTimeCnt;      // 各项任务的周期
+    MMTimer *plotTimer;      // 刷新各个图表的定时器
+    qint16 plotCnt;          // 绘图计数
     QMutex *globalLock;
+    QStringList userInputAll;// 用户手动输入的信息
 
     QChart *fbgChart;
-    QSplineSeries *fbgSeriesCh1600;
-    //QValueAxis *fbgXaxis;
+    QSplineSeries *fbgSeriesCh1601;
+    QSplineSeries *fbgSeriesCh1701;
+    QSplineSeries *fbgSeriesCh1801;
+    QValueAxis *fbgXaxis;
     QValueAxis *fbgYaxis;
-    QDateTimeAxis *fbgXaxis;
-    qreal fbgx;
-    qreal fbgy;
+    QList<double> fbg1601Data;
+    QList<double> fbg1701Data;
+    QList<double> fbg1801Data;
+    qint16 maxFbgSize;
+
+    QChart *ds18No1Chart;
+    QSplineSeries *ds18seriesCh0701;
+    QSplineSeries *ds18seriesCh0702;
+    QSplineSeries *ds18seriesCh0703;
+    QSplineSeries *ds18seriesCh0704;
+    QValueAxis *ds18No1Xaxis;
+    QValueAxis *ds18No1Yaxis;
+    QList<double> ds180701Data;
+    QList<double> ds180702Data;
+    QList<double> ds180703Data;
+    QList<double> ds180704Data;
+    qint16 maxds18No1Size;
+
+    QChart *ds18No2Chart;
+    QSplineSeries *ds18seriesCh0901;
+    QSplineSeries *ds18seriesCh1101;
+    QSplineSeries *ds18seriesCh1301;
+    QSplineSeries *ds18seriesCh1501;
+    QValueAxis *ds18No2Xaxis;
+    QValueAxis *ds18No2Yaxis;
+    QList<double> ds180901Data;
+    QList<double> ds181101Data;
+    QList<double> ds181301Data;
+    QList<double> ds181501Data;
+    qint16 maxds18No2Size;
+
+    QChart *envBarChart;
+    QBarSeries *envBarSeries;
+    QBarSet *frontSet;
+    QBarSet *backSet;
+    QBarSet *rightSet;
+    QBarSet *leftSet;
+    QBarCategoryAxis *envXaxis;
+    QValueAxis *envYaxis;
 
     QChart *laserSensorChart;
     QSplineSeries *laserSensorX;
     QSplineSeries *laserSensorY;
     QSplineSeries *laserSensorZ;
-    QDateTimeAxis *laserSensorXaxis;
+    QValueAxis *laserSensorXaxis;
     QValueAxis *laserSensorYaxis;
+    QList<double> laserXData;      // 存储业务数据的list
+    QList<double> laserZData;
+    qint16 maxLaserSize;
 };
 
 #endif // MAINWINDOW_H

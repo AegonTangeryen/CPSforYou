@@ -35,100 +35,314 @@ MainWindow::MainWindow(QWidget *parent) :
     statusBar()->addWidget(statusbarCCDLabel);
 
     // 选项卡“首页”初始化配置
-    ui->cncdislink_pushButton->setEnabled(false);
-    ui->ds18dislink_pushButton->setEnabled(false);
     ui->FBGclose_pushButton->setEnabled(false);
-    ui->closeccd_pushButton->setEnabled(false);
+    ui->ds18dislink_pushButton->setEnabled(false);
     ui->envdislinkpushButton->setEnabled(false);
+    ui->cncdislink_pushButton->setEnabled(false);
+    ui->closeccd_pushButton->setEnabled(false);
     ui->dislinkcloud_pushButton->setEnabled(false);
 
-    // 选项卡“数控系统信息”页面初始化配置
+    QPalette wordColor; QFont wordFont;
+    wordColor.setColor(QPalette::WindowText,Qt::white);
+    wordFont.setPointSize(16); wordFont.setBold(true); wordFont.setItalic(true);
+    ui->fbglinklabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    ui->fbglinklabel->setFont(wordFont);
+    ui->fbglinklabel->setPalette(wordColor);
 
-    // 选项卡“FBG传感器”页面初始化配置
-    fbgChart = new QChart();
+    ui->ds18No1linklabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    ui->ds18No1linklabel->setFont(wordFont);
+    ui->ds18No1linklabel->setPalette(wordColor);
+
+    ui->ds18No2linklabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    ui->ds18No2linklabel->setFont(wordFont);
+    ui->ds18No2linklabel->setPalette(wordColor);
+
+    ui->ds18Envlinklabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    ui->ds18Envlinklabel->setFont(wordFont);
+    ui->ds18Envlinklabel->setPalette(wordColor);
+
+    ui->hnclink_label->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    ui->hnclink_label->setFont(wordFont);
+    ui->hnclink_label->setPalette(wordColor);
+
+    ui->ccdlinklabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    ui->ccdlinklabel->setFont(wordFont);
+    ui->ccdlinklabel->setPalette(wordColor);
+
+    ui->cloudlinklabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    ui->cloudlinklabel->setFont(wordFont);
+    ui->cloudlinklabel->setPalette(wordColor);
+
+    // 1.选项卡“FBG传感器”页面初始化配置
+    fbgChart = new QChart();     //  fbg传感器关键点温度变化折线图
+    fbgChart->legend()->setAlignment(Qt::AlignRight);          // 图例放在右方
+    fbgChart->setAnimationOptions(QChart::GridAxisAnimations); // 图形伸缩时有动画效果
+    fbgChart->setTheme(QChart::ChartThemeDark);
     fbgChart->setTitle("FBG传感器关键点展示");
-    fbgChart->legend()->setAlignment(Qt::AlignRight);     // 图例放在右方
-    fbgChart->setAnimationOptions(QChart::AllAnimations); // 图形伸缩时有动画效果
-    fbgChart->setTheme(QChart::ChartThemeBlueCerulean);
+    fbgChart->setTitleFont(QFont("Timers",12,QFont::Bold));
 
-    fbgSeriesCh1600 = new QSplineSeries(fbgChart);
-    QPen red(Qt::red);
-    red.setWidth(3);
-    fbgSeriesCh1600->setPen(red);
-    fbgSeriesCh1600->setName("CH16-1");
+    QPen lineType;   // 画笔，可设置线条颜色和粗细，此变量重复使用
+    lineType.setWidth(3);
+    fbgSeriesCh1601 = new QSplineSeries(fbgChart);
+    lineType.setColor(Qt::white);
+    fbgSeriesCh1601->setPen(lineType);
+    fbgSeriesCh1601->setUseOpenGL(true);
+    fbgSeriesCh1601->setName("CH16-1");
 
-    fbgXaxis = new QDateTimeAxis();                      // 横轴是时间轴
+    fbgSeriesCh1701 = new QSplineSeries(fbgChart);
+    lineType.setColor(Qt::cyan);
+    fbgSeriesCh1701->setPen(lineType);
+    fbgSeriesCh1701->setUseOpenGL(true);
+    fbgSeriesCh1701->setName("CH17-1");
+
+    fbgSeriesCh1801 = new QSplineSeries(fbgChart);
+    lineType.setColor(Qt::red);
+    fbgSeriesCh1801->setPen(lineType);
+    fbgSeriesCh1801->setUseOpenGL(true);
+    fbgSeriesCh1801->setName("CH18-1");
+
+    fbgXaxis = new QValueAxis();
     fbgXaxis->setTickCount(10);
-    fbgXaxis->setFormat("hh:mm:ss");
+    fbgXaxis->setLabelFormat("g");
     fbgXaxis->setLabelsAngle(20);
     fbgXaxis->setTitleFont(QFont("Timers",10,QFont::Bold));
-    fbgXaxis->setTitleText("Time(hh:mm:ss)");
+    fbgXaxis->setTitleText("时间轴还没有研究清楚");
 
     fbgYaxis = new QValueAxis();
     fbgYaxis->setTickCount(10);
     fbgYaxis->setLabelFormat("%g");
     fbgYaxis->setMinorTickCount(5);
-    fbgYaxis->setRange(1500,1600);
+    fbgYaxis->setRange(1520,1580);
     fbgYaxis->setTitleText("Wave length(um)");
     fbgYaxis->setTitleFont(QFont("Timers",10,QFont::Bold));
 
-    fbgChart->addSeries(fbgSeriesCh1600);                   // 添加这一条线到图中
+    fbgChart->addSeries(fbgSeriesCh1601);                   // 添加这一条线到图中
+    fbgChart->addSeries(fbgSeriesCh1701);
+    fbgChart->addSeries(fbgSeriesCh1801);
     fbgChart->createDefaultAxes();
-    fbgChart->setAxisX(fbgXaxis, fbgSeriesCh1600);
-    fbgChart->setAxisY(fbgYaxis, fbgSeriesCh1600);
+    fbgChart->setAxisX(fbgXaxis, fbgSeriesCh1601);
+    fbgChart->setAxisY(fbgYaxis, fbgSeriesCh1601);
+    fbgChart->setAxisX(fbgXaxis, fbgSeriesCh1701);
+    fbgChart->setAxisY(fbgYaxis, fbgSeriesCh1701);
+    fbgChart->setAxisX(fbgXaxis, fbgSeriesCh1801);
+    fbgChart->setAxisY(fbgYaxis, fbgSeriesCh1801);
 
+    maxFbgSize=50;
     ui->fbgchartview->setRenderHint(QPainter::Antialiasing); // 抗锯齿
     ui->fbgchartview->setChart(fbgChart);
-    connect(ui->FBGseeallpushButton,&QPushButton::clicked,this,&MainWindow::fbgSeeAll);
+    connect(ui->FBGseeallpushButton,&QPushButton::clicked,this,&MainWindow::fbgSeeAll); // 点击查看全部可以看到全部数据
 
-    // 选项卡“电类温度传感器”页面初始化配置
+    // 2-3.选项卡“电类温度传感器”页面初始化配置
+    ds18No1Chart = new QChart(); // (1)电类传感器一号板第七通道温度变化曲线图
+    ds18No1Chart->legend()->setAlignment(Qt::AlignRight);           // 图例放在右方
+    ds18No1Chart->setAnimationOptions(QChart::GridAxisAnimations);  // 图形伸缩时有动画效果
+    ds18No1Chart->setTheme(QChart::ChartThemeBrownSand);
+    ds18No1Chart->setTitle("电类传感器第1~8通道关键点温度变化展示");
+    ds18No1Chart->setTitleFont(QFont("Timers",8,QFont::Bold));
+
+    ds18seriesCh0701 = new QSplineSeries(ds18No1Chart);
+    ds18seriesCh0701->setUseOpenGL(true);
+    ds18seriesCh0701->setName("CH07-01");
+
+    ds18seriesCh0702 = new QSplineSeries(ds18No1Chart);
+    ds18seriesCh0702->setUseOpenGL(true);
+    ds18seriesCh0702->setName("CH07-02");
+
+    ds18seriesCh0703 = new QSplineSeries(ds18No1Chart);
+    ds18seriesCh0703->setUseOpenGL(true);
+    ds18seriesCh0703->setName("CH07-03");
+
+    ds18seriesCh0704 = new QSplineSeries(ds18No1Chart);
+    ds18seriesCh0704->setUseOpenGL(true);
+    ds18seriesCh0704->setName("CH07-04");
+
+    ds18No1Xaxis = new QValueAxis();
+    ds18No1Xaxis->setTickCount(10);
+    ds18No1Xaxis->setLabelFormat("g");
+    ds18No1Xaxis->setLabelsAngle(20);
+    ds18No1Xaxis->setRange(0,100);
+    ds18No1Xaxis->setTitleFont(QFont("Timers",8,QFont::Bold));
+    ds18No1Xaxis->setTitleText("时间轴还没有研究清楚");
+
+    ds18No1Yaxis = new QValueAxis();
+    ds18No1Yaxis->setTickCount(10);
+    ds18No1Yaxis->setLabelFormat("%g");
+    ds18No1Yaxis->setMinorTickCount(5);
+    ds18No1Yaxis->setRange(-5,40);
+    ds18No1Yaxis->setTitleText("摄氏温度(℃)");
+    ds18No1Yaxis->setTitleFont(QFont("Timers",8,QFont::Bold));
+
+    ds18No1Chart->addSeries(ds18seriesCh0701); // 添加4条线到图中
+    ds18No1Chart->addSeries(ds18seriesCh0702);
+    ds18No1Chart->addSeries(ds18seriesCh0703);
+    ds18No1Chart->addSeries(ds18seriesCh0704);
+    ds18No1Chart->createDefaultAxes();
+    ds18No1Chart->setAxisX(ds18No1Xaxis, ds18seriesCh0701);
+    ds18No1Chart->setAxisY(ds18No1Yaxis, ds18seriesCh0701);
+    ds18No1Chart->setAxisX(ds18No1Xaxis, ds18seriesCh0702);
+    ds18No1Chart->setAxisY(ds18No1Yaxis, ds18seriesCh0702);
+    ds18No1Chart->setAxisX(ds18No1Xaxis, ds18seriesCh0703);
+    ds18No1Chart->setAxisY(ds18No1Yaxis, ds18seriesCh0703);
+    ds18No1Chart->setAxisX(ds18No1Xaxis, ds18seriesCh0704);
+    ds18No1Chart->setAxisY(ds18No1Yaxis, ds18seriesCh0704);
+    maxds18No1Size = 50;
+    ui->ds18no1chartview->setRenderHint(QPainter::Antialiasing);
+    ui->ds18no1chartview->setChart(ds18No1Chart);
+
+    ds18No2Chart = new QChart(); // (2)电类传感器二号板关键点温度变化曲线图
+    ds18No2Chart->legend()->setAlignment(Qt::AlignRight);
+    ds18No2Chart->setAnimationOptions(QChart::GridAxisAnimations);
+    ds18No2Chart->setTheme(QChart::ChartThemeBrownSand);
+    ds18No2Chart->setTitle("电类传感器第9~16通道关键点温度变化展示");
+    ds18No2Chart->setTitleFont(QFont("Timers",8,QFont::Bold));
+
+    ds18seriesCh0901 = new QSplineSeries(ds18No1Chart);
+    ds18seriesCh0901->setUseOpenGL(true);
+    ds18seriesCh0901->setName("CH09-01");
+
+    ds18seriesCh1101 = new QSplineSeries(ds18No1Chart);
+    ds18seriesCh1101->setUseOpenGL(true);
+    ds18seriesCh1101->setName("CH11-01");
+
+    ds18seriesCh1301 = new QSplineSeries(ds18No1Chart);
+    ds18seriesCh1301->setUseOpenGL(true);
+    ds18seriesCh1301->setName("CH13-01");
+
+    ds18seriesCh1501 = new QSplineSeries(ds18No1Chart);
+    ds18seriesCh1501->setUseOpenGL(true);
+    ds18seriesCh1501->setName("CH15-01");
+
+    ds18No2Xaxis = new QValueAxis();
+    ds18No2Xaxis->setTickCount(10);
+    ds18No2Xaxis->setLabelFormat("g");
+    ds18No2Xaxis->setLabelsAngle(20);
+    ds18No2Xaxis->setRange(0,100);
+    ds18No2Xaxis->setTitleFont(QFont("Timers",8,QFont::Bold));
+    ds18No2Xaxis->setTitleText("时间轴还没有研究清楚");
+
+    ds18No2Yaxis = new QValueAxis();
+    ds18No2Yaxis->setTickCount(10);
+    ds18No2Yaxis->setLabelFormat("%g");
+    ds18No2Yaxis->setMinorTickCount(5);
+    ds18No2Yaxis->setRange(-5,40);
+    ds18No2Yaxis->setTitleText("摄氏温度(℃)");
+    ds18No2Yaxis->setTitleFont(QFont("Timers",8,QFont::Bold));
+
+    ds18No2Chart->addSeries(ds18seriesCh0901); // 添加4条线到图中
+    ds18No2Chart->addSeries(ds18seriesCh1101);
+    ds18No2Chart->addSeries(ds18seriesCh1301);
+    ds18No2Chart->addSeries(ds18seriesCh1501);
+    ds18No2Chart->createDefaultAxes();
+    ds18No2Chart->setAxisX(ds18No2Xaxis, ds18seriesCh0901);
+    ds18No2Chart->setAxisY(ds18No2Yaxis, ds18seriesCh0901);
+    ds18No2Chart->setAxisX(ds18No2Xaxis, ds18seriesCh1101);
+    ds18No2Chart->setAxisY(ds18No2Yaxis, ds18seriesCh1101);
+    ds18No2Chart->setAxisX(ds18No2Xaxis, ds18seriesCh1301);
+    ds18No2Chart->setAxisY(ds18No2Yaxis, ds18seriesCh1301);
+    ds18No2Chart->setAxisX(ds18No2Xaxis, ds18seriesCh1501);
+    ds18No2Chart->setAxisY(ds18No2Yaxis, ds18seriesCh1501);
+    maxds18No2Size = 50;
+    ui->ds18no2chartview->setRenderHint(QPainter::Antialiasing);
+    ui->ds18no2chartview->setChart(ds18No2Chart);
+
+    envBarChart = new QChart(); // (3) 环境温度柱状图
+    envBarChart->legend()->setAlignment(Qt::AlignRight);
+    envBarChart->setAnimationOptions(QChart::GridAxisAnimations);
+    envBarChart->setTheme(QChart::ChartThemeBrownSand);
+    envBarChart->setTitle("环境温度柱状图对比展示");
+    envBarChart->setTitleFont(QFont("Timers",8,QFont::Bold));
+
+    frontSet = new QBarSet("前方");
+    backSet  = new QBarSet("后方");
+    rightSet = new QBarSet("右方");
+    leftSet  = new QBarSet("左方");
+
+    *frontSet << 7.00;
+    *backSet << 8.52;
+    *rightSet << 10.6;
+    *leftSet << 9.8;
+    envBarSeries = new QBarSeries(envBarChart);
+    envBarSeries->append(frontSet);
+    envBarSeries->append(backSet);
+    envBarSeries->append(rightSet);
+    envBarSeries->append(leftSet);
+
+    QStringList categories;
+    categories << "当前时刻";
+    envXaxis = new QBarCategoryAxis();
+    envXaxis->append(categories);
+
+    envYaxis = new QValueAxis();
+    envYaxis->setTickCount(10);
+    envYaxis->setRange(0,40);
+
+    envBarChart->addSeries(envBarSeries);
+    envBarChart->createDefaultAxes();
+    envBarChart->setAxisX(envXaxis,envBarSeries);
+    envBarChart->setAxisY(envYaxis,envBarSeries);
+    ui->envchartview->setRenderHint(QPainter::Antialiasing);
+    ui->envchartview->setChart(envBarChart);
+
     connect(ui->ds18seeallpushButton,&QPushButton::clicked,this,&MainWindow::ds18SeeAll);
 
-    // 选项卡“数控系统信息”页面初始化配置
+    // 3.选项卡“数控系统信息”页面初始化配置
 
-    // 选项卡“位移传感器”页面初始化配置
+    // 4.选项卡“位移传感器”页面初始化配置
+    ui->x_lcdNumber->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    ui->x_lcdNumber->setFont(QFont("Timers",20,QFont::ExtraBold|QFont::StyleItalic));
+    ui->y_lcdNumber->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    ui->y_lcdNumber->setFont(QFont("Timers",20,QFont::Bold));
+    ui->z_lcdNumber->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    ui->z_lcdNumber->setFont(QFont("Timers",20,QFont::Bold));
+
     laserSensorChart = new QChart();
-    laserSensorChart->setTitle("FBG传感器关键点展示");
-    laserSensorChart->legend()->setAlignment(Qt::AlignRight);     // 图例放在右方
-    laserSensorChart->setAnimationOptions(QChart::AllAnimations); // 图形伸缩时有动画效果
+    laserSensorChart->setTitle("位移传感器三轴变化趋势图");
+    laserSensorChart->legend()->setAlignment(Qt::AlignRight);
+    laserSensorChart->setAnimationOptions(QChart::GridAxisAnimations);
     laserSensorChart->setTheme(QChart::ChartThemeBlueCerulean);
+    laserSensorChart->setTitleFont(QFont("Timers",12,QFont::Bold));
 
-    laserSensorX = new QSplineSeries();
-    red.setColor(Qt::red);
-    red.setWidth(3);
-    laserSensorX->setPen(red);
+    laserSensorX = new QSplineSeries(laserSensorChart);
+    lineType.setColor(Qt::red);
+    laserSensorX->setPen(lineType);
+    laserSensorX->setUseOpenGL(true);
     laserSensorX->setName("X轴");
-    laserSensorY = new QSplineSeries();
-    red.setColor(Qt::darkBlue);
-    laserSensorY->setPen(red);
+    laserSensorY = new QSplineSeries(laserSensorChart);
+    lineType.setColor(Qt::cyan);
+    laserSensorY->setPen(lineType);
+    laserSensorY->setUseOpenGL(true);
     laserSensorY->setName("Y轴");
-    laserSensorZ = new QSplineSeries();
-    red.setColor(Qt::darkGreen);
-    laserSensorZ->setPen(red);
+    laserSensorZ = new QSplineSeries(laserSensorChart);
+    lineType.setColor(Qt::black);
+    laserSensorZ->setPen(lineType);
+    laserSensorZ->setUseOpenGL(true);
     laserSensorZ->setName("Z轴");
 
-    laserSensorXaxis = new QDateTimeAxis();                      // 横轴是时间轴
+    laserSensorXaxis = new QValueAxis();
     laserSensorXaxis->setTickCount(10);
-    laserSensorXaxis->setFormat("hh:mm:ss");
-    laserSensorXaxis->setLabelsAngle(20);
+    laserSensorXaxis->setMinorTickCount(3);
+    laserSensorXaxis->setLabelFormat("g");
+    laserSensorXaxis->setRange(0,100);
     laserSensorXaxis->setTitleFont(QFont("Timers",10,QFont::Bold));
-    laserSensorXaxis->setTitleText("Time(hh:mm:ss)");
+    laserSensorXaxis->setTitleText("横轴原本设想应该是时间，但是时间轴没有处理好，现在横轴代表什么我也不知道");
 
     laserSensorYaxis = new QValueAxis();
     laserSensorYaxis->setTickCount(10);
     laserSensorYaxis->setLabelFormat("%g");
-    laserSensorYaxis->setMinorTickCount(5);
-    laserSensorYaxis->setRange(1500,1600);
-    laserSensorYaxis->setTitleText("Displacement(mm)");
+    laserSensorYaxis->setMinorTickCount(3);
+    laserSensorYaxis->setRange(-0.05,0.05);
+    laserSensorYaxis->setTitleText("位移(mm)");
     laserSensorYaxis->setTitleFont(QFont("Timers",10,QFont::Bold));
 
     laserSensorChart->addSeries(laserSensorX);
     laserSensorChart->addSeries(laserSensorY);
     laserSensorChart->addSeries(laserSensorZ);
     laserSensorChart->createDefaultAxes();
+    laserSensorChart->setAxisX(laserSensorXaxis, laserSensorZ);
+    laserSensorChart->setAxisY(laserSensorYaxis, laserSensorZ);
     laserSensorChart->setAxisX(laserSensorXaxis, laserSensorX);
     laserSensorChart->setAxisY(laserSensorYaxis, laserSensorX);
-
+    maxLaserSize = 50;
     ui->laserchartview->setRenderHint(QPainter::Antialiasing); // 抗锯齿
     ui->laserchartview->setChart(laserSensorChart);
 
@@ -142,38 +356,34 @@ MainWindow::MainWindow(QWidget *parent) :
     currentDate = QDateTime::currentDateTime().toString("yyyy-MM-dd hh：mm：ss");
     lwfdir = new QDir();
     rootPath = lwfdir->currentPath()+"/数据大家族";
-    if(lwfdir->exists(rootPath)) qDebug()<<"根目录已存在!";
-    else
+    if(!lwfdir->exists(rootPath))
     {
-        if(lwfdir->mkdir(rootPath)) qDebug()<<"根目录创建成功！";
+        lwfdir->mkdir(rootPath);
     }
 
     EverydayPath = rootPath+"/数据家族的日常"+"("+currentDate+")";
-    if(lwfdir->exists(EverydayPath)) qDebug()<<"每日数据集已存在！";
-    else
+    if(!lwfdir->exists(EverydayPath))
     {
-        if(lwfdir->mkdir(EverydayPath)) qDebug()<<"每日数据集创建成功！";
+        lwfdir->mkdir(EverydayPath);
     }
 
     originalPath = EverydayPath+"/数据家族全家福"+"("+currentDate+")";
-    if(lwfdir->exists(originalPath)) qDebug()<<"原始数据集已存在！";
-    else
+    if(!lwfdir->exists(originalPath))
     {
-        if(lwfdir->mkdir(originalPath)) qDebug()<<"原始数据集创建成功！";
+        lwfdir->mkdir(originalPath);
     }
 
     samplePath = EverydayPath+"/数据家族小可爱"+"("+currentDate+")";
-    if(lwfdir->exists(samplePath)) qDebug()<<"抽样数据集已存在！";
-    else
+    if(!lwfdir->exists(samplePath))
     {
-        if(lwfdir->mkdir(samplePath)) qDebug()<<"抽样数据集创建成功！";
+        lwfdir->mkdir(samplePath);
     }
 /*-------------------------------全局变量初始化----------------------------------*/
     for(int gyn=0; gyn<FBG_Channel_Max; gyn++)
     {
         for(int jn=0; jn<FBG_Index_Max; jn++)
         {
-            FBG_ALL[gyn][jn] = QString::number(255,10);
+            FBG_ALL[gyn][jn] = "255";
         }
     }
 
@@ -201,9 +411,9 @@ MainWindow::MainWindow(QWidget *parent) :
         ENV_ALL_Node[i].temperature = "87";
     }
 
-    ccdInfo[0] = "888888";
-    ccdInfo[1] = "888888";
-    ccdInfo[2] = "888888";
+    ccdInfo[0] = "0";
+    ccdInfo[1] = "0";
+    ccdInfo[2] = "0";
 
 /*-----------------------------主线程成员变量初始化-----------------------------------*/
     taskTimeCnt =0;
@@ -213,6 +423,11 @@ MainWindow::MainWindow(QWidget *parent) :
     kingTimer->setTimerType(Qt::PreciseTimer);
     kingTimer->setInterval(1000); // 每1s中断一次
     kingTimer->start();
+
+    plotCnt = 0;
+    plotTimer = new MMTimer(1000,this);
+    connect(plotTimer,&MMTimer::timeout,this,&MainWindow::plotTimePoll);
+    plotTimer->start();
 }
 
 MainWindow::~MainWindow()
@@ -557,8 +772,40 @@ void MainWindow::timeisup()
 
     ui->_1191_Browserlabel->clear();
     ui->_1191_Browserlabel->setText("1191状态第"+QString::number(taskTimeCnt)+"次："+QString::number(statusFor1191));
+
+    // 以下语句目的是每秒刷新位移传感器的显示示数
+    bool convertion;
+    ccdInfo[0].toDouble(&convertion);
+    if(convertion)
+    {
+        ui->x_lcdNumber->setStyleSheet("color:green");
+    }
+    else
+    {
+        ui->x_lcdNumber->setStyleSheet("color:red");
+    }
     ui->x_lcdNumber->setText(ccdInfo[0]);
+
+    ccdInfo[1].toDouble(&convertion);
+    if(convertion)
+    {
+        ui->y_lcdNumber->setStyleSheet("color:green");
+    }
+    else
+    {
+        ui->y_lcdNumber->setStyleSheet("color:red");
+    }
     ui->y_lcdNumber->setText(ccdInfo[1]);
+
+    ccdInfo[2].toDouble(&convertion);
+    if(convertion)
+    {
+        ui->z_lcdNumber->setStyleSheet("color:green");
+    }
+    else
+    {
+        ui->z_lcdNumber->setStyleSheet("color:red");
+    }
     ui->z_lcdNumber->setText(ccdInfo[2]);
 
     if(taskTimeCnt == 19941008)    // 计数器清零
@@ -705,6 +952,249 @@ void MainWindow::recordAllLaserSensors(QString *gc)
     writeFile(laserAllDataPath,ccdContent);
 }
 
+// 图形动态更新定时器
+void MainWindow::plotTimePoll()
+{    
+    plotCnt++;
+    switch (plotCnt)
+    {
+        case 1:
+            if(fbgWorkingStatus) rePlotFbg(); break;
+        case 2:
+            if(ds18WorkingStatus) rePlotDs18No1(); break;
+        case 3:
+            if(ds18No2WorkStatus) rePlotDs18No2(); break;
+        case 4:
+            if(envWorkingStatus) rePlotEnvironment();
+            if(cncWorkingStatus) rePlotHnc();
+            break;
+        case 5:
+            if(laserWorkingStatus) rePlotLaserSensors(); plotCnt=0; break;
+        default: break;
+    }
+}
+
+// 1.重新绘制光纤光栅传感器图表
+void MainWindow::rePlotFbg()
+{
+    fbg1601Data << FBG_ALL[15][0].toDouble();    // 将当前最新值添加到list末尾
+    while (fbg1601Data.size() > maxFbgSize)      // 如果超过最大容量，删除第一个
+    {
+        fbg1601Data.removeFirst();
+    }
+
+    fbg1701Data << FBG_ALL[16][0].toDouble();
+    while (fbg1701Data.size() > maxFbgSize)
+    {
+        fbg1701Data.removeFirst();
+    }
+
+    fbg1801Data << FBG_ALL[17][0].toDouble();
+    while (fbg1801Data.size() > maxFbgSize)
+    {
+        fbg1801Data.removeFirst();
+    }
+
+    if (isVisible()) // 界面被隐藏后就没有必要绘制数据的曲线了
+    {
+        int dx = 100 / (maxFbgSize-1);
+        int less = maxFbgSize - fbg1601Data.size();
+        fbgSeriesCh1601->clear();
+        for (int i = 0; i < fbg1601Data.size(); ++i)
+        {
+            fbgSeriesCh1601->append(less*dx+i*dx, fbg1601Data.at(i));
+        }
+
+        less = maxFbgSize - fbg1701Data.size();
+        fbgSeriesCh1701->clear();
+        for (int i = 0; i < fbg1701Data.size(); ++i)
+        {
+            fbgSeriesCh1701->append(less*dx+i*dx, fbg1701Data.at(i));
+        }
+
+        less = maxFbgSize - fbg1801Data.size();
+        fbgSeriesCh1801->clear();
+        for (int i = 0; i < fbg1801Data.size(); ++i)
+        {
+            fbgSeriesCh1801->append(less*dx+i*dx, fbg1801Data.at(i));
+        }
+    }
+}
+
+// 2.1. 重新绘制电类传感器一号板图表
+void MainWindow::rePlotDs18No1()
+{
+    ds180701Data << DS18B20_ALL_Node[6][0].temperature.toDouble(); // 第七通道第1号点
+    while (ds180701Data.size() > maxds18No1Size)
+    {
+        ds180701Data.removeFirst();
+    }
+
+    ds180702Data << DS18B20_ALL_Node[6][1].temperature.toDouble(); // 第七通道第2号点
+    while (ds180702Data.size() > maxds18No1Size)
+    {
+        ds180702Data.removeFirst();
+    }
+
+    ds180703Data << DS18B20_ALL_Node[6][2].temperature.toDouble(); // 第七通道第3号点
+    while (ds180703Data.size() > maxds18No1Size)
+    {
+        ds180703Data.removeFirst();
+    }
+
+    ds180704Data << DS18B20_ALL_Node[6][4].temperature.toDouble(); // 第七通道第4号点
+    while (ds180704Data.size() > maxds18No1Size)
+    {
+        ds180704Data.removeFirst();
+    }
+
+    if (isVisible()) // 界面被隐藏后就没有必要绘制数据的曲线了
+    {
+        int dx = 100 / (maxds18No1Size-1);
+        int less = maxds18No1Size - ds180701Data.size();
+        ds18seriesCh0701->clear();
+        for (int i = 0; i < ds180701Data.size(); ++i)
+        {
+            ds18seriesCh0701->append(less*dx+i*dx, ds180701Data.at(i));
+        }
+
+        less = maxds18No1Size - ds180702Data.size();
+        ds18seriesCh0702->clear();
+        for (int i = 0; i < ds180702Data.size(); ++i)
+        {
+            ds18seriesCh0702->append(less*dx+i*dx, ds180702Data.at(i));
+        }
+
+        less = maxds18No1Size - ds180703Data.size();
+        ds18seriesCh0703->clear();
+        for (int i = 0; i < ds180703Data.size(); ++i)
+        {
+            ds18seriesCh0703->append(less*dx+i*dx, ds180703Data.at(i));
+        }
+
+        less = maxds18No1Size - ds180704Data.size();
+        ds18seriesCh0704->clear();
+        for (int i = 0; i < ds180704Data.size(); ++i)
+        {
+            ds18seriesCh0704->append(less*dx+i*dx, ds180704Data.at(i));
+        }
+    }
+}
+
+// 2.2. 重新绘制电类传感器二号板图表
+void MainWindow::rePlotDs18No2()
+{
+    ds180901Data << DS18B20_ADD_Node[0][0].temperature.toDouble(); // 第9通道第1号点
+    while (ds180901Data.size() > maxds18No2Size)
+    {
+        ds180901Data.removeFirst();
+    }
+
+    ds181101Data << DS18B20_ADD_Node[2][0].temperature.toDouble(); // 第11通道第1号点
+    while (ds181101Data.size() > maxds18No2Size)
+    {
+        ds181101Data.removeFirst();
+    }
+
+    ds181301Data << DS18B20_ADD_Node[4][0].temperature.toDouble(); // 第13通道第1号点
+    while (ds181301Data.size() > maxds18No2Size)
+    {
+        ds181301Data.removeFirst();
+    }
+
+    ds181501Data << DS18B20_ADD_Node[6][0].temperature.toDouble(); // 第15通道第1号点
+    while (ds181501Data.size() > maxds18No2Size)
+    {
+        ds181501Data.removeFirst();
+    }
+
+    if (isVisible()) // 界面被隐藏后就没有必要绘制数据的曲线了
+    {
+        int dx = 100 / (maxds18No2Size-1);
+        int less = maxds18No2Size - ds180901Data.size();
+        ds18seriesCh0901->clear();
+        for (int i = 0; i < ds180901Data.size(); ++i)
+        {
+            ds18seriesCh0901->append(less*dx+i*dx, ds180901Data.at(i));
+        }
+
+        less = maxds18No2Size - ds181101Data.size();
+        ds18seriesCh1101->clear();
+        for (int i = 0; i < ds181101Data.size(); ++i)
+        {
+            ds18seriesCh1101->append(less*dx+i*dx, ds181101Data.at(i));
+        }
+
+        less = maxds18No2Size - ds181301Data.size();
+        ds18seriesCh1301->clear();
+        for (int i = 0; i < ds181301Data.size(); ++i)
+        {
+            ds18seriesCh1301->append(less*dx+i*dx, ds181301Data.at(i));
+        }
+
+        less = maxds18No2Size - ds181501Data.size();
+        ds18seriesCh1501->clear();
+        for (int i = 0; i < ds181501Data.size(); ++i)
+        {
+            ds18seriesCh1501->append(less*dx+i*dx, ds181501Data.at(i));
+        }
+    }
+}
+
+// 3.重新绘制环境温度图表
+void MainWindow::rePlotEnvironment()
+{
+    frontSet->replace(0,ENV_ALL_Node[0].temperature.toDouble());
+    backSet->replace(0,ENV_ALL_Node[1].temperature.toDouble());
+    rightSet->replace(0,ENV_ALL_Node[2].temperature.toDouble());
+    leftSet->replace(0,ENV_ALL_Node[3].temperature.toDouble());
+
+    qDebug()<<"lwf";
+    envBarSeries->append(frontSet);
+    envBarSeries->append(backSet);
+    envBarSeries->append(rightSet);
+    envBarSeries->append(leftSet);
+}
+
+// 4.重新绘制数控信息图表
+void MainWindow::rePlotHnc()
+{
+    qDebug()<<"你让我画啥";
+}
+
+// 5.重新绘制激光位移传感器图表
+void MainWindow::rePlotLaserSensors()
+{
+    laserXData << ccdInfo[0].toDouble();
+    while (laserXData.size() > maxLaserSize)
+    {
+        laserXData.removeFirst();
+    }
+
+    laserZData << ccdInfo[1].toDouble();
+    while (laserZData.size() > maxLaserSize)
+    {
+        laserZData.removeFirst();
+    }
+
+    if (isVisible()) // 界面被隐藏后就没有必要绘制数据的曲线了
+    {
+        int dx = 100 / (maxLaserSize-1);
+        int less = maxLaserSize - laserXData.size();
+        laserSensorX->clear();
+        for (int i = 0; i < laserXData.size(); ++i)
+        {
+            laserSensorX->append(less*dx+i*dx, laserXData.at(i));
+        }
+
+        laserSensorZ->clear();
+        less = maxLaserSize - laserZData.size();
+        for (int i = 0; i < laserZData.size(); ++i)
+        {
+            laserSensorZ->append(less*dx+i*dx, laserZData.at(i));
+        }
+    }
+}
 /**********************************************************************************************
 
                                           1.FBG传感器部分
@@ -841,21 +1331,25 @@ void MainWindow::on_FBGclose_pushButton_clicked()
 // 显示
 void MainWindow::showFbgResults(int tywin)
 {
-//    switch (tywin)
-//    {
-//        case -1: ui->FBG_textBrowser->append("FBG线程已关闭，内存释放");
-//            break;
-//        case 0:  ui->FBG_textBrowser->append("FBG暂时断开");
-//            break;
-//        case 1:  ui->FBG_textBrowser->append("FBG保持连接");
-//            break;
-//        default: break;
-//    }
-
+    switch (tywin)
+    {
+        case -1: ui->fbglinklabel->setText("FBG线程已关闭，内存释放");
+            break;
+        case 0:  ui->fbglinklabel->setText("FBG暂时断开");
+            break;
+        case 1:  ui->fbglinklabel->setText("FBG保持连接");
+            break;
+        default: break;
+    }
 }
 
+// 点击按钮，查看fbg详细数据
 void MainWindow::fbgSeeAll()
-{}
+{
+   fbgAllDataUi *iWantSeeAllFbg = new fbgAllDataUi(this);
+   if(iWantSeeAllFbg->exec() == QDialog::Accepted) {}
+   delete iWantSeeAllFbg;
+}
 
 /**********************************************************************************************
 
@@ -1018,7 +1512,9 @@ void MainWindow::showDS18Msg(QString msg, int status)
 // 显示全部数据
 void MainWindow::ds18SeeAll()
 {
-
+    Ds18SeeAllUi *iWant2SeeYou = new Ds18SeeAllUi(this);
+    if(iWant2SeeYou->exec() == QDialog::Accepted) {}
+    delete iWant2SeeYou;
 }
 
 // 关闭此线程
@@ -1131,15 +1627,15 @@ void MainWindow::showCNCMsg(QString msg, bool result)
     {
         ui->cnclink_pushButton->setEnabled(false);
         ui->cncdislink_pushButton->setEnabled(true);
-        ui->cnclink_label_2->setText("已连接\r\n数控机床");
-        ui->cnclink_label_2->setStyleSheet("color:blue");
+        ui->hnclink_label->setText("已连接数控机床");
+        ui->hnclink_label->setStyleSheet("color:green");
     }
     else                    // 连接失败
     {
         ui->cnclink_pushButton->setEnabled(true);
         ui->cncdislink_pushButton->setEnabled(false);
-        ui->cnclink_label_2->setText("未连接\r\n数控机床");
-        ui->cnclink_label_2->setStyleSheet("color:red");
+        ui->hnclink_label->setText("未连接数控机床");
+        ui->hnclink_label->setStyleSheet("color:red");
     }
 }
 
@@ -1232,7 +1728,7 @@ void MainWindow::on_closeccd_pushButton_clicked()
 // 显示返回信息
 void MainWindow::ccdUiOperation(QString joffery)
 {
-    if(joffery == "连接成功")
+    if(joffery == "OK")
     {
         ui->linkccd_pushButton->setEnabled(false);
         ui->closeccd_pushButton->setEnabled(true);
@@ -1339,3 +1835,81 @@ void MainWindow::showCompResult(int robert)
     ui->comp_textBrowser->append("实际补偿："+QString::number(robert,10));
 }
 
+/**********************************************************************************************
+
+                                                8.菜单栏显示界面部分
+
+***********************************************************************************************/
+
+// 点击菜单栏“设置”->“Configure”,弹出配置页面，可以手动输入相关参数
+void MainWindow::on_actionConfigure_triggered()
+{
+    ConfigurationUI *config = new ConfigurationUI(this);   
+    if(config->exec() == QDialog::Accepted)  // 点击确认
+    {
+        userInputAll = config->getUserInputParameters();
+        qDebug()<<userInputAll.size()<<endl<<userInputAll;
+    }
+    delete config;
+}
+
+// 点击菜单栏“设置”->“Appearence”,弹出图表主题页面，可以修改图表主题
+void MainWindow::on_actionAppearence_triggered()
+{
+    int index;
+    ChartThemeOption *trendMaker = new ChartThemeOption(this);
+    if(trendMaker->exec() == QDialog::Accepted)  // 点击确认
+    {
+        index = trendMaker->getCurrentTheme();
+        switch (index)
+        {
+        case 0:
+        {
+            fbgChart->setTheme(QChart::ChartThemeLight);
+            ds18No1Chart->setTheme(QChart::ChartThemeBlueCerulean);
+            ds18No2Chart->setTheme(QChart::ChartThemeBlueCerulean);
+            envBarChart->setTheme(QChart::ChartThemeBlueCerulean);
+            laserSensorChart->setTheme(QChart::ChartThemeDark);
+        }
+            break;
+        case 1:
+        {
+            fbgChart->setTheme(QChart::ChartThemeDark);
+            ds18No1Chart->setTheme(QChart::ChartThemeBrownSand);
+            ds18No2Chart->setTheme(QChart::ChartThemeBrownSand);
+            envBarChart->setTheme(QChart::ChartThemeBrownSand);
+            laserSensorChart->setTheme(QChart::ChartThemeBlueCerulean);
+        }
+            break;
+        case 2:
+        {
+            fbgChart->setTheme(QChart::ChartThemeDark);
+            ds18No1Chart->setTheme(QChart::ChartThemeBrownSand);
+            ds18No2Chart->setTheme(QChart::ChartThemeBrownSand);
+            envBarChart->setTheme(QChart::ChartThemeBrownSand);
+            laserSensorChart->setTheme(QChart::ChartThemeHighContrast);
+        }
+            break;
+        case 3:
+        {
+            fbgChart->setTheme(QChart::ChartThemeBrownSand);
+            ds18No1Chart->setTheme(QChart::ChartThemeHighContrast);
+            ds18No2Chart->setTheme(QChart::ChartThemeHighContrast);
+            envBarChart->setTheme(QChart::ChartThemeHighContrast);
+            laserSensorChart->setTheme(QChart::ChartThemeLight);
+        }
+            break;
+        case 4:
+        {
+            fbgChart->setTheme(QChart::ChartThemeHighContrast);
+            ds18No1Chart->setTheme(QChart::ChartThemeLight);
+            ds18No2Chart->setTheme(QChart::ChartThemeLight);
+            envBarChart->setTheme(QChart::ChartThemeLight);
+            laserSensorChart->setTheme(QChart::ChartThemeBlueCerulean);
+        }
+            break;
+        default: break;
+        }
+    }
+    delete trendMaker;
+}
