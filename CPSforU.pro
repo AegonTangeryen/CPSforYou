@@ -10,7 +10,7 @@ QT       += network
 QT       += serialport
 QT       += charts
 
-RC_ICONS += Panda.ico
+RC_ICONS += img/Panda.ico
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -57,7 +57,8 @@ SOURCES += \
         UI/musicintrductionui.cpp \
         UI/seriesintroductionui.cpp \
         UI/animationintroductionui.cpp \
-        UI/loginui.cpp
+        UI/loginui.cpp \
+        UI/inquireupdateui.cpp
 
 HEADERS += \
         Connections/cloudplatform.h \
@@ -130,7 +131,8 @@ HEADERS += \
         IncludesRely/passwd.h \
         IncludesRely/smplcalc.h \
         IncludesRely/temp.h \
-        IncludesRely/trspack.h
+        IncludesRely/trspack.h \
+        UI/inquireupdateui.h
 
 FORMS += \
         mainwindow.ui \
@@ -143,7 +145,8 @@ FORMS += \
         musicintrductionui.ui \
         seriesintroductionui.ui \
         animationintroductionui.ui \
-        loginui.ui
+        loginui.ui \
+        inquireupdateui.ui
 
 INCLUDEPATH += ./IncludesRely \
                ./Auxiliary \

@@ -355,7 +355,8 @@ MainWindow::MainWindow(QWidget *parent) :
     currentday = QDateTime::currentDateTime().toString("yyyyMMdd");
     currentDate = QDateTime::currentDateTime().toString("yyyy-MM-dd hh：mm：ss");
     lwfdir = new QDir();
-    rootPath = lwfdir->currentPath()+"/数据大家族";
+    rootPath = QDir::currentPath()+"/数据大家族";
+    qDebug()<<rootPath;
     if(!lwfdir->exists(rootPath))
     {
         lwfdir->mkdir(rootPath);
