@@ -4,8 +4,8 @@ bool cloudLinkStatus = false;  //云平台连接状态
 
 CloudPlatform::CloudPlatform()
 {
-    //cloudServerIP = "59.69.101.206";
-    cloudServerIP = getHostIpAddress();
+    cloudServerIP = "59.69.101.206";             // 正式连接
+//    cloudServerIP = getHostIpAddress();          // 本地连接测试
     cloudServerPort = 3690;
     cloudSocket = new QTcpSocket(this);
     cloudTimer = new QTimer(this);

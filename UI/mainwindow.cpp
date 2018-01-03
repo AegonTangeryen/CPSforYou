@@ -9,30 +9,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
 /*-------------------------------显示页面初始化------------------- -------------------*/
     // 最下方状态栏初始化配置
-    statusbarCNCLabel = new QLabel("数控系统提示");
-    statusbarDs18Label = new QLabel("DS18b20未连接  ");
-    statusbarFBGLabel = new QLabel("FBG提示  ");
-    statusbarCCDLabel = new QLabel("位移传感器提示  ");
-
-    statusbarCNCLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-    statusbarCNCLabel->setFont(QFont("Timers",14,QFont::Bold));
-    statusbarCNCLabel->setStyleSheet("color:red");
-    statusbarDs18Label->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-    statusbarDs18Label->setFont(QFont("Timers",14,QFont::Bold));
-    statusbarDs18Label->setStyleSheet("color:red");
-    statusbarFBGLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-    statusbarFBGLabel->setFont(QFont("Timers",14,QFont::Bold));
-    statusbarFBGLabel->setStyleSheet("color:red");
-    statusbarCCDLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-    statusbarCCDLabel->setFont(QFont("Timers",14,QFont::Bold));
-    statusbarCCDLabel->setStyleSheet("color:red");
-
-    statusBar()->setStyleSheet(QString("QStatusBar::item{border: 0px}"));// 设置不显示label的边框
+    statusbarIndicator = new QLabel("请连接所有传感器(若未开启数控机床可不连接)");
+    statusbarIndicator->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    statusbarIndicator->setFont(QFont("Timers",20,QFont::Bold));
+    statusbarIndicator->setStyleSheet("color:darkRed");
+    statusBar()->setStyleSheet(QString("QStatusBar::item{border: 0px}"));//不显示label的边框
     statusBar()->setSizeGripEnabled(true); //设置是否显示右边的大小控制点
-    statusBar()->addWidget(statusbarCNCLabel);
-    statusBar()->addWidget(statusbarDs18Label);
-    statusBar()->addWidget(statusbarFBGLabel);
-    statusBar()->addWidget(statusbarCCDLabel);
+    statusBar()->addWidget(statusbarIndicator);
 
     // 选项卡“首页”初始化配置
     ui->FBGclose_pushButton->setEnabled(false);
@@ -352,34 +335,28 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->clearcomp_pushButton,&QPushButton::clicked,this,&MainWindow::clearCompBrowser);
 
 /*-------------------------------创建数据存储文件夹-------------------------------------*/
-    currentday = QDateTime::currentDateTime().toString("yyyyMMdd");
+    currentday = QDateTime::currentDateTime().toString("yyyyMMdd"); // 获取当前日期
     currentDate = QDateTime::currentDateTime().toString("yyyy-MM-dd hh：mm：ss");
     lwfdir = new QDir();
+
+    // 创建数据存储根目录
     rootPath = QDir::currentPath()+"/数据大家族";
-    qDebug()<<rootPath;
-    if(!lwfdir->exists(rootPath))
-    {
-        lwfdir->mkdir(rootPath);
-    }
+    if(!lwfdir->exists(rootPath))   {lwfdir->mkdir(rootPath);}
 
+    // 在根目录下创建每日数据存储文件夹
     EverydayPath = rootPath+"/数据家族的日常"+"("+currentDate+")";
-    if(!lwfdir->exists(EverydayPath))
-    {
-        lwfdir->mkdir(EverydayPath);
-    }
+    if(!lwfdir->exists(EverydayPath))   {lwfdir->mkdir(EverydayPath);}
 
+    // 在每日存储文件夹下创建原始全部数据文件夹
     originalPath = EverydayPath+"/数据家族全家福"+"("+currentDate+")";
-    if(!lwfdir->exists(originalPath))
-    {
-        lwfdir->mkdir(originalPath);
-    }
+    if(!lwfdir->exists(originalPath))   {lwfdir->mkdir(originalPath);}
 
+    // 在每日存储文件夹下创建抽样数据文件夹
     samplePath = EverydayPath+"/数据家族小可爱"+"("+currentDate+")";
-    if(!lwfdir->exists(samplePath))
-    {
-        lwfdir->mkdir(samplePath);
-    }
+    if(!lwfdir->exists(samplePath)) {lwfdir->mkdir(samplePath);}
+
 /*-------------------------------全局变量初始化----------------------------------*/
+    // 全部初始化时为了避免一些奇奇怪怪的错误，保证无论何时全局数组里面的每一项都不为空
     for(int gyn=0; gyn<FBG_Channel_Max; gyn++)
     {
         for(int jn=0; jn<FBG_Index_Max; jn++)
@@ -393,7 +370,7 @@ MainWindow::MainWindow(QWidget *parent) :
         for(int j =0;j<DS18B20_Index_Max;j++)
         {
             DS18B20_ALL_Node[i][j].ID = "0";
-            DS18B20_ALL_Node[i][j].temperature = "85";
+            DS18B20_ALL_Node[i][j].temperature = "94";
         }
     }
 
@@ -402,14 +379,14 @@ MainWindow::MainWindow(QWidget *parent) :
         for(int j =0;j<DS18B20_Index_Max;j++)
         {
             DS18B20_ADD_Node[i][j].ID = "0";
-            DS18B20_ADD_Node[i][j].temperature = "86";
+            DS18B20_ADD_Node[i][j].temperature = "94";
         }
     }
 
     for(int i=0; i<Env_Number_Max;i++)
     {
         ENV_ALL_Node[i].ID = "0";
-        ENV_ALL_Node[i].temperature = "87";
+        ENV_ALL_Node[i].temperature = "94";
     }
 
     ccdInfo[0] = "0";
@@ -417,7 +394,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ccdInfo[2] = "0";
 
 /*-----------------------------主线程成员变量初始化-----------------------------------*/
-    taskTimeCnt =0;
+    taskTimeCnt=0;
+    ds18AllRecordCnt=0;
+    ds18No1RecordCnt=0;
+    ds18No2RecordCnt=0;
+    envRecordCnt=0;
     globalLock = new QMutex();
     kingTimer = new QTimer(this);
     connect(kingTimer,&QTimer::timeout, this,MainWindow::timeisup);
@@ -428,7 +409,7 @@ MainWindow::MainWindow(QWidget *parent) :
     plotCnt = 0;
     plotTimer = new MMTimer(1000,this);
     connect(plotTimer,&MMTimer::timeout,this,&MainWindow::plotTimePoll);
-    plotTimer->start();
+//    plotTimer->start();   // 暂不启用图形更新
 }
 
 MainWindow::~MainWindow()
@@ -450,36 +431,20 @@ void MainWindow::timeisup()
         currentday = QDateTime::currentDateTime().toString("yyyyMMdd");
         currentDate = QDateTime::currentDateTime().toString("yyyy-MM-dd hh：mm：ss");
         EverydayPath = rootPath+"/数据家族的日常"+"("+currentDate+")";
-        if(lwfdir->exists(EverydayPath))qDebug()<<"新的一天数据集已存在！";
-        else
-        {
-            if(lwfdir->mkdir(EverydayPath)) qDebug()<<"新的一天数据集创建成功！";
-        }
+        if(!lwfdir->exists(EverydayPath)) {lwfdir->mkdir(EverydayPath);}
 
         originalPath = EverydayPath+"/数据家族全家福"+"("+currentDate+")";
-        if(lwfdir->exists(originalPath)) qDebug()<<"原始数据集已存在！";
-        else
-        {
-            if(lwfdir->mkdir(originalPath)) qDebug()<<"原始数据集创建成功！";
-        }
+        if(!lwfdir->exists(originalPath)) {lwfdir->mkdir(originalPath);}
 
         samplePath = EverydayPath+"/数据家族小可爱"+"("+currentDate+")";
-        if(lwfdir->exists(samplePath)) qDebug()<<"抽样数据集已存在！";
-        else
-        {
-            if(lwfdir->mkdir(samplePath)) qDebug()<<"抽样数据集创建成功！";
-        }
+        if(!lwfdir->exists(samplePath)) {lwfdir->mkdir(samplePath);}
         emit createNewDayFolder(originalPath); // 发送信号指示各子线程更换文件存储路径
 
         QString nowTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh：mm：ss");
         if(fbgWorkingStatus) // 如果FBG传感器正在工作，创建新文件夹
         {
             fbgSamplePath = samplePath+"/FBG波长数据("+nowTime+")";
-            if(lwfdir->exists(fbgSamplePath)) qDebug()<<"!rose1";
-            else
-            {
-                if(lwfdir->mkdir(fbgSamplePath)) qDebug()<<"rose1";
-            }
+            if(!lwfdir->exists(fbgSamplePath)) {lwfdir->mkdir(fbgSamplePath);}
 
             FbgAllDataPath = fbgSamplePath+"/TCH.csv";
             QString csvHeader = "时间";
@@ -507,12 +472,8 @@ void MainWindow::timeisup()
                     csvHeader+=title;
                 }
             }
-            if(QFile::exists(FbgAllDataPath)) qDebug()<<"dragon1.1";
-            else
-            {
-                if(writeFile(FbgAllDataPath,csvHeader))
-                qDebug()<<"dragon1.1";
-            }
+            // fbg全部32通道*20点合表
+            if(!QFile::exists(FbgAllDataPath)) {writeFile(FbgAllDataPath,csvHeader);}
 
             fbgAllStressPath = fbgSamplePath+"/TSCH.csv";
             csvHeader = "时间";
@@ -540,12 +501,8 @@ void MainWindow::timeisup()
                     csvHeader+=title;
                 }
             }
-            if(QFile::exists(fbgAllStressPath)) qDebug()<<"dragon1.2";
-            else
-            {
-                if(writeFile(fbgAllStressPath,csvHeader))
-                qDebug()<<"dragon1.2";
-            }
+            // fbg第1~8通道应力传感器合表
+            if(!QFile::exists(fbgAllStressPath)) {writeFile(fbgAllStressPath,csvHeader);}
 
             fbgAllTempPath = fbgSamplePath+"/TTCH.csv";
             csvHeader = "时间";
@@ -573,33 +530,18 @@ void MainWindow::timeisup()
                     csvHeader+=title;
                 }
             }
-            if(QFile::exists(fbgAllTempPath)) qDebug()<<"dragon1.3";
-            else
-            {
-                if(writeFile(fbgAllTempPath,csvHeader))
-                qDebug()<<"dragon1.3";
-            }
+            // fbg第9~32通道温度传感器合表
+            if(!QFile::exists(fbgAllTempPath)) {writeFile(fbgAllTempPath,csvHeader);}
         }
+
         if(ds18WorkingStatus || ds18No2WorkStatus) // 如果电类传感器正在工作，创建新文件夹
         {
             ds18SamplePath = samplePath+"/WiFi温度数据("+nowTime+")";
             ds18No1SamplePath = ds18SamplePath+"/WiFi温度数据一号板("+nowTime+")";
             ds18No2SamplePath = ds18SamplePath+"/WiFi温度数据二号板("+nowTime+")";
-            if(lwfdir->exists(ds18SamplePath)) qDebug()<<"!rose2";
-            else
-            {
-                if(lwfdir->mkdir(ds18SamplePath)) qDebug()<<"rose2";
-            }
-            if(lwfdir->exists(ds18No1SamplePath)) qDebug()<<"!rose2.1";
-            else
-            {
-                if(lwfdir->mkdir(ds18No1SamplePath)) qDebug()<<"rose2.1";
-            }
-            if(lwfdir->exists(ds18No2SamplePath)) qDebug()<<"!rose2.2";
-            else
-            {
-                if(lwfdir->mkdir(ds18No2SamplePath)) qDebug()<<"rose2.2";
-            }
+            if(!lwfdir->exists(ds18SamplePath))    {lwfdir->mkdir(ds18SamplePath);}
+            if(!lwfdir->exists(ds18No1SamplePath)) {lwfdir->mkdir(ds18No1SamplePath);}
+            if(!lwfdir->exists(ds18No2SamplePath)) {lwfdir->mkdir(ds18No2SamplePath);}
 
             ds18AllDataPath = ds18SamplePath+"/DCH.csv";
             QString csvHeader = "时间";
@@ -627,12 +569,7 @@ void MainWindow::timeisup()
                     csvHeader+=title;
                 }
             }
-            if(QFile::exists(ds18AllDataPath)) qDebug()<<"dragon2";
-            else
-            {
-                if(writeFile(ds18AllDataPath,csvHeader))
-                qDebug()<<"dragon2";
-            }
+            if(!QFile::exists(ds18AllDataPath)) {writeFile(ds18AllDataPath,csvHeader);}
 
             dsNo1DataPath = ds18No1SamplePath+"/DCH1.csv";
             dsNo2DataPath = ds18No2SamplePath+"/DCH2.csv";
@@ -661,12 +598,7 @@ void MainWindow::timeisup()
                     csvHeader+=title;
                 }
             }
-            if(QFile::exists(dsNo1DataPath)) qDebug()<<"dragon2.1";
-            else
-            {
-                if(writeFile(dsNo1DataPath,csvHeader))
-                qDebug()<<"dragon2.1";
-            }
+            if(!QFile::exists(dsNo1DataPath)) {writeFile(dsNo1DataPath,csvHeader);}
 
             csvHeader = "时间";
             for(int channum=9;channum<= 16;channum++)
@@ -693,74 +625,42 @@ void MainWindow::timeisup()
                     csvHeader+=title;
                 }
             }
-            if(QFile::exists(dsNo2DataPath)) qDebug()<<"dragon2.2";
-            else
-            {
-                if(writeFile(dsNo2DataPath,csvHeader))
-                qDebug()<<"dragon2.2";
-            }
+            if(!QFile::exists(dsNo2DataPath)) {writeFile(dsNo2DataPath,csvHeader);}
         }
 
         if(envWorkingStatus) // 如果环境温度传感器正在工作，创建新文件夹
         {
             envSamplePath = samplePath+"/环境温度("+nowTime+")";
-            if(lwfdir->exists(envSamplePath)) qDebug()<<"!rose3";
-            else
-            {
-                if(lwfdir->mkdir(envSamplePath)) qDebug()<<"rose3";
-            }
+            if(!lwfdir->exists(envSamplePath)) {lwfdir->mkdir(envSamplePath);}
 
             envAllDataPath = envSamplePath+"/EDCH.csv";
             QString csvHeader = "时间,EDCH01-01,EDCH01-02,EDCH02-01,EDCH02-02";
-            if(QFile::exists(envAllDataPath)) qDebug()<<"dragon3";
-            else
-            {
-                if(writeFile(envAllDataPath,csvHeader))
-                qDebug()<<"dragon3";
-            }
+            if(!QFile::exists(envAllDataPath)) {writeFile(envAllDataPath,csvHeader);}
         }
 
         if(cncWorkingStatus) // 如果数控机床正在工作，创建新文件夹(一般不可能)
         {
             hncSamplePath = samplePath+"/CNC机床数据("+nowTime+")";
-            if(lwfdir->exists(hncSamplePath)) qDebug()<<"!rose4";
-            else
-            {
-                if(lwfdir->mkdir(hncSamplePath)) qDebug()<<"!rose4";
-            }
+            if(!lwfdir->exists(hncSamplePath)) {lwfdir->mkdir(hncSamplePath);}
 
             hncAllDataPath = hncSamplePath+"/CNC数据值.csv";
             QString csvHeader = "时间,机床通道,X轴坐标,Y轴坐标,Z轴坐标,主轴坐标,进给速度,主轴速度,X轴功率,Y轴功率,Z轴功率,主轴功率,X轴负荷,Y轴负荷,Z轴负荷,主轴负荷,暂停状态";
-            if(QFile::exists(hncAllDataPath)) qDebug()<<"dragon4";
-            else
-            {
-                if(writeFile(hncAllDataPath,csvHeader))
-                qDebug()<<"dragon4";
-            }
+            if(!QFile::exists(hncAllDataPath)) {writeFile(hncAllDataPath,csvHeader);}
         }
 
         if(laserWorkingStatus) // 如果激光位移传感器正在工作，创建新文件夹
         {
             laserSamplePath = samplePath+"/CCD位移数据("+nowTime+")";
-            if(lwfdir->exists(laserSamplePath)) qDebug()<<"!rose5";
-            else
-            {
-                if(lwfdir->mkdir(laserSamplePath)) qDebug()<<"!rose5";
-            }
+            if(!lwfdir->exists(laserSamplePath)) {lwfdir->mkdir(laserSamplePath);}
 
             laserAllDataPath = laserSamplePath+"/CCD数据值.csv";
             QString csvHeader = "时间,X轴位移,Y轴位移,Z轴位移";
-            if(QFile::exists(laserAllDataPath)) qDebug()<<"dragon5";
-            else
-            {
-                if(writeFile(laserAllDataPath,csvHeader))
-                qDebug()<<"dragon5";
-            }
+            if(!QFile::exists(laserAllDataPath)) {writeFile(laserAllDataPath,csvHeader);}
         }
     }
 
     taskTimeCnt++;
-    if(taskTimeCnt %5 == 0)         // 每5s抽样一次
+    if(taskTimeCnt%5==0)         // 每5s抽样一次
     {
         if(fbgWorkingStatus) recordAllFbg();
         if(ds18WorkingStatus && ds18No2WorkStatus) recordAllDs18b20(DS18B20_ALL_Node,DS18B20_Channel_Max,DS18B20_ADD_Node,DS18B20_Channel_Max);
@@ -770,11 +670,15 @@ void MainWindow::timeisup()
         if(cncWorkingStatus) recordAllCnc(CNCInfo);
         if(laserWorkingStatus) recordAllLaserSensors(ccdInfo);
     }
+    if(taskTimeCnt%8==0)         // 每8s检测一次连接状态
+    {
+        detectConnection();
+    }
 
     ui->_1191_Browserlabel->clear();
     ui->_1191_Browserlabel->setText("1191状态第"+QString::number(taskTimeCnt)+"次："+QString::number(statusFor1191));
 
-    // 以下语句目的是每秒刷新位移传感器的显示示数
+    // 以下语句作用是每秒刷新位移传感器的显示示数
     bool convertion;
     ccdInfo[0].toDouble(&convertion);
     if(convertion)
@@ -818,9 +722,10 @@ void MainWindow::timeisup()
 // 1.记录光纤光栅传感器全部数据
 void MainWindow::recordAllFbg()
 {
+
     QString currentTime = QDateTime::currentDateTime().toString("yyyy-MM-dd-hh:mm:ss");
     QString fbgContent = currentTime;
-    for(int i=0;i<FBG_Channel_Max;i++)                               // 写1~32通道总表
+    for(int i=0;i<FBG_Channel_Max;i++)                            // 写1~32通道总表
     {
         if(FBG_ALL[i][0]=="255") break;                           // 还没有收到数据
         for(int j=0;j<FBG_Index_Max;j++)
@@ -841,7 +746,7 @@ void MainWindow::recordAllFbg()
     }
     writeFile(fbgAllStressPath,fbgContent);
 
-    fbgContent.clear();  fbgContent = currentTime;              // 写8~32通道温度传感器总表
+    fbgContent.clear();  fbgContent = currentTime;                // 写8~32通道温度传感器总表
     for(int i=8;i<FBG_Channel_Max;i++)
     {
         if(FBG_ALL[i][0]=="255") break;                           // 还没有收到数据
@@ -856,23 +761,37 @@ void MainWindow::recordAllFbg()
 // 2.记录电类温度传感器全部数据
 void MainWindow::recordAllDs18b20(DS18B20_Node (*a)[DS18B20_Index_Max], int nrow1,DS18B20_Node (*b)[DS18B20_Index_Max],int nrow2)
 {
+    if(ds18AllRecordCnt<=5)    // 延迟25s再存储，确保一轮传输完成
+    {
+        ds18AllRecordCnt++;
+        return;
+    }
     QString currentTime = QDateTime::currentDateTime().toString("yyyy-MM-dd-hh:mm:ss");
     QString ds18Content;
     ds18Content = currentTime;
-    for(int row =0; row < nrow1; row++)
+    for(int row=0; row<nrow1; row++)
     {
         for(int col = 0;col < DS18B20_Index_Max; col++)
         {
-            if(a[row][col].ID=="0") continue;
+            if(a[row][col].ID=="0")   // 未收到此ID对应的数据，按86填充
+            {
+                ds18Content+=",86";
+                continue;
+            }
             ds18Content+=",";
             ds18Content+=a[row][col].temperature;
         }
     }
-    for(int row =0; row < nrow2; row++)
+
+    for(int row=0; row<nrow2; row++)
     {
         for(int col = 0;col < DS18B20_Index_Max; col++)
         {
-            if(b[row][col].ID=="0") continue;
+            if(b[row][col].ID=="0")  // 未收到此ID对应的数据，按86填充
+            {
+                ds18Content+=",86";
+                continue;
+            }
             ds18Content+=",";
             ds18Content+=b[row][col].temperature;
         }
@@ -883,14 +802,23 @@ void MainWindow::recordAllDs18b20(DS18B20_Node (*a)[DS18B20_Index_Max], int nrow
 // 2.1 记录电类温度传感器一号板全部数据
 void MainWindow::recordNo1Ds18b20(DS18B20_Node (*a)[DS18B20_Index_Max], int nrow)
 {
+    if(ds18No1RecordCnt<=5)  // 延迟25s接收
+    {
+        ds18No1RecordCnt++;
+        return;
+    }
     QString currentTime = QDateTime::currentDateTime().toString("yyyy-MM-dd-hh:mm:ss");
     QString ds18Content;
     ds18Content = currentTime;
-    for(int row =0; row < nrow; row++)
+    for(int row=0; row<nrow; row++)                        // 一号板前七个通道
     {
         for(int col = 0;col < DS18B20_Index_Max; col++)
         {
-            if(a[row][col].ID=="0") continue;
+            if(a[row][col].ID=="0")   // 未收到此ID对应的数据，按86填充
+            {
+                ds18Content+=",86";
+                continue;
+            }
             ds18Content+=",";
             ds18Content+=a[row][col].temperature;
         }
@@ -901,14 +829,23 @@ void MainWindow::recordNo1Ds18b20(DS18B20_Node (*a)[DS18B20_Index_Max], int nrow
 // 2.2 记录电类温度传感器二号板全部数据
 void MainWindow::recordNo2Ds18b20(DS18B20_Node (*b)[DS18B20_Index_Max], int nrow)
 {
+    if(ds18No2RecordCnt<=5)  // 延迟25s接收
+    {
+        ds18No2RecordCnt++;
+        return;
+    }
     QString currentTime = QDateTime::currentDateTime().toString("yyyy-MM-dd-hh:mm:ss");
     QString ds18Content;
     ds18Content = currentTime;
-    for(int row =0; row < nrow; row++)
+    for(int row=0; row<nrow; row++)
     {
         for(int col = 0;col < DS18B20_Index_Max; col++)
         {
-            if(b[row][col].ID=="0") continue;
+            if(b[row][col].ID=="0")   // 未收到此ID对应的数据，按86填充
+            {
+                ds18Content+=",86";
+                continue;
+            }
             ds18Content+=",";
             ds18Content+=b[row][col].temperature;
         }
@@ -919,11 +856,20 @@ void MainWindow::recordNo2Ds18b20(DS18B20_Node (*b)[DS18B20_Index_Max], int nrow
 // 3.记录环境温度传感器全部数据
 void MainWindow::recordAllEnvironmentt(Env_Node *a, int nrow)
 {
+    if(envRecordCnt<=3)  // 延迟15s接收
+    {
+        envRecordCnt++;
+        return;
+    }
     QString currentTime = QDateTime::currentDateTime().toString("yyyy-MM-dd-hh:mm:ss");
     QString content = currentTime;
-    for(int row=0; row < nrow; row++)       // 写总表
+    for(int row=0; row<nrow; row++)       // 写总表
     {
-        if(a[row].ID=="0") continue;             // 某些节点还没有收到数据
+        if(a[row].ID=="0")   // 未收到此ID对应的数据，按86填充
+        {
+            content+=",86";
+            continue;
+        }
         content+=",";
         content+=a[row].temperature;
     }
@@ -1150,7 +1096,6 @@ void MainWindow::rePlotEnvironment()
     rightSet->replace(0,ENV_ALL_Node[2].temperature.toDouble());
     leftSet->replace(0,ENV_ALL_Node[3].temperature.toDouble());
 
-    qDebug()<<"lwf";
     envBarSeries->append(frontSet);
     envBarSeries->append(backSet);
     envBarSeries->append(rightSet);
@@ -1196,6 +1141,31 @@ void MainWindow::rePlotLaserSensors()
         }
     }
 }
+
+// 检测各传感器连接状态，并显示在状态栏
+void MainWindow::detectConnection()
+{
+    QString content="暂未连接：";
+    if(!fbgWorkingStatus) content+=" FBG传感器";
+    if(!ds18WorkingStatus) content+=" 电类温度一号板";
+    if(!ds18No2WorkStatus) content+=" 电类温度二号板";
+    if(!envWorkingStatus) content+=" 环境温度";
+    if(!cncWorkingStatus) content+=" 数控机床";
+    if(!laserWorkingStatus) content+=" 位移传感器";
+    if(!cloudLinkStatus) content+=" 云平台";
+    if(fbgWorkingStatus&&ds18WorkingStatus&&ds18No2WorkStatus&&envWorkingStatus
+       &&cncWorkingStatus&&laserWorkingStatus&&cloudLinkStatus)
+    {
+        content="全部设备已连接";
+    }
+    if(fbgWorkingStatus&&ds18WorkingStatus&&ds18No2WorkStatus
+       &&envWorkingStatus&&laserWorkingStatus&&cloudLinkStatus)
+    {
+        content="全部传感器已连接(若数控机床未开启可不连接)";
+    }
+    statusbarIndicator->setText(content);
+}
+
 /**********************************************************************************************
 
                                           1.FBG传感器部分
@@ -1358,18 +1328,9 @@ void MainWindow::on_ds18link_pushButton_clicked()
     ds18SamplePath = samplePath+"/WiFi温度数据("+nowTime+")";
     ds18No1SamplePath = ds18SamplePath+"/WiFi温度数据一号板("+nowTime+")";
     ds18No2SamplePath = ds18SamplePath+"/WiFi温度数据二号板("+nowTime+")";
-    if(!lwfdir->exists(ds18SamplePath))
-    {
-        lwfdir->mkdir(ds18SamplePath);
-    }
-    if(!lwfdir->exists(ds18No1SamplePath))
-    {
-        lwfdir->mkdir(ds18No1SamplePath);
-    }
-    if(!lwfdir->exists(ds18No2SamplePath))
-    {
-        lwfdir->mkdir(ds18No2SamplePath);
-    }
+    if(!lwfdir->exists(ds18SamplePath))     lwfdir->mkdir(ds18SamplePath);
+    if(!lwfdir->exists(ds18No1SamplePath))  lwfdir->mkdir(ds18No1SamplePath);
+    if(!lwfdir->exists(ds18No2SamplePath))  lwfdir->mkdir(ds18No2SamplePath);
 
     ds18AllDataPath = ds18SamplePath+"/DCH.csv";
     QString csvHeader = "时间";
@@ -1509,7 +1470,7 @@ void MainWindow::on_ds18dislink_pushButton_clicked()
 {
     emit closeDs18Sensors();
     ui->ds18link_pushButton->setEnabled(true);
-    ui->ds18dislink_pushButton->setEnabled(true);
+    ui->ds18dislink_pushButton->setEnabled(false);
 }
 
 /**********************************************************************************************
@@ -1517,22 +1478,16 @@ void MainWindow::on_ds18dislink_pushButton_clicked()
                                             3.环境温度部分
 
 ***********************************************************************************************/
-// 监听
+// 监听环境温度传感器
 void MainWindow::on_envlinkpushButton_clicked()
 {
     QString nowTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh：mm：ss");
     envSamplePath = samplePath+"/环境温度("+nowTime+")";
-    if(!lwfdir->exists(envSamplePath))
-    {
-        lwfdir->mkdir(envSamplePath);
-    }
+    if(!lwfdir->exists(envSamplePath))  lwfdir->mkdir(envSamplePath);
 
     envAllDataPath = envSamplePath+"/EDCH.csv";
     QString csvHeader = "时间,EDCH01-01,EDCH01-02,EDCH02-01,EDCH02-02";
-    if(!QFile::exists(envAllDataPath))
-    {
-        writeFile(envAllDataPath,csvHeader);
-    }
+    if(!QFile::exists(envAllDataPath))  writeFile(envAllDataPath,csvHeader);
 
     EnviThread *airEnv = new EnviThread(originalPath);
     connect(airEnv, &EnviThread::relayMsg2Ui,this,&MainWindow::showEnvMsg);
@@ -1544,7 +1499,7 @@ void MainWindow::on_envlinkpushButton_clicked()
     ui->envdislinkpushButton->setEnabled(true);
 }
 
-// 断开
+// 断开环境温度传感器
 void MainWindow::on_envdislinkpushButton_clicked()
 {
     emit closeEnvironment();
@@ -1552,6 +1507,7 @@ void MainWindow::on_envdislinkpushButton_clicked()
     ui->envdislinkpushButton->setEnabled(false);
 }
 
+// 显示环境温度传感器连接状态
 void MainWindow::showEnvMsg(QString loveU, int loveMe)
 {
     if(loveMe == 1)

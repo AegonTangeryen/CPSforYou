@@ -30,7 +30,8 @@ Hnc848System::Hnc848System(QString cncpath)
    cncDir = new QDir();
 
    connect(cncTimer,&QTimer::timeout, this,&Hnc848System::timeIsup);
-   cncTimer->setInterval(1000);  // 每1s中断一次
+   cncTimer->setInterval(200);  // 每200ms中断一次
+   cncTimer->setTimerType(Qt::PreciseTimer);
    cncTimer->start();
 }
 

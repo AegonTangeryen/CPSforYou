@@ -7,10 +7,10 @@ FBGSensos::FBGSensos() {}
 
 FBGSensos::FBGSensos(QString path)
 {
-//    fbgIp = "192.168.0.119";
-//    fbgPort = 4010;
-    fbgIp = getHostIpAddress();
-    fbgPort = 1994;
+    fbgIp = "192.168.0.119";
+    fbgPort = 4010;
+//    fbgIp = getHostIpAddress();
+//    fbgPort = 1994;
     fbgfileDir = path;
     fbgSocket = new QUdpSocket(this);
     fbgLock = new QMutex();
@@ -24,9 +24,9 @@ FBGSensos::FBGSensos(QString path)
 // 连接FBG解调仪
 void FBGSensos::linkFbg()
 {
-    char connectOrder[2] = {0x01,0x02};
-    char startOrder[4] = {0x01,0x0a,0x55,0x00};
-    char stopOrder[4] = {0x01,0x0a,0x00,0x00};
+    char connectOrder[2] = {0x01,0x02};           // 特定连接指令
+    char startOrder[4] = {0x01,0x0a,0x55,0x00};   // 特定开始指令
+    char stopOrder[4] = {0x01,0x0a,0x00,0x00};    // 特定断开指令
     fbgSocket->writeDatagram(stopOrder,4,QHostAddress(fbgIp),fbgPort);        // 关闭解调仪
     fbgSocket->writeDatagram(connectOrder,2,QHostAddress(fbgIp),fbgPort);     // 连接解调仪
     fbgSocket->writeDatagram(startOrder,4,QHostAddress(fbgIp),fbgPort);       // 启动解调仪
@@ -37,16 +37,15 @@ void FBGSensos::linkFbg()
     {
         fbgDir->mkdir(fbgfileDir);
     }
-    fbgWorkingStatus = true;
 }
 
 // 读取socket缓存数据
 void FBGSensos::readFbgData()
 {
     char recBuf[1000];
-    while (fbgSocket->hasPendingDatagrams())
+    while (fbgSocket->hasPendingDatagrams()) // 数据接收在recBuff里
     {
-        fbgSocket->readDatagram(recBuf,999); // 数据接收在recBuff里
+        fbgSocket->readDatagram(recBuf,999);
     }
 
     if(strlen(recBuf) == 0)                  // 如果啥也没有收到，判定udp断开
@@ -55,7 +54,7 @@ void FBGSensos::readFbgData()
         emit sendPara2Ui(0);
         return;
     }
-    else
+    else                                     // 如果收到了，判定udp保持连接
     {
         fbgWorkingStatus = true;
         emit sendPara2Ui(1);

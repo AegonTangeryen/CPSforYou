@@ -11,21 +11,21 @@ LogInUi::LogInUi(QWidget *parent) :
     ui->username->setText("admin");
     ui->password->setText("admin");
 
-    updateProcess = new QProcess();
-    updateIniRead = new QSettings(QDir::currentPath()+"/update.ini", QSettings::IniFormat);
-    currentVersion = updateIniRead->value("/program/version").toDouble();
-    newVersion = updateIniRead->value("/update/newVersion").toDouble();
-    if(newVersion>currentVersion)
-    {
-        Sleep(1000);
-        QDialog *doUWant2Update = new InquireUpdateUi(this);
-        if(doUWant2Update->exec()==QDialog::Accepted)
-        {
-            updateProcess->start("E:/CPS/CPSforUpdate.exe");
-            delete doUWant2Update;
-            killTask("CPSforU.exe");
-        }
-    }
+//    updateProcess = new QProcess();
+//    updateIniRead = new QSettings(QDir::currentPath()+"/update.ini", QSettings::IniFormat);
+//    currentVersion = updateIniRead->value("/program/version").toDouble();
+//    newVersion = updateIniRead->value("/update/newVersion").toDouble();
+//    if(newVersion>currentVersion)
+//    {
+//        Sleep(1000);
+//        QDialog *doUWant2Update = new InquireUpdateUi(this);
+//        if(doUWant2Update->exec()==QDialog::Accepted)
+//        {
+//            updateProcess->start("E:/CPS/CPSforUpdate.exe");
+//            delete doUWant2Update;
+//            killTask("CPSforU.exe");
+//        }
+//    }
 }
 
 LogInUi::~LogInUi()

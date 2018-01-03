@@ -43,7 +43,10 @@ private:
     QByteArray dataAddALL;
     bool newFullFragment;                                 // 是否完整一帧
     bool addNewFullFragment;
-    QString dsNo1Dir,dsNo2Dir;
+    bool totalRenewed;                                    // 是否全部收到了一轮
+    bool addTotalRenewed;
+    QString dsNo1Dir;
+    QString dsNo2Dir;
     QString ds18ErrPath;                                  // 错误记录
     QMutex *ds18Lock;
     QDir *ds18Dir;

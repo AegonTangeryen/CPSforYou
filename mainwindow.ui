@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>856</width>
-    <height>617</height>
+    <width>848</width>
+    <height>628</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -1309,7 +1309,7 @@ background-image: url(:/pure2.jpg);</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>856</width>
+     <width>848</width>
      <height>27</height>
     </rect>
    </property>

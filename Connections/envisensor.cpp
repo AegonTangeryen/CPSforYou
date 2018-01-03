@@ -59,7 +59,6 @@ bool EnviSensor::listenEnvironment()
 void EnviSensor::newClientConnection()
 {
     envSocket = envServer->nextPendingConnection();  //获取客户端连接
-    envWorkingStatus = true;
     emit sendMsg("环境温度已连接",1);
     connect(envSocket, &QTcpSocket::readyRead, this, &EnviSensor::readEnvData);
     connect(envSocket, &QTcpSocket::disconnected, this, &EnviSensor::socketDisconnected);
@@ -68,6 +67,7 @@ void EnviSensor::newClientConnection()
 // 读取传感器发送的数据
 void EnviSensor::readEnvData()
 {
+    envWorkingStatus = true;
     QByteArray buffer;
     buffer = envSocket->readAll();                      // 读取本次全部数据
     EnvDataALL+=buffer;                                 // 存入数据队列

@@ -68,10 +68,11 @@ public:
     void rePlotEnvironment();
     void rePlotHnc();
     void rePlotLaserSensors();
+    void detectConnection();
 
 private slots:
-    void timeisup();     // 主定时器中断处理函数
-    void plotTimePoll(); // 定时重新绘图
+    void timeisup();        // 主定时器中断处理函数
+    void plotTimePoll();    // 定时重新绘图
 
     void on_cnclink_pushButton_clicked();
     void on_cncdislink_pushButton_clicked();
@@ -151,15 +152,15 @@ private:
     QString hncSamplePath;
     QString laserSamplePath;
 
-    QLabel *statusbarFBGLabel;
-    QLabel *statusbarDs18Label;
-    QLabel *statusbarEnvLabel;
-    QLabel *statusbarCNCLabel;
-    QLabel *statusbarCCDLabel;
+    QLabel *statusbarIndicator;
     QString currentday;
     QString currentDate;
     QTimer *kingTimer;       // 主定时器
     qint64 taskTimeCnt;      // 各项任务的周期
+    qint16 ds18AllRecordCnt; // 为防止数据未收齐一轮就抽样
+    qint16 ds18No1RecordCnt;
+    qint16 ds18No2RecordCnt;
+    qint16 envRecordCnt;
     MMTimer *plotTimer;      // 刷新各个图表的定时器
     qint16 plotCnt;          // 绘图计数
     QMutex *globalLock;
