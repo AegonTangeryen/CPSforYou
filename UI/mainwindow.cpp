@@ -736,7 +736,7 @@ void MainWindow::recordAllFbg()
     writeFile(FbgAllDataPath,fbgContent);
 
     fbgContent.clear();  fbgContent = currentTime;                // 写1~7通道应力传感器总表
-    for(int i=0;i<8;i++)
+    for(int i=0;i<7;i++)
     {
         if(FBG_ALL[i][0]=="255") break;                           // 还没有收到数据
         for(int j=0;j<FBG_Index_Max;j++)
@@ -747,7 +747,7 @@ void MainWindow::recordAllFbg()
     writeFile(fbgAllStressPath,fbgContent);
 
     fbgContent.clear();  fbgContent = currentTime;                // 写8~32通道温度传感器总表
-    for(int i=8;i<FBG_Channel_Max;i++)
+    for(int i=7;i<FBG_Channel_Max;i++)
     {
         if(FBG_ALL[i][0]=="255") break;                           // 还没有收到数据
         for(int j=0;j<FBG_Index_Max;j++)
