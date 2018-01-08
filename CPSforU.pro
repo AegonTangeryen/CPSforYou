@@ -58,7 +58,8 @@ SOURCES += \
         UI/seriesintroductionui.cpp \
         UI/animationintroductionui.cpp \
         UI/loginui.cpp \
-        UI/inquireupdateui.cpp
+        UI/inquireupdateui.cpp \
+        UI/customui.cpp
 
 HEADERS += \
         Connections/cloudplatform.h \
@@ -87,6 +88,7 @@ HEADERS += \
         UI/seriesintroductionui.h \
         UI/animationintroductionui.h \
         UI/loginui.h \
+        UI/customui.h \
         IncludesRely/autotestncu.h \
         IncludesRely/devdict.h \
         IncludesRely/eventdef.h \
@@ -132,7 +134,7 @@ HEADERS += \
         IncludesRely/smplcalc.h \
         IncludesRely/temp.h \
         IncludesRely/trspack.h \
-        UI/inquireupdateui.h
+        UI/inquireupdateui.h \
 
 FORMS += \
         mainwindow.ui \
@@ -146,7 +148,8 @@ FORMS += \
         seriesintroductionui.ui \
         animationintroductionui.ui \
         loginui.ui \
-        inquireupdateui.ui
+        inquireupdateui.ui \
+        customui.ui
 
 INCLUDEPATH += ./IncludesRely \
                ./Auxiliary \

@@ -20,11 +20,9 @@ ThermalErrorCompensation::ThermalErrorCompensation(QString path)
     QString currentDate = QDateTime::currentDateTime().toString("yyyyMMdd");
     compenPath = compenPath+"/预测和补偿记录"+currentDate+".csv";
     QString csvHeader = "时间,次数,当前预测值,上一次预测值,当前补偿值";
-    if(QFile::exists(compenPath)) qDebug()<<"预测和补偿记录文件已存在";
-    else
+    if(!QFile::exists(compenPath))
     {
         writeFile(compenPath,csvHeader);
-        qDebug()<<"预测和补偿记录文件创建成功";
     }
 
     duketimer = new QTimer(this);
@@ -37,7 +35,6 @@ ThermalErrorCompensation::ThermalErrorCompensation(QString path)
 ThermalErrorCompensation::~ThermalErrorCompensation()
 {
     delete duketimer;
-    qDebug()<<"退出预测补偿线程，进入析构函数，删除定时器";
 }
 
 void ThermalErrorCompensation::timeisup()
@@ -178,11 +175,9 @@ void ThermalErrorCompensation::niceNewDay(QString gaintPanda)
     QString currentDate = QDateTime::currentDateTime().toString("yyyyMMdd");
     compenPath = gaintPanda+"/预测和补偿记录"+currentDate+".csv";
     QString csvHeader = "时间,次数,当前预测值,上一次预测值,当前补偿值";
-    if(QFile::exists(compenPath)) qDebug()<<"预测和补偿记录文件已存在";
-    else
+    if(!QFile::exists(compenPath))
     {
         writeFile(compenPath,csvHeader);
-        qDebug()<<"预测和补偿记录文件创建成功";
     }
 }
 

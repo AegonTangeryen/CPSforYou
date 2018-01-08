@@ -37,7 +37,7 @@
        <string notr="true">font: 75 12pt &quot;微软雅黑&quot;;</string>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tab">
        <property name="styleSheet">
@@ -1051,11 +1051,6 @@ background-image: url(:/pure2.jpg);</string>
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_2">
-       <attribute name="title">
-        <string>数控系统信息</string>
-       </attribute>
-      </widget>
       <widget class="QWidget" name="tab_5">
        <attribute name="title">
         <string>位移传感器</string>
@@ -1175,17 +1170,17 @@ background-image: url(:/pure2.jpg);</string>
        <widget class="QTextBrowser" name="cloud_textBrowser">
         <property name="geometry">
          <rect>
-          <x>10</x>
-          <y>60</y>
-          <width>391</width>
-          <height>291</height>
+          <x>50</x>
+          <y>140</y>
+          <width>701</width>
+          <height>351</height>
          </rect>
         </property>
        </widget>
        <widget class="QLabel" name="label_8">
         <property name="geometry">
          <rect>
-          <x>150</x>
+          <x>340</x>
           <y>10</y>
           <width>101</width>
           <height>41</height>
@@ -1196,25 +1191,63 @@ background-image: url(:/pure2.jpg);</string>
         </property>
        </widget>
       </widget>
-      <widget class="QWidget" name="tab_6">
+      <widget class="QWidget" name="tab_2">
        <attribute name="title">
-        <string>热误差补偿</string>
+        <string>数控和补偿信息</string>
        </attribute>
        <widget class="QTextBrowser" name="comp_textBrowser">
         <property name="geometry">
          <rect>
-          <x>80</x>
-          <y>20</y>
+          <x>20</x>
+          <y>150</y>
           <width>531</width>
           <height>311</height>
          </rect>
         </property>
        </widget>
+       <widget class="QWidget" name="layoutWidget_2">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>20</y>
+          <width>358</width>
+          <height>33</height>
+         </rect>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_14">
+         <item>
+          <widget class="QLabel" name="label_9">
+           <property name="minimumSize">
+            <size>
+             <width>150</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:18pt;&quot;&gt;#1191示数：&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="_1191_Browserlabel">
+           <property name="minimumSize">
+            <size>
+             <width>200</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
        <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
-          <x>230</x>
-          <y>360</y>
+          <x>30</x>
+          <y>70</y>
           <width>239</width>
           <height>62</height>
          </rect>
@@ -1256,44 +1289,6 @@ background-image: url(:/pure2.jpg);</string>
            </property>
            <property name="text">
             <string>清空</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="layoutWidget_2">
-        <property name="geometry">
-         <rect>
-          <x>170</x>
-          <y>440</y>
-          <width>358</width>
-          <height>33</height>
-         </rect>
-        </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_14">
-         <item>
-          <widget class="QLabel" name="label_9">
-           <property name="minimumSize">
-            <size>
-             <width>150</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:18pt;&quot;&gt;#1191数值：&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="_1191_Browserlabel">
-           <property name="minimumSize">
-            <size>
-             <width>200</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
            </property>
           </widget>
          </item>

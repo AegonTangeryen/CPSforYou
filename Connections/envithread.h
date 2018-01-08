@@ -10,11 +10,12 @@ class EnviThread: public QThread
 public:
     EnviThread();
     ~EnviThread();
-    EnviThread(QString filePath);
+    EnviThread(QString filePath,QString peaceport);
 
 public:
     void run();
     QString path;
+    QString listenPort;
 
 public slots:
      void passEnvMsg2Ui(QString para, int starkstatus);

@@ -13,7 +13,7 @@ class CloudPlatform: public QObject
     Q_OBJECT
 
 public:
-    CloudPlatform();
+    CloudPlatform(QString skyIP,QString sunPort);
     ~CloudPlatform();
     void packageData();
     void linkOnceAgain();

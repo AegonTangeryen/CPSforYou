@@ -1,19 +1,20 @@
 #include "cloudtcpthread.h"
 
 // 构造函数
-CloudTcpThread::CloudTcpThread()  {}
+CloudTcpThread::CloudTcpThread(QString ourIp,QString ourPort)
+{
+    cloudIp = ourIp;
+    cloudPort = ourPort;
+}
 
 // 析构函数
-CloudTcpThread::~CloudTcpThread()
-{
-    qDebug()<<"云服务平台线程已退出";
-}
+CloudTcpThread::~CloudTcpThread() {}
 
 // 子线程
 void CloudTcpThread::run()
 {
     emit passCloudInfo("进入云服务平台线程",1);
-    cloudForU = new CloudPlatform();
+    CloudPlatform *cloudForU = new CloudPlatform(cloudIp,cloudPort);
     connect(cloudForU, &CloudPlatform::sendMsg, this, &CloudTcpThread::relayCloudInfo);
     connect(this,&CloudTcpThread::destroyTcpClient,cloudForU,&CloudPlatform::deleteTcpClient);
     exec();
@@ -32,4 +33,5 @@ void CloudTcpThread::closeThread()
     sleep(1);
     quit();
     wait();
+    qDebug()<<"cloudQuit";
 }

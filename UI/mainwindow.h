@@ -33,6 +33,7 @@
 #include "envithread.h"
 #include "configurationui.h"            // 参数配置页面
 #include "chartthemeoption.h"           // 风格配置页面
+#include "customui.h"                   // 自娱自乐页面
 #include "fbgalldataui.h"               // fbg全部数据页面
 #include "ds18seeallui.h"               // ds18b20全部数据页面
 #include "contactusui.h"                // 联系我们页面
@@ -71,8 +72,8 @@ public:
     void detectConnection();
 
 private slots:
-    void timeisup();        // 主定时器中断处理函数
-    void plotTimePoll();    // 定时重新绘图
+    void timeisup();         // 主定时器中断处理函数
+    void plotTimePoll();     // 定时重新绘图
 
     void on_cnclink_pushButton_clicked();
     void on_cncdislink_pushButton_clicked();
@@ -115,6 +116,8 @@ private slots:
     void on_actionmusic_triggered();
     void on_actionTV_Series_triggered();
     void on_actionAnimation_triggered();
+
+    void on_actionCustom_triggered();
 
 signals:
     void closeHncSystem();

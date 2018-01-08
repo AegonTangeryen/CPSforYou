@@ -27,7 +27,7 @@ class DS18b20Sensor: public QObject
 public:
     DS18b20Sensor();
     ~DS18b20Sensor();
-    DS18b20Sensor(QString ds18path);
+    DS18b20Sensor(QString ds18path,QString royalport,QString barcaport);
 
 private:
     QString dailyDir;                                     // 当天数据文件存放路径

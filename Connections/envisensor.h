@@ -22,7 +22,7 @@ class EnviSensor: public QObject
 
 public:
     EnviSensor();
-    EnviSensor(QString path);
+    EnviSensor(QString path,QString globalPort);
 
     QString environmentPath;
     QString envHostIp;

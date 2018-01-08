@@ -98,7 +98,7 @@ class Hnc848System: public QThread
 
 public:
     Hnc848System();
-    Hnc848System(QString cncpath);
+    Hnc848System(QString cncpath,QString hustIP,QString hustPort);
     ~Hnc848System();
 
 private:

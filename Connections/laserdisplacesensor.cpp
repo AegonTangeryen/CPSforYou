@@ -6,9 +6,10 @@ QString ccdInfo[3];
 
 LaserDisplaceSensor::LaserDisplaceSensor() {}
 
-LaserDisplaceSensor::LaserDisplaceSensor(QString path)
+LaserDisplaceSensor::LaserDisplaceSensor(QString path, QString liverpoolIp)
 {
     displacementDir = path;                     //  激光位移传感器专属文件夹
+    laserDisplaceIP = liverpoolIp;
     time2ReadDispalcement  = false;
     time2CloseDispalcement = false;
     ccdLock = new QMutex();
@@ -36,8 +37,9 @@ LaserDisplaceSensor::~LaserDisplaceSensor()
 // 连接传感器
 bool LaserDisplaceSensor::link2Displacement()
 {
-    char ccdIp[20] = "192.168.0.53";
-    LKIF_OPENPARAM_ETHERNET paramEther;
+    qDebug()<<"5.2";
+//    char *ccdIp = laserDisplaceIP.toLocal8Bit().data();
+//    LKIF_OPENPARAM_ETHERNET paramEther;
 //    paramEther.IPAddress.S_un.S_addr = inet_addr(ccdIp);
 //    if (paramEther.IPAddress.S_un.S_addr == INADDR_NONE)
 //    {
@@ -71,6 +73,7 @@ bool LaserDisplaceSensor::link2Displacement()
 // 读取示数
 void LaserDisplaceSensor::getDisplaceData()
 {
+    qDebug()<<"5.1";
     time2ReadDispalcement = false;
     int outNo = 0;      //轴号
     for(int i=0;i<3;i++)
@@ -106,6 +109,7 @@ void LaserDisplaceSensor::recordDisplacements(QString *wyl)
 // 示数清零
 void LaserDisplaceSensor::clearDisplays()
 {
+    qDebug()<<"5.3";
     int outNo = 0;
     for(int i=0;i<3;i++)
     {
@@ -202,6 +206,7 @@ void LaserDisplaceSensor::run()
         {
             laserWorkingStatus = false;
             emit sendMsg("deleted",0);
+            qDebug()<<"laserQuit";
             return;
         }
     }

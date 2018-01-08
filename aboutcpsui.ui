@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>857</width>
-    <height>604</height>
+    <width>858</width>
+    <height>623</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,25 +15,31 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="label">
+    <widget class="QLabel" name="label_2">
+     <property name="styleSheet">
+      <string notr="true">font: 16pt &quot;幼圆&quot;;</string>
+     </property>
      <property name="text">
-      <string/>
-     </property>
-     <property name="pixmap">
-      <pixmap resource="rc.qrc">:/img/cps.png</pixmap>
-     </property>
-     <property name="scaledContents">
-      <bool>true</bool>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;远远眺望你的方向&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QPlainTextEdit" name="plainTextEdit">
-     <property name="styleSheet">
-      <string notr="true">font: 16pt &quot;黑体&quot;;</string>
+    <widget class="QLabel" name="label">
+     <property name="maximumSize">
+      <size>
+       <width>900</width>
+       <height>600</height>
+      </size>
      </property>
-     <property name="plainText">
-      <string>    信息物理系统（CPS,Cyber-Physical Systems）是一个综合计算、网络和物理环境的多维复杂系统，通过3C（Computer、Communication、Control）技术的有机融合与深度协作，实现大型工程系统的实时感知、动态控制和信息服务。CPS实现计算、通信与物理系统的一体化设计，可使系统更加可靠、高效、实时协同，具有重要而广泛的应用前景。</string>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap resource="rc.qrc">:/img/whut2.jpg</pixmap>
+     </property>
+     <property name="scaledContents">
+      <bool>true</bool>
      </property>
     </widget>
    </item>

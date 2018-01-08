@@ -16,12 +16,12 @@ Hnc848System::~Hnc848System()
     delete cncDir;
 }
 
-Hnc848System::Hnc848System(QString cncpath)
+Hnc848System::Hnc848System(QString cncpath, QString hustIP, QString hustPort)
 {
    cncFileDir = cncpath;
    clientNo = 256;
-   CNCPORT_Init = 5555;
-   hncIp = "192.168.0.113";
+   CNCPORT_Init = hustPort.toInt();
+   hncIp = hustIP;
    alarmHisRecCnt = 0;
    time2ReadCNCData = false;
    quitThread = false;
@@ -116,6 +116,7 @@ bool Hnc848System::connect2CNC()
 // 从数控系统中获取数据：成功返回1，失败返回0
 bool Hnc848System::getCNCData()
 {
+    qDebug()<<"4";
     int ret = 0;
     ret = HNC_NetIsConnect(clientNo);   //是否保持连接
     if(ret != 0)                        // 非正常状态下连接中断,重连
@@ -395,6 +396,7 @@ void Hnc848System::run()
         {
             cncWorkingStatus = false;
             emit sendMsg("退出hnc线程",false);
+            qDebug()<<"hncQuit";
             return;
         }
     }

@@ -13,10 +13,11 @@ QString envMap[4] =
 
 EnviSensor::EnviSensor()    {}
 
-EnviSensor::EnviSensor(QString path)
+EnviSensor::EnviSensor(QString path, QString globalPort)
 {
     envHostIp = getHostIpAddress();  // 获取本地IP
-    envPort = 2002;
+    envPort = globalPort.toInt();
+    qDebug()<<"env:"<<envPort;
     envNewFullFragment = false;
     errCnt = 0;
     envLock = new QMutex();
@@ -30,7 +31,7 @@ EnviSensor::EnviSensor(QString path)
     {
         envDir->mkdir(environmentPath);
     }
-    if(listenEnvironment()) qDebug()<<endl<<"2002端口监听成功";
+    listenEnvironment();
     connect(envServer,&QTcpServer::newConnection,this,&EnviSensor::newClientConnection);
 }
 
@@ -67,6 +68,7 @@ void EnviSensor::newClientConnection()
 // 读取传感器发送的数据
 void EnviSensor::readEnvData()
 {
+    qDebug()<<"3";
     envWorkingStatus = true;
     QByteArray buffer;
     buffer = envSocket->readAll();                      // 读取本次全部数据

@@ -14,12 +14,13 @@ class LaserDisplaceSensor: public QThread
 
 public:
     LaserDisplaceSensor();
-    LaserDisplaceSensor(QString path);
+    LaserDisplaceSensor(QString path,QString liverpoolIp);
     ~LaserDisplaceSensor();
 
 public:
     QString displacementPath;
     QString displacementDir;
+    QString laserDisplaceIP;
     QMutex *ccdLock;
     QTimer *ccdTimer;
     MMTimer *MultiMediaTimer;

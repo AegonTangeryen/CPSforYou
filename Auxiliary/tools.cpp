@@ -66,7 +66,7 @@ bool writeFile(QString fileName, QString text)
     QFile f(fileName);
     if (!f.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append))
     {
-        qDebug() << "Open failed.";
+        qDebug() << "csv Open failed.";
         return false;
     }
     QTextStream txtOutput(&f);
@@ -84,7 +84,6 @@ QString getHostIpAddress()
     foreach(QHostAddress address,info.addresses()) // 如果存在多条ip地址ipv4和ipv6：
     {
         if(address.protocol()==QAbstractSocket::IPv4Protocol){  // 只取ipv4协议的地址
-            qDebug()<<address.toString();
             ipAddr = address.toString();
         }
     }
@@ -107,4 +106,17 @@ QString getHostMacAddress()
         }
     }
     return strMacAddr;
+}
+
+// 获取本机内存使用情况
+QStringList getSysMemory()
+{
+    QStringList coreInfo;
+    MEMORYSTATUSEX statex;
+    statex.dwLength = sizeof (statex);
+    GlobalMemoryStatusEx (&statex);
+    coreInfo.append(QString::number(statex.ullTotalPhys/MB)); // 总内存大小(MB)
+    coreInfo.append(QString::number(statex.ullAvailPhys/MB)); // 可用内存大小(MB)
+
+    return coreInfo;
 }

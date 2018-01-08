@@ -7,7 +7,6 @@ fbgAllDataUi::fbgAllDataUi(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->tableWidget->setWindowTitle("光纤光栅传感器32通道*20节点示数展示");
     QStringList header;
     for(int channum=1;channum<=32;channum++)
     {
@@ -37,6 +36,7 @@ fbgAllDataUi::~fbgAllDataUi()
 
 void fbgAllDataUi::refreshTable()
 {
+    ui->tableWidget->clearContents();
     if(fbgWorkingStatus)
     {
         for(int col=0;col<32;col++)     // 每个通道，按列填充

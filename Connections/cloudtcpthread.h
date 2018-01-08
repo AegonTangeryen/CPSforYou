@@ -11,12 +11,14 @@ class CloudTcpThread: public QThread
     Q_OBJECT
 
 public:
-    CloudTcpThread();
+    CloudTcpThread(QString ourIp,QString ourPort);
     ~CloudTcpThread();
 
 public:
     QString path;
-    CloudPlatform *cloudForU;
+    QString cloudIp;
+    QString cloudPort;
+    //CloudPlatform *cloudForU;
     void run();
 
 signals:

@@ -1,19 +1,17 @@
 #include "envithread.h"
 
-EnviThread::EnviThread(QString filePath)
+EnviThread::EnviThread(QString filePath, QString peaceport)
 {
     path = filePath;
+    listenPort = peaceport;
 }
 
-EnviThread::~EnviThread()
-{
-    qDebug()<<"退出环境温度子线程";
-}
+EnviThread::~EnviThread() {}
 
 // 环境温度专属子线程
 void EnviThread::run()
 {
-    EnviSensor *loveEnvironment = new EnviSensor(path);
+    EnviSensor *loveEnvironment = new EnviSensor(path,listenPort);
     connect(loveEnvironment, &EnviSensor::sendMsg, this, &EnviThread::passEnvMsg2Ui);
     connect(this,&EnviThread::sendNewDay,loveEnvironment,&EnviSensor::niceNewDay);
     connect(this,&EnviThread::destroyTcp,loveEnvironment,&EnviSensor::deleteEnvServer);
@@ -39,4 +37,5 @@ void EnviThread::forceThread2Quit()
     sleep(1);
     quit();
     wait();
+    qDebug()<<"envQuit";
 }

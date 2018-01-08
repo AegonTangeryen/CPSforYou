@@ -2,20 +2,19 @@
 
 Ds18TcpThread::Ds18TcpThread() {}
 
-Ds18TcpThread::Ds18TcpThread(QString dspath)
+Ds18TcpThread::Ds18TcpThread(QString dspath,QString no1port,QString no2port)
 {
     path = dspath;
+    firstPort = no1port;
+    secondPort = no2port;
 }
 
-Ds18TcpThread::~Ds18TcpThread()
-{
-    qDebug()<<"DS18b20 tcp socket通信子线程退出";
-}
+Ds18TcpThread::~Ds18TcpThread(){}
 
 // DS18b20专属tcp socket通信子线程
 void Ds18TcpThread::run()
 {
-    DS18b20Sensor *ds18B20 = new DS18b20Sensor(path);
+    DS18b20Sensor *ds18B20 = new DS18b20Sensor(path,firstPort,secondPort);
     connect(ds18B20, &DS18b20Sensor::sendMsg, this, &Ds18TcpThread::passDS18Msg2Ui);
     connect(this,&Ds18TcpThread::sendNewDay,ds18B20,&DS18b20Sensor::niceNewDay);
     connect(this,&Ds18TcpThread::destroyTcp,ds18B20,&DS18b20Sensor::deleteTcpServer);
@@ -41,4 +40,5 @@ void Ds18TcpThread::forceThread2Quit()
     sleep(1);
     quit();
     wait();
+    qDebug()<<"ds18Quit";
 }

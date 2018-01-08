@@ -2,6 +2,9 @@
 #define DS18SEEALLUI_H
 
 #include <QDialog>
+#include <QTableWidget>
+#include <QTableWidgetItem>
+#include <ds18b20sensor.h>
 
 namespace Ui {
 class Ds18SeeAllUi;
@@ -17,6 +20,10 @@ public:
 
 private:
     Ui::Ds18SeeAllUi *ui;
+    QTimer *churchTimer;
+
+private slots:
+    void refreshTable();
 };
 
 #endif // DS18SEEALLUI_H

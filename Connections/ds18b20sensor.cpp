@@ -184,11 +184,12 @@ QString dsNo2Map[8][9] =            // 二号板ID列表
 DS18b20Sensor::DS18b20Sensor()  {}
 DS18b20Sensor::~DS18b20Sensor() {}
 
-DS18b20Sensor::DS18b20Sensor(QString ds18path)
+DS18b20Sensor::DS18b20Sensor(QString ds18path, QString royalport, QString barcaport)
 {
     errDS18B20Cnt = 0;
-    dslinkport1 = "1001";
-    dslinkport2 = "3003";
+    dslinkport1 = royalport;
+    dslinkport2 = barcaport;
+    qDebug()<<"ds"<<dslinkport1<<dslinkport2;
     dsHostIp = getHostIpAddress();  // 获取本地IP
     ds18Dir = new QDir();
     newFullFragment = false;
@@ -214,8 +215,8 @@ DS18b20Sensor::DS18b20Sensor(QString ds18path)
         writeFile(ds18ErrPath,errHeader);
     }
 
-    if(listenDS18b20()) qDebug()<<endl<<"1001端口监听成功";
-    if(listenDS18Add()) qDebug()<<endl<<"3003端口监听成功";
+    listenDS18b20();
+    listenDS18Add();
     connect(ds18Server,&QTcpServer::newConnection,this,&DS18b20Sensor::newClientConnection);
     connect(ds18AddServer,&QTcpServer::newConnection,this,&DS18b20Sensor::addNewClientConnection);
 }
@@ -270,6 +271,7 @@ void DS18b20Sensor::newClientConnection()
 // 读取传感器一号板发送的数据
 void DS18b20Sensor::readDS18Data()
 {
+    qDebug()<<"2.1";
     ds18WorkingStatus = true;                      // 在此判定一号板已连接
     QByteArray buffer;
     buffer = ds18Socket->readAll();                  // 读取本次全部数据
@@ -350,6 +352,7 @@ void DS18b20Sensor::addNewClientConnection()
 // 读取传感器二号板发送的数据
 void DS18b20Sensor::readDS18AddData()
 {
+    qDebug()<<"2.2";
     ds18No2WorkStatus = true;                               // 在此判定二号板已连接
     QByteArray buffer;
     buffer = ds18AddSocket->readAll();                      // 读取本次全部数据

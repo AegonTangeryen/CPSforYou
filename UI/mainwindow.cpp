@@ -24,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->cncdislink_pushButton->setEnabled(false);
     ui->closeccd_pushButton->setEnabled(false);
     ui->dislinkcloud_pushButton->setEnabled(false);
+    ui->zeroccd_pushButton->setEnabled(false);
 
     QPalette wordColor; QFont wordFont;
     wordColor.setColor(QPalette::WindowText,Qt::white);
@@ -399,6 +400,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ds18No1RecordCnt=0;
     ds18No2RecordCnt=0;
     envRecordCnt=0;
+    userInputAll<<"192.168.0.119"<<"4010"<<"1001"<<"3003"<<"2002"<<"192.168.0.113"
+                <<"5555"<<"192.168.0.53"<<"59.69.101.206"<<"3690";  // 默认值填充
+
     globalLock = new QMutex();
     kingTimer = new QTimer(this);
     connect(kingTimer,&QTimer::timeout, this,MainWindow::timeisup);
@@ -410,10 +414,12 @@ MainWindow::MainWindow(QWidget *parent) :
     plotTimer = new MMTimer(1000,this);
     connect(plotTimer,&MMTimer::timeout,this,&MainWindow::plotTimePoll);
 //    plotTimer->start();   // 暂不启用图形更新
+    qDebug()<<"MainInit";
 }
 
 MainWindow::~MainWindow()
 {
+    qDebug()<<"MainQuit";
     delete ui;
 }
 
@@ -657,11 +663,13 @@ void MainWindow::timeisup()
             QString csvHeader = "时间,X轴位移,Y轴位移,Z轴位移";
             if(!QFile::exists(laserAllDataPath)) {writeFile(laserAllDataPath,csvHeader);}
         }
+        qDebug()<<"MainNewDay";
     }
 
     taskTimeCnt++;
     if(taskTimeCnt%5==0)         // 每5s抽样一次
     {
+        qDebug()<<"Total Memory/Avaliable:"+getSysMemory()[0]+"/"+getSysMemory()[1]+"MB";
         if(fbgWorkingStatus) recordAllFbg();
         if(ds18WorkingStatus && ds18No2WorkStatus) recordAllDs18b20(DS18B20_ALL_Node,DS18B20_Channel_Max,DS18B20_ADD_Node,DS18B20_Channel_Max);
         if(ds18WorkingStatus) recordNo1Ds18b20(DS18B20_ALL_Node,DS18B20_Channel_Max);
@@ -674,7 +682,6 @@ void MainWindow::timeisup()
     {
         detectConnection();
     }
-
     ui->_1191_Browserlabel->clear();
     ui->_1191_Browserlabel->setText("1191状态第"+QString::number(taskTimeCnt)+"次："+QString::number(statusFor1191));
 
@@ -1276,12 +1283,13 @@ void MainWindow::on_FBGlink_pushButton_clicked()
 
     ui->FBGlink_pushButton->setEnabled(false);
     ui->FBGclose_pushButton->setEnabled(true);
-    FBGUdpThread *fbgThread = new FBGUdpThread(originalPath);
+    FBGUdpThread *fbgThread = new FBGUdpThread(originalPath,userInputAll[0],userInputAll[1]);
     connect(fbgThread,&FBGUdpThread::passUdpInfo,this,&MainWindow::showFbgResults);
     connect(this,&MainWindow::createNewDayFolder,fbgThread,&FBGUdpThread::newDayforYou);
     connect(this,&MainWindow::closeFbgSocket,fbgThread,&FBGUdpThread::forceThread2Quit);
     connect(fbgThread,&FBGUdpThread::finished,fbgThread,&FBGUdpThread::deleteLater);
     fbgThread->start();
+    qDebug()<<"FBGInit";
 }
 
 // 关闭连接
@@ -1297,11 +1305,11 @@ void MainWindow::showFbgResults(int tywin)
 {
     switch (tywin)
     {
-        case -1: ui->fbglinklabel->setText("FBG线程已关闭");
+        case -1: ui->fbglinklabel->setText("未连接");
             break;
-        case 0:  ui->fbglinklabel->setText("FBG暂时断开");
+        case 0:  ui->fbglinklabel->setText("未收到");
             break;
-        case 1:  ui->fbglinklabel->setText("FBG保持连接");
+        case 1:  ui->fbglinklabel->setText("保持连接");
             break;
         default: break;
     }
@@ -1310,10 +1318,9 @@ void MainWindow::showFbgResults(int tywin)
 // 点击按钮，查看fbg详细数据
 void MainWindow::fbgSeeAll()
 {
-   fbgAllDataUi *iWantSeeAllFbg = new fbgAllDataUi(this);
-   iWantSeeAllFbg->setWindowTitle("光纤光栅传感器全部数据展示");
-   if(iWantSeeAllFbg->exec() == QDialog::Accepted) {}
-   delete iWantSeeAllFbg;
+   fbgAllDataUi iWantSeeAllFbg;
+   iWantSeeAllFbg.setWindowTitle("光纤光栅传感器全部数据展示");
+   if(iWantSeeAllFbg.exec() == QDialog::Accepted) {}
 }
 
 /**********************************************************************************************
@@ -1425,14 +1432,15 @@ void MainWindow::on_ds18link_pushButton_clicked()
         writeFile(dsNo2DataPath,csvHeader);
     }
 
-    Ds18TcpThread *ds18Thread = new Ds18TcpThread(originalPath);
+    ui->ds18link_pushButton->setEnabled(false);
+    ui->ds18dislink_pushButton->setEnabled(true);
+    Ds18TcpThread *ds18Thread = new Ds18TcpThread(originalPath,userInputAll[2],userInputAll[3]);
     connect(ds18Thread, &Ds18TcpThread::relayMsg2Ui,this,&MainWindow::showDS18Msg);
     connect(this,&MainWindow::closeDs18Sensors,ds18Thread,&Ds18TcpThread::forceThread2Quit);
     connect(this,&MainWindow::createNewDayFolder,ds18Thread,&Ds18TcpThread::newDayforYou);
     connect(ds18Thread, &Ds18TcpThread::finished, ds18Thread, &QObject::deleteLater);
     ds18Thread->start();
-    ui->ds18link_pushButton->setEnabled(false);
-    ui->ds18dislink_pushButton->setEnabled(true);
+    qDebug()<<"DS18Init";
 }
 
 // 返回提示信息
@@ -1459,10 +1467,9 @@ void MainWindow::showDS18Msg(QString msg, int status)
 // 显示全部数据
 void MainWindow::ds18SeeAll()
 {
-    Ds18SeeAllUi *iWant2SeeYou = new Ds18SeeAllUi(this);
-    iWant2SeeYou->setWindowTitle("电类温度传感器全部数据展示");
-    if(iWant2SeeYou->exec() == QDialog::Accepted) {}
-    delete iWant2SeeYou;
+    Ds18SeeAllUi iWant2SeeYou;
+    iWant2SeeYou.setWindowTitle("电类温度传感器全部数据展示");
+    if(iWant2SeeYou.exec() == QDialog::Accepted) {}
 }
 
 // 关闭此线程
@@ -1489,14 +1496,15 @@ void MainWindow::on_envlinkpushButton_clicked()
     QString csvHeader = "时间,EDCH01-01,EDCH01-02,EDCH02-01,EDCH02-02";
     if(!QFile::exists(envAllDataPath))  writeFile(envAllDataPath,csvHeader);
 
-    EnviThread *airEnv = new EnviThread(originalPath);
+    ui->envlinkpushButton->setEnabled(false);
+    ui->envdislinkpushButton->setEnabled(true);
+    EnviThread *airEnv = new EnviThread(originalPath,userInputAll[4]);
     connect(airEnv, &EnviThread::relayMsg2Ui,this,&MainWindow::showEnvMsg);
     connect(this,&MainWindow::closeEnvironment,airEnv,&EnviThread::forceThread2Quit);
     connect(this,&MainWindow::createNewDayFolder,airEnv,&EnviThread::newDayforYou);
     connect(airEnv, &EnviThread::finished, airEnv, &QObject::deleteLater);
     airEnv->start();
-    ui->envlinkpushButton->setEnabled(false);
-    ui->envdislinkpushButton->setEnabled(true);
+    qDebug()<<"envInit";
 }
 
 // 断开环境温度传感器
@@ -1528,27 +1536,14 @@ void MainWindow::showEnvMsg(QString loveU, int loveMe)
 // 点击"连接机床"
 void MainWindow::on_cnclink_pushButton_clicked()
 {
-    QString nowTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh：mm：ss");
-    hncSamplePath = samplePath+"/CNC机床数据("+nowTime+")";
-    if(!lwfdir->exists(hncSamplePath))
-    {
-        lwfdir->mkdir(hncSamplePath);
-    }
-
-    hncAllDataPath = hncSamplePath+"/CNC数据值.csv";
-    QString csvHeader = "时间,机床通道,X轴坐标,Y轴坐标,Z轴坐标,主轴坐标,进给速度,主轴速度,X轴功率,Y轴功率,Z轴功率,主轴功率,X轴负荷,Y轴负荷,Z轴负荷,主轴负荷,暂停状态";
-    if(!QFile::exists(hncAllDataPath))
-    {
-        writeFile(hncAllDataPath,csvHeader);
-    }
-
-    Hnc848System *hnc848c = new Hnc848System(originalPath); // 将每日数据集路径送入对象
+    Hnc848System *hnc848c = new Hnc848System(originalPath,userInputAll[5],userInputAll[6]);
     connect(hnc848c, &Hnc848System::sendMsg, this, &MainWindow::showCNCMsg);
     connect(hnc848c,&Hnc848System::sendPara,this,&MainWindow::showComp);
     connect(this,&MainWindow::createNewDayFolder,hnc848c,&Hnc848System::niceNewDay);
     connect(this,&MainWindow::closeHncSystem,hnc848c,&Hnc848System::forceThreadtoQuit);
     connect(hnc848c, &Hnc848System::finished, hnc848c, &QObject::deleteLater);
     hnc848c->start(); // 启动数控系统子线程
+    qDebug()<<"hncInit";
 }
 
 // 点击"断开机床"
@@ -1565,14 +1560,20 @@ void MainWindow::showCNCMsg(QString msg, bool result)
         ui->cnclink_pushButton->setEnabled(false);
         ui->cncdislink_pushButton->setEnabled(true);
         ui->hnclink_label->setText("已连接");
-        ui->hnclink_label->setStyleSheet("color:green");
+
+        // 连接成功之后建立文件夹
+        QString nowTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh：mm：ss");
+        hncSamplePath = samplePath+"/CNC机床数据("+nowTime+")";
+        if(!lwfdir->exists(hncSamplePath)) { lwfdir->mkdir(hncSamplePath);}
+        hncAllDataPath = hncSamplePath+"/CNC数据值.csv";
+        QString csvHeader = "时间,机床通道,X轴坐标,Y轴坐标,Z轴坐标,主轴坐标,进给速度,主轴速度,X轴功率,Y轴功率,Z轴功率,主轴功率,X轴负荷,Y轴负荷,Z轴负荷,主轴负荷,暂停状态";
+        if(!QFile::exists(hncAllDataPath)) { writeFile(hncAllDataPath,csvHeader);}
     }
     else                    // 连接失败
     {
         ui->cnclink_pushButton->setEnabled(true);
         ui->cncdislink_pushButton->setEnabled(false);
         ui->hnclink_label->setText("未连接");
-        ui->hnclink_label->setStyleSheet("color:red");
     }
 }
 
@@ -1614,28 +1615,15 @@ void MainWindow::showComp(short _105, short _106, short _107, unsigned int c1, u
 // 点击连接激光位移传感器之后
 void MainWindow::on_linkccd_pushButton_clicked()
 {
-    QString nowTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh：mm：ss");
-    laserSamplePath = samplePath+"/CCD位移数据("+nowTime+")";
-    if(!lwfdir->exists(laserSamplePath))
-    {
-        lwfdir->mkdir(laserSamplePath);
-    }
-
-    laserAllDataPath = laserSamplePath+"/CCD数据值.csv";
-    QString csvHeader = "时间,X轴位移,Y轴位移,Z轴位移";
-    if(!QFile::exists(laserAllDataPath))
-    {
-        writeFile(laserAllDataPath,csvHeader);
-    }
-
-    LaserDisplaceSensor *ccdSensor = new LaserDisplaceSensor(originalPath);
+    ui->linkccd_pushButton->setEnabled(false);
+    ui->closeccd_pushButton->setEnabled(false);
+    LaserDisplaceSensor *ccdSensor = new LaserDisplaceSensor(originalPath,userInputAll[7]);
     connect(this,&MainWindow::closeLaserSensors,ccdSensor,&LaserDisplaceSensor::forceThread2Quit);
     connect(ccdSensor, &LaserDisplaceSensor::sendMsg,this,&MainWindow::ccdUiOperation);
     connect(this,&MainWindow::createNewDayFolder,ccdSensor,&LaserDisplaceSensor::niceNewDay);
     connect(ccdSensor, &LaserDisplaceSensor::finished, ccdSensor, &QObject::deleteLater);
     ccdSensor->start();
-    ui->linkccd_pushButton->setEnabled(false);
-    ui->closeccd_pushButton->setEnabled(false);
+    qDebug()<<"laserInit";
 }
 
 // 点击位移传感器示数归零之后
@@ -1665,6 +1653,7 @@ void MainWindow::ccdUiOperation(QString joffery,int tommen)
         {
             ui->linkccd_pushButton->setEnabled(true);
             ui->closeccd_pushButton->setEnabled(false);
+            ui->zeroccd_pushButton->setEnabled(false);
             ui->ccdlinklabel->setText("未连接");
         }
             break;
@@ -1672,7 +1661,22 @@ void MainWindow::ccdUiOperation(QString joffery,int tommen)
         {
             ui->linkccd_pushButton->setEnabled(false);
             ui->closeccd_pushButton->setEnabled(true);
+            ui->zeroccd_pushButton->setEnabled(true);
             ui->ccdlinklabel->setText("已连接");
+
+            QString nowTime = QDateTime::currentDateTime().toString("yyyy-MM-dd hh：mm：ss");
+            laserSamplePath = samplePath+"/CCD位移数据("+nowTime+")";
+            if(!lwfdir->exists(laserSamplePath))
+            {
+                lwfdir->mkdir(laserSamplePath);
+            }
+
+            laserAllDataPath = laserSamplePath+"/CCD数据值.csv";
+            QString csvHeader = "时间,X轴位移,Y轴位移,Z轴位移";
+            if(!QFile::exists(laserAllDataPath))
+            {
+                writeFile(laserAllDataPath,csvHeader);
+            }
         }
             break;
         case  2:    // 异常情况
@@ -1691,13 +1695,14 @@ void MainWindow::ccdUiOperation(QString joffery,int tommen)
 // 点击连接
 void MainWindow::on_lincloud_pushButton_clicked()
 {
-    CloudTcpThread *cloudThread = new CloudTcpThread();
+    ui->lincloud_pushButton->setEnabled(false);
+    ui->dislinkcloud_pushButton->setEnabled(true);
+    CloudTcpThread *cloudThread = new CloudTcpThread(userInputAll[8],userInputAll[9]);
     connect(cloudThread,&CloudTcpThread::passCloudInfo,this,&MainWindow::showCloudInfo);
     connect(this,&MainWindow::closeCloudSocket,cloudThread,&CloudTcpThread::closeThread);
     connect(cloudThread,&CloudTcpThread::finished,cloudThread,&CloudTcpThread::deleteLater);
     cloudThread->start();
-    ui->lincloud_pushButton->setEnabled(false);
-    ui->dislinkcloud_pushButton->setEnabled(true);
+    qDebug()<<"cloudInit";
 }
 
 // 显示
@@ -1810,24 +1815,23 @@ void MainWindow::showCompResult(int robert)
 // 点击菜单栏“设置”->“Configure”,弹出配置页面，可以手动输入相关参数
 void MainWindow::on_actionConfigure_triggered()
 {
-    ConfigurationUI *config = new ConfigurationUI(this);
-    config->setWindowTitle("设置");
-    if(config->exec() == QDialog::Accepted)  // 点击确认
+    ConfigurationUI config;
+    config.setWindowTitle("设置");
+    if(config.exec() == QDialog::Accepted)  // 点击确认
     {
-        userInputAll = config->getUserInputParameters();
+        userInputAll = config.getUserInputParameters();
     }
-    delete config;
 }
 
 // 点击菜单栏“设置”->“Appearence”,弹出图表主题页面，可以修改图表主题
 void MainWindow::on_actionAppearence_triggered()
 {
     int index;
-    ChartThemeOption *trendMaker = new ChartThemeOption(this);
-    trendMaker->setWindowTitle("主题颜色");
-    if(trendMaker->exec() == QDialog::Accepted)  // 点击确认
+    ChartThemeOption trendMaker;
+    trendMaker.setWindowTitle("主题颜色");
+    if(trendMaker.exec() == QDialog::Accepted)  // 点击确认
     {
-        index = trendMaker->getCurrentTheme();
+        index = trendMaker.getCurrentTheme();
         switch (index)
         {
         case 0:
@@ -1878,50 +1882,54 @@ void MainWindow::on_actionAppearence_triggered()
         default: break;
         }
     }
-    delete trendMaker;
+}
+
+// 点击菜单栏“设置”->“Custom”,弹出自我娱乐页面
+void MainWindow::on_actionCustom_triggered()
+{
+    CustomUi ljr;
+    ljr.setWindowTitle("一首不为谁而作的歌");
+    if(ljr.exec() == QDialog::Accepted) {}
 }
 
 // 点击“帮助”->“Contact us”，弹出联系页面，可访问云平台
 void MainWindow::on_actionContacts_triggered()
 {
-    ContactUsUi *giveMeMoney = new ContactUsUi(this);
-    giveMeMoney->setWindowTitle("联系我们");
-    if(giveMeMoney->exec() == QDialog::Accepted)
-    delete giveMeMoney;
+    ContactUsUi giveMeMoney;
+    giveMeMoney.setWindowTitle("联系我们");
+    if(giveMeMoney.exec() == QDialog::Accepted) {}
 }
 
 // 点击“帮助”->“About CPS”，弹出介绍页面，简介什么是CPS
 void MainWindow::on_actionAbout_CPS_triggered()
 {
-    AboutCpsUi *whatIsCps = new AboutCpsUi(this);
-    whatIsCps->setWindowTitle("CPS简介");
-    if(whatIsCps->exec() == QDialog::Accepted)
-    delete whatIsCps;
+    AboutCpsUi whatIsCps;
+    whatIsCps.setWindowTitle("CPS简介");
+    if(whatIsCps.exec() == QDialog::Accepted) {}
 }
 
 // 点击“推荐”->“Music”，弹出音乐推荐页面
 void MainWindow::on_actionmusic_triggered()
 {
-    MusicIntrductionUi *sheSingsMeaSong = new MusicIntrductionUi(this);
-    sheSingsMeaSong->setWindowTitle("音乐推荐");
-    if(sheSingsMeaSong->exec() == QDialog::Accepted)
-    delete sheSingsMeaSong;
+    MusicIntrductionUi sheSingsMeaSong;
+    sheSingsMeaSong.setWindowTitle("音乐推荐");
+    if(sheSingsMeaSong.exec() == QDialog::Accepted) {}
 }
 
 // 点击“推荐”->“TV Series”，弹出美国和英国电视剧推荐页面
 void MainWindow::on_actionTV_Series_triggered()
 {
-    SeriesIntroductionUi *gameOfThrone = new SeriesIntroductionUi(this);
-    gameOfThrone->setWindowTitle("电视剧推荐");
-    if(gameOfThrone->exec() == QDialog::Accepted)
-    delete gameOfThrone;
+    SeriesIntroductionUi gameOfThrone;
+    gameOfThrone.setWindowTitle("电视剧推荐");
+    if(gameOfThrone.exec() == QDialog::Accepted) {}
 }
 
 // 点击“推荐”->“Animation & Comic”，弹出动漫推荐页面
 void MainWindow::on_actionAnimation_triggered()
 {
-    AnimationIntroductionUi *onePiece = new AnimationIntroductionUi(this);
-    onePiece->setWindowTitle("动漫推荐");
-    if(onePiece->exec() == QDialog::Accepted)
-    delete onePiece;
+    AnimationIntroductionUi onePiece;
+    onePiece.setWindowTitle("动漫推荐");
+    if(onePiece.exec() == QDialog::Accepted) {}
 }
+
+

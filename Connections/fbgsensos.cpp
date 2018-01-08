@@ -5,10 +5,10 @@ bool fbgWorkingStatus = false;
 
 FBGSensos::FBGSensos() {}
 
-FBGSensos::FBGSensos(QString path)
+FBGSensos::FBGSensos(QString path, QString IP, QString HARRYPORTER)
 {
-    fbgIp = "192.168.0.119";
-    fbgPort = 4010;
+    fbgIp = IP;
+    fbgPort = HARRYPORTER.toInt();
 //    fbgIp = getHostIpAddress();
 //    fbgPort = 1994;
     fbgfileDir = path;
@@ -72,10 +72,8 @@ void FBGSensos::readFbgData()
             unsigned char highInfo = recBuf[startIdx + j * 2];				// 高八位
             unsigned char lowInfo = recBuf[startIdx + j * 2 + 1];			// 低八位
             double fbgw = 1520.0 + (256.0 * lowInfo + highInfo) / 1000.0;	// fbg转换公式
-            if (fbgw<1500)
-            {
-                qDebug("Blood and fire");
-            }
+//            if (fbgw<1500) // 异常检测
+//            {}
             if (j < FBG_Index_Max)											// 只保存20个点
             {
                 if (j >= idxNum) fbgw = 0.0;
@@ -133,5 +131,6 @@ void FBGSensos::deleteUdpSocket()
     delete fbgSocket;
     delete fbgDir;
     emit sendPara2Ui(-1);
+    qDebug()<<"FBGQuit";
 }
 

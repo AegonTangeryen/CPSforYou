@@ -2,12 +2,12 @@
 
 bool cloudLinkStatus = false;  //云平台连接状态
 
-CloudPlatform::CloudPlatform()
+CloudPlatform::CloudPlatform(QString skyIP, QString sunPort)
 {
-    cloudServerIP = "59.69.101.206";             // 正式连接
+    cloudServerIP = skyIP;             // 正式连接
 //    cloudServerIP = getHostIpAddress();          // 本地连接测试
-    cloudServerPort = 3690;
-    cloudSocket = new QTcpSocket(this);
+    cloudServerPort = sunPort.toInt();
+    cloudSocket = new QTcpSocket();
     cloudTimer = new QTimer(this);
     userOperation = false;
     ticToc = 0;
@@ -42,12 +42,12 @@ void CloudPlatform::receiveFromCloud()
     QString lxd = dataXML::xmlStrRead(QString(recBuff));
     QString cloudUrls = dataInfo.cloudInfo.cloudURLS.value("MODELBIN");
     QString cloudCmds = dataInfo.cloudInfo.cloudCMDS;
-    qDebug()<<"urls:"<<cloudUrls<<endl<<"cmds:"<<cloudCmds;
 }
 
 // 云平台单方面断开连接
 void CloudPlatform::afterDisconnected()
 {
+    qDebug()<<"6.1";
     if(userOperation) return;
     cloudSocket->connectToHost(QHostAddress(cloudServerIP), cloudServerPort);
     if(!cloudSocket->waitForConnected(5000))
@@ -60,6 +60,7 @@ void CloudPlatform::afterDisconnected()
 // 清除内存
 void CloudPlatform::deleteTcpClient()
 {
+    qDebug()<<"6.2";
     cloudLinkStatus = false;
     userOperation = true;
     cloudSocket->close();
@@ -71,6 +72,7 @@ void CloudPlatform::deleteTcpClient()
 // 定时器中断
 void CloudPlatform::onTimeIsUp()
 {
+    qDebug()<<"6.3";
     packageData();
     QString xmlOutStr = dataXML::xmlStrCreat(dataInfo);
     xmlOutStr += "end\n";
@@ -83,6 +85,7 @@ void CloudPlatform::onTimeIsUp()
  // 定时30s重新连接云平台
 void CloudPlatform::linkOnceAgain()
 {
+    qDebug()<<"6.4";
     ticToc = 0;
     cloudSocket->connectToHost(QHostAddress(cloudServerIP), cloudServerPort);
     if(!cloudSocket->waitForConnected(5000)) emit sendMsg("本次云平台尝试连接失败",2);

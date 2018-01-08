@@ -9,12 +9,14 @@ class FBGUdpThread: public QThread
 
 public:
     FBGUdpThread();
-    FBGUdpThread(QString path);
+    FBGUdpThread(QString path,QString ip,QString port);
     ~FBGUdpThread();
 
 public:
     void run();
     QString fbgPath;
+    QString fbgIP;
+    QString fbgPort;
 
 signals:
     void passUdpInfo(int);

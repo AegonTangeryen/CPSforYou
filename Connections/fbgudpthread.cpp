@@ -4,15 +4,17 @@ FBGUdpThread::FBGUdpThread()  {}
 
 FBGUdpThread::~FBGUdpThread() {}
 
-FBGUdpThread::FBGUdpThread(QString path)
+FBGUdpThread::FBGUdpThread(QString path,QString ip,QString port)
 {
     fbgPath = path;
+    fbgIP = ip;
+    fbgPort = port;
 }
 
 // 子线程
 void FBGUdpThread::run()
 {
-    FBGSensos *farewellSensors = new FBGSensos(fbgPath);
+    FBGSensos *farewellSensors = new FBGSensos(fbgPath,fbgIP,fbgPort);
     connect(farewellSensors,&FBGSensos::sendPara2Ui,this,&FBGUdpThread::relayUdpInfo);
     connect(this,&FBGUdpThread::destroyUdp,farewellSensors,&FBGSensos::deleteUdpSocket);
     connect(this,&FBGUdpThread::sendNewDay,farewellSensors,&FBGSensos::niceNewDay);

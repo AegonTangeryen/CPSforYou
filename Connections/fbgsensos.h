@@ -15,7 +15,7 @@ class FBGSensos: public QObject
 
 public:
     FBGSensos();
-    FBGSensos(QString path);
+    FBGSensos(QString path,QString IP,QString HARRYPORTER);
 
 public:
     QString fbgIp;			                           // FBG解调仪地址

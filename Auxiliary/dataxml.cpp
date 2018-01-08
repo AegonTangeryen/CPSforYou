@@ -14,7 +14,6 @@ QMap<QString, QString> dataXML::xmlFindKeyValue(QDomNode _node){
          if(!e.isNull())
          {
              tempMap.insert(e.tagName(), e.text());
-            qDebug()<<e.tagName() << ":" << e.text();
          }
          _node = _node.nextSibling();
      }

@@ -10,14 +10,16 @@ class Ds18TcpThread: public QThread
 public:
     Ds18TcpThread();
     ~Ds18TcpThread();
-    Ds18TcpThread(QString dspath);
+    Ds18TcpThread(QString dspath,QString no1port,QString no2port);
 
 public:
-    void run();                                              // 专属于DS18b20的tcp socket子线程
-    QString path;                                            // 文件存放路径
+    void run();
+    QString path;        // 文件存放路径
+    QString firstPort;
+    QString secondPort;
 
 public slots:
-     void passDS18Msg2Ui(QString para, int starkstatus);    // 从子线程发送消息到主界面
+     void passDS18Msg2Ui(QString para, int starkstatus);
      void forceThread2Quit();
      void newDayforYou(QString seaworth);
 
