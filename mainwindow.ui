@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>848</width>
-    <height>628</height>
+    <width>884</width>
+    <height>642</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -20,7 +20,7 @@
    <string>MainWindow</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">font: 75 12pt &quot;微软雅黑&quot;;
+   <string notr="true">font: 75 14pt &quot;微软雅黑&quot;;
 </string>
   </property>
   <widget class="QWidget" name="centralWidget">
@@ -37,7 +37,7 @@
        <string notr="true">font: 75 12pt &quot;微软雅黑&quot;;</string>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>5</number>
       </property>
       <widget class="QWidget" name="tab">
        <property name="styleSheet">
@@ -46,7 +46,7 @@
        <attribute name="title">
         <string>首页</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_6">
+       <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
@@ -92,7 +92,7 @@
              <string notr="true">font: 9pt &quot;楷体&quot;;</string>
             </property>
             <property name="text">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:24pt; font-weight:600; color:#000000;&quot;&gt;厚德博学&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;span style=&quot; font-size:24pt; font-weight:600; color:#000000;&quot;&gt;追求卓越&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:36pt; font-weight:600; color:#000000;&quot;&gt;厚德博学&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:36pt; font-weight:600; color:#000000;&quot;&gt;追求卓越&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
            </widget>
           </item>
@@ -112,9 +112,9 @@
           <property name="title">
            <string/>
           </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <layout class="QVBoxLayout" name="verticalLayout_2">
            <item>
-            <layout class="QVBoxLayout" name="verticalLayout_2">
+            <layout class="QHBoxLayout" name="horizontalLayout_2">
              <item>
               <widget class="QLabel" name="label_15">
                <property name="minimumSize">
@@ -126,11 +126,16 @@
                <property name="autoFillBackground">
                 <bool>false</bool>
                </property>
+               <property name="styleSheet">
+                <string notr="true">font: 24pt &quot;微软雅黑&quot;;
+color: rgb(0, 78, 115);
+background-color: rgb(218, 218, 218);</string>
+               </property>
                <property name="frameShape">
                 <enum>QFrame::StyledPanel</enum>
                </property>
                <property name="text">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:18pt; font-weight:600; color:#aa0000;&quot;&gt;FBG解调仪&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; color:#000000;&quot;&gt;FBG解调仪&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="scaledContents">
                 <bool>false</bool>
@@ -144,184 +149,31 @@
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="label_12">
-               <property name="minimumSize">
-                <size>
-                 <width>181</width>
-                 <height>50</height>
-                </size>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">border-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));</string>
-               </property>
-               <property name="frameShape">
-                <enum>QFrame::StyledPanel</enum>
-               </property>
-               <property name="text">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:18pt; font-weight:600; color:#55aa7f;&quot;&gt;电类温度传感器&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_14">
-               <property name="minimumSize">
-                <size>
-                 <width>181</width>
-                 <height>50</height>
-                </size>
-               </property>
-               <property name="frameShape">
-                <enum>QFrame::StyledPanel</enum>
-               </property>
-               <property name="text">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:18pt; font-weight:600; color:#ffaaff;&quot;&gt;环境温度&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_11">
-               <property name="minimumSize">
-                <size>
-                 <width>181</width>
-                 <height>50</height>
-                </size>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">border-color: qconicalgradient(cx:0, cy:0, angle:135, stop:0 rgba(255, 255, 0, 69), stop:0.375 rgba(255, 255, 0, 69), stop:0.423533 rgba(251, 255, 0, 145), stop:0.45 rgba(247, 255, 0, 208), stop:0.477581 rgba(255, 244, 71, 130), stop:0.518717 rgba(255, 218, 71, 130), stop:0.55 rgba(255, 255, 0, 255), stop:0.57754 rgba(255, 203, 0, 130), stop:0.625 rgba(255, 255, 0, 69), stop:1 rgba(255, 255, 0, 69));
-background-image: url(:/pure2.jpg);</string>
-               </property>
-               <property name="frameShape">
-                <enum>QFrame::StyledPanel</enum>
-               </property>
-               <property name="text">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:18pt; font-weight:600; color:#5555ff;&quot;&gt;数控系统&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="margin">
-                <number>2</number>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_16">
-               <property name="minimumSize">
-                <size>
-                 <width>181</width>
-                 <height>50</height>
-                </size>
-               </property>
-               <property name="frameShape">
-                <enum>QFrame::StyledPanel</enum>
-               </property>
-               <property name="text">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:18pt; font-weight:600; color:#55aaff;&quot;&gt;位移传感器&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_17">
-               <property name="minimumSize">
-                <size>
-                 <width>181</width>
-                 <height>50</height>
-                </size>
-               </property>
-               <property name="frameShape">
-                <enum>QFrame::StyledPanel</enum>
-               </property>
-               <property name="text">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:18pt; font-weight:600; color:#aaaaff;&quot;&gt;云服务平台&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QVBoxLayout" name="verticalLayout_3">
-             <item>
               <widget class="QPushButton" name="FBGlink_pushButton">
                <property name="minimumSize">
                 <size>
-                 <width>75</width>
+                 <width>105</width>
                  <height>50</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>100</width>
-                 <height>60</height>
+                 <width>200</width>
+                 <height>200</height>
                 </size>
                </property>
+               <property name="cursor">
+                <cursorShape>OpenHandCursor</cursorShape>
+               </property>
                <property name="styleSheet">
-                <string notr="true">font: 18pt &quot;华文彩云&quot;;</string>
+                <string notr="true">font: 20pt &quot;微软雅黑&quot;;
+color: rgb(72, 72, 107);</string>
                </property>
                <property name="text">
                 <string>连接</string>
                </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="ds18link_pushButton">
-               <property name="minimumSize">
-                <size>
-                 <width>75</width>
-                 <height>50</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>100</width>
-                 <height>60</height>
-                </size>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">font: 18pt &quot;华文彩云&quot;;</string>
-               </property>
-               <property name="text">
-                <string>监听</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="envlinkpushButton">
-               <property name="minimumSize">
-                <size>
-                 <width>75</width>
-                 <height>50</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>100</width>
-                 <height>60</height>
-                </size>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">font: 18pt &quot;华文彩云&quot;;</string>
-               </property>
-               <property name="text">
-                <string>监听</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="cnclink_pushButton">
-               <property name="minimumSize">
-                <size>
-                 <width>75</width>
-                 <height>50</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>100</width>
-                 <height>60</height>
-                </size>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">font: 18pt &quot;华文彩云&quot;;</string>
-               </property>
-               <property name="text">
-                <string>连接</string>
+               <property name="autoDefault">
+                <bool>false</bool>
                </property>
                <property name="flat">
                 <bool>false</bool>
@@ -329,63 +181,16 @@ background-image: url(:/pure2.jpg);</string>
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="linkccd_pushButton">
-               <property name="minimumSize">
-                <size>
-                 <width>75</width>
-                 <height>50</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>100</width>
-                 <height>60</height>
-                </size>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">font: 18pt &quot;华文彩云&quot;;</string>
-               </property>
-               <property name="text">
-                <string>连接</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="lincloud_pushButton">
-               <property name="minimumSize">
-                <size>
-                 <width>75</width>
-                 <height>50</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>100</width>
-                 <height>60</height>
-                </size>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">font: 18pt &quot;华文彩云&quot;;</string>
-               </property>
-               <property name="text">
-                <string>冲上云霄</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QVBoxLayout" name="verticalLayout_4">
-             <item>
               <widget class="QLabel" name="fbglinklabel">
                <property name="minimumSize">
                 <size>
-                 <width>360</width>
+                 <width>380</width>
                  <height>50</height>
                 </size>
                </property>
                <property name="styleSheet">
-                <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));</string>
+                <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));
+font: 75 20pt &quot;微软雅黑&quot;;</string>
                </property>
                <property name="frameShape">
                 <enum>QFrame::StyledPanel</enum>
@@ -399,33 +204,90 @@ background-image: url(:/pure2.jpg);</string>
               </widget>
              </item>
              <item>
+              <widget class="QPushButton" name="FBGclose_pushButton">
+               <property name="minimumSize">
+                <size>
+                 <width>100</width>
+                 <height>50</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>200</width>
+                 <height>200</height>
+                </size>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">font: 75 18pt &quot;微软雅黑&quot;;</string>
+               </property>
+               <property name="text">
+                <string>断开</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_22">
+             <item>
+              <widget class="QLabel" name="label_12">
+               <property name="minimumSize">
+                <size>
+                 <width>181</width>
+                 <height>50</height>
+                </size>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">color: rgb(0, 78, 115);
+background-color: rgb(218, 218, 218);</string>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::StyledPanel</enum>
+               </property>
+               <property name="text">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:24pt; font-weight:400; color:#000000;&quot;&gt;电类温度&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="ds18link_pushButton">
+               <property name="minimumSize">
+                <size>
+                 <width>105</width>
+                 <height>50</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>200</width>
+                 <height>200</height>
+                </size>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">font: 20pt &quot;微软雅黑&quot;;
+color: rgb(72, 72, 107);</string>
+               </property>
+               <property name="text">
+                <string>监听</string>
+               </property>
+               <property name="flat">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
               <layout class="QHBoxLayout" name="horizontalLayout">
-               <item>
-                <widget class="QLabel" name="label">
-                 <property name="minimumSize">
-                  <size>
-                   <width>90</width>
-                   <height>50</height>
-                  </size>
-                 </property>
-                 <property name="styleSheet">
-                  <string notr="true">background-color: rgb(211, 211, 211);</string>
-                 </property>
-                 <property name="text">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:600;&quot;&gt;一号板&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                 </property>
-                </widget>
-               </item>
                <item>
                 <widget class="QLabel" name="ds18No1linklabel">
                  <property name="minimumSize">
                   <size>
-                   <width>90</width>
+                   <width>187</width>
                    <height>50</height>
                   </size>
                  </property>
                  <property name="styleSheet">
-                  <string notr="true">background-color: rgb(86, 86, 86);</string>
+                  <string notr="true">font: 18pt &quot;微软雅黑&quot;;
+background-color: rgb(83, 83, 83);</string>
                  </property>
                  <property name="text">
                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:16pt; font-weight:600; color:#ffffff;&quot;&gt;未连接&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -433,31 +295,16 @@ background-image: url(:/pure2.jpg);</string>
                 </widget>
                </item>
                <item>
-                <widget class="QLabel" name="label_2">
-                 <property name="minimumSize">
-                  <size>
-                   <width>90</width>
-                   <height>50</height>
-                  </size>
-                 </property>
-                 <property name="styleSheet">
-                  <string notr="true">background-color: rgb(180, 180, 180);</string>
-                 </property>
-                 <property name="text">
-                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:600; font-style:italic;&quot;&gt;二号板&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
                 <widget class="QLabel" name="ds18No2linklabel">
                  <property name="minimumSize">
                   <size>
-                   <width>90</width>
+                   <width>187</width>
                    <height>50</height>
                   </size>
                  </property>
                  <property name="styleSheet">
-                  <string notr="true">background-color: rgb(83, 83, 83);</string>
+                  <string notr="true">font: 18pt &quot;微软雅黑&quot;;
+background-color: rgb(83, 83, 83);</string>
                  </property>
                  <property name="text">
                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:16pt; font-weight:600; color:#ffffff;&quot;&gt;未连接&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -467,15 +314,85 @@ background-image: url(:/pure2.jpg);</string>
               </layout>
              </item>
              <item>
-              <widget class="QLabel" name="ds18Envlinklabel">
+              <widget class="QPushButton" name="ds18dislink_pushButton">
                <property name="minimumSize">
                 <size>
-                 <width>360</width>
+                 <width>100</width>
+                 <height>50</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>200</width>
+                 <height>200</height>
+                </size>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">font: 75 18pt &quot;微软雅黑&quot;;</string>
+               </property>
+               <property name="text">
+                <string>断开</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_23">
+             <item>
+              <widget class="QLabel" name="label_14">
+               <property name="minimumSize">
+                <size>
+                 <width>181</width>
                  <height>50</height>
                 </size>
                </property>
                <property name="styleSheet">
-                <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));</string>
+                <string notr="true">color: rgb(0, 78, 115);
+background-color: rgb(218, 218, 218);</string>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::StyledPanel</enum>
+               </property>
+               <property name="text">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:24pt; font-weight:400; color:#000000;&quot;&gt;环境温度&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="envlinkpushButton">
+               <property name="minimumSize">
+                <size>
+                 <width>105</width>
+                 <height>50</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>200</width>
+                 <height>200</height>
+                </size>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">font: 20pt &quot;微软雅黑&quot;;
+color: rgb(72, 72, 107);</string>
+               </property>
+               <property name="text">
+                <string>监听</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="ds18Envlinklabel">
+               <property name="minimumSize">
+                <size>
+                 <width>380</width>
+                 <height>50</height>
+                </size>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));
+font: 75 20pt &quot;微软雅黑&quot;;</string>
                </property>
                <property name="frameShape">
                 <enum>QFrame::StyledPanel</enum>
@@ -492,15 +409,91 @@ background-image: url(:/pure2.jpg);</string>
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="hnclink_label">
+              <widget class="QPushButton" name="envdislinkpushButton">
                <property name="minimumSize">
                 <size>
-                 <width>360</width>
-                 <height>40</height>
+                 <width>100</width>
+                 <height>50</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>200</width>
+                 <height>200</height>
                 </size>
                </property>
                <property name="styleSheet">
-                <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));</string>
+                <string notr="true">font: 75 18pt &quot;微软雅黑&quot;;</string>
+               </property>
+               <property name="text">
+                <string>断开</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_24">
+             <item>
+              <widget class="QLabel" name="label_11">
+               <property name="minimumSize">
+                <size>
+                 <width>181</width>
+                 <height>50</height>
+                </size>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">color: rgb(0, 78, 115);
+background-color: rgb(218, 218, 218);</string>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::StyledPanel</enum>
+               </property>
+               <property name="text">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:24pt; font-weight:400; color:#000000;&quot;&gt;数控系统&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="margin">
+                <number>2</number>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="cnclink_pushButton">
+               <property name="minimumSize">
+                <size>
+                 <width>105</width>
+                 <height>50</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>200</width>
+                 <height>200</height>
+                </size>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">font: 20pt &quot;微软雅黑&quot;;
+color: rgb(72, 72, 107);</string>
+               </property>
+               <property name="text">
+                <string>连接</string>
+               </property>
+               <property name="flat">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="hnclink_label">
+               <property name="minimumSize">
+                <size>
+                 <width>380</width>
+                 <height>50</height>
+                </size>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));
+font: 75 20pt &quot;微软雅黑&quot;;</string>
                </property>
                <property name="frameShape">
                 <enum>QFrame::StyledPanel</enum>
@@ -511,132 +504,91 @@ background-image: url(:/pure2.jpg);</string>
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="ccdlinklabel">
+              <widget class="QPushButton" name="cncdislink_pushButton">
                <property name="minimumSize">
                 <size>
-                 <width>360</width>
+                 <width>100</width>
                  <height>50</height>
                 </size>
                </property>
-               <property name="styleSheet">
-                <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));</string>
-               </property>
-               <property name="frameShape">
-                <enum>QFrame::StyledPanel</enum>
-               </property>
-               <property name="text">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:16pt; font-weight:600; color:#ffffff;&quot;&gt;未连接&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="cloudlinklabel">
-               <property name="minimumSize">
+               <property name="maximumSize">
                 <size>
-                 <width>360</width>
-                 <height>50</height>
+                 <width>200</width>
+                 <height>200</height>
                 </size>
                </property>
                <property name="styleSheet">
-                <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));</string>
-               </property>
-               <property name="frameShape">
-                <enum>QFrame::StyledPanel</enum>
+                <string notr="true">font: 75 18pt &quot;微软雅黑&quot;;</string>
                </property>
                <property name="text">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:16pt; font-weight:600; color:#ffffff;&quot;&gt;未连接&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>断开</string>
                </property>
               </widget>
              </item>
             </layout>
            </item>
            <item>
-            <layout class="QVBoxLayout" name="verticalLayout_5">
+            <layout class="QHBoxLayout" name="horizontalLayout_25">
              <item>
-              <widget class="QPushButton" name="FBGclose_pushButton">
+              <widget class="QLabel" name="label_16">
                <property name="minimumSize">
                 <size>
-                 <width>75</width>
+                 <width>181</width>
                  <height>50</height>
                 </size>
                </property>
-               <property name="maximumSize">
-                <size>
-                 <width>100</width>
-                 <height>60</height>
-                </size>
-               </property>
                <property name="styleSheet">
-                <string notr="true">font: 75 18pt &quot;微软雅黑&quot;;</string>
+                <string notr="true">color: rgb(0, 78, 115);
+background-color: rgb(218, 218, 218);</string>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::StyledPanel</enum>
                </property>
                <property name="text">
-                <string>断开</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:24pt; font-weight:400; color:#000000;&quot;&gt;位移传感器&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="ds18dislink_pushButton">
+              <widget class="QPushButton" name="linkccd_pushButton">
                <property name="minimumSize">
                 <size>
-                 <width>75</width>
+                 <width>105</width>
                  <height>50</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>100</width>
-                 <height>60</height>
+                 <width>200</width>
+                 <height>200</height>
                 </size>
                </property>
                <property name="styleSheet">
-                <string notr="true">font: 75 18pt &quot;微软雅黑&quot;;</string>
+                <string notr="true">font: 20pt &quot;微软雅黑&quot;;
+color: rgb(72, 72, 107);</string>
                </property>
                <property name="text">
-                <string>断开</string>
+                <string>连接</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="envdislinkpushButton">
+              <widget class="QLabel" name="ccdlinklabel">
                <property name="minimumSize">
                 <size>
-                 <width>75</width>
+                 <width>380</width>
                  <height>50</height>
                 </size>
                </property>
-               <property name="maximumSize">
-                <size>
-                 <width>100</width>
-                 <height>60</height>
-                </size>
-               </property>
                <property name="styleSheet">
-                <string notr="true">font: 75 18pt &quot;微软雅黑&quot;;</string>
+                <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));
+font: 75 20pt &quot;微软雅黑&quot;;</string>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::StyledPanel</enum>
                </property>
                <property name="text">
-                <string>断开</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="cncdislink_pushButton">
-               <property name="minimumSize">
-                <size>
-                 <width>75</width>
-                 <height>50</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>100</width>
-                 <height>60</height>
-                </size>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">font: 75 18pt &quot;微软雅黑&quot;;</string>
-               </property>
-               <property name="text">
-                <string>断开</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:16pt; font-weight:600; color:#ffffff;&quot;&gt;未连接&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
               </widget>
              </item>
@@ -644,14 +596,14 @@ background-image: url(:/pure2.jpg);</string>
               <widget class="QPushButton" name="closeccd_pushButton">
                <property name="minimumSize">
                 <size>
-                 <width>75</width>
+                 <width>100</width>
                  <height>50</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>100</width>
-                 <height>60</height>
+                 <width>200</width>
+                 <height>200</height>
                 </size>
                </property>
                <property name="styleSheet">
@@ -662,18 +614,85 @@ background-image: url(:/pure2.jpg);</string>
                </property>
               </widget>
              </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_26">
              <item>
-              <widget class="QPushButton" name="dislinkcloud_pushButton">
+              <widget class="QLabel" name="label_17">
                <property name="minimumSize">
                 <size>
-                 <width>75</width>
+                 <width>181</width>
+                 <height>50</height>
+                </size>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">color: rgb(0, 78, 115);
+background-color: rgb(218, 218, 218);</string>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::StyledPanel</enum>
+               </property>
+               <property name="text">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:24pt; font-weight:400; color:#000000;&quot;&gt;云服务平台&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="lincloud_pushButton">
+               <property name="minimumSize">
+                <size>
+                 <width>105</width>
                  <height>50</height>
                 </size>
                </property>
                <property name="maximumSize">
                 <size>
+                 <width>200</width>
+                 <height>200</height>
+                </size>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">font: 20pt &quot;微软雅黑&quot;;
+color: rgb(72, 72, 107);</string>
+               </property>
+               <property name="text">
+                <string>冲上云霄</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="cloudlinklabel">
+               <property name="minimumSize">
+                <size>
+                 <width>380</width>
+                 <height>50</height>
+                </size>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));
+font: 75 20pt &quot;微软雅黑&quot;;</string>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::StyledPanel</enum>
+               </property>
+               <property name="text">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:16pt; font-weight:600; color:#ffffff;&quot;&gt;未连接&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="dislinkcloud_pushButton">
+               <property name="minimumSize">
+                <size>
                  <width>100</width>
-                 <height>60</height>
+                 <height>50</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>200</width>
+                 <height>200</height>
                 </size>
                </property>
                <property name="styleSheet">
@@ -819,7 +838,7 @@ background-image: url(:/pure2.jpg);</string>
              </size>
             </property>
             <property name="styleSheet">
-             <string notr="true">font: 75 12pt &quot;微软雅黑&quot;;
+             <string notr="true">font: 75 16pt &quot;微软雅黑&quot;;
 </string>
             </property>
             <property name="text">
@@ -1037,6 +1056,9 @@ background-image: url(:/pure2.jpg);</string>
                    <height>100</height>
                   </size>
                  </property>
+                 <property name="styleSheet">
+                  <string notr="true">font: 75 16pt &quot;微软雅黑&quot;;</string>
+                 </property>
                  <property name="text">
                   <string>查看全部</string>
                  </property>
@@ -1060,6 +1082,9 @@ background-image: url(:/pure2.jpg);</string>
          <layout class="QHBoxLayout" name="horizontalLayout_6">
           <item>
            <widget class="QGroupBox" name="groupBox_2">
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
             <property name="title">
              <string>示数</string>
             </property>
@@ -1078,6 +1103,9 @@ background-image: url(:/pure2.jpg);</string>
                  <width>150</width>
                  <height>50</height>
                 </size>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">font: 24pt &quot;Times New Roman&quot;;</string>
                </property>
                <property name="text">
                 <string/>
@@ -1099,6 +1127,9 @@ background-image: url(:/pure2.jpg);</string>
                  <height>50</height>
                 </size>
                </property>
+               <property name="styleSheet">
+                <string notr="true">font: 24pt &quot;Times New Roman&quot;;</string>
+               </property>
                <property name="text">
                 <string/>
                </property>
@@ -1119,6 +1150,9 @@ background-image: url(:/pure2.jpg);</string>
                  <height>50</height>
                 </size>
                </property>
+               <property name="styleSheet">
+                <string notr="true">font: 24pt &quot;Times New Roman&quot;;</string>
+               </property>
                <property name="text">
                 <string/>
                </property>
@@ -1132,7 +1166,7 @@ background-image: url(:/pure2.jpg);</string>
             <property name="minimumSize">
              <size>
               <width>75</width>
-              <height>50</height>
+              <height>80</height>
              </size>
             </property>
             <property name="maximumSize">
@@ -1142,7 +1176,9 @@ background-image: url(:/pure2.jpg);</string>
              </size>
             </property>
             <property name="styleSheet">
-             <string notr="true">font: 75 14pt &quot;微软雅黑&quot;;</string>
+             <string notr="true">font: 75 24pt &quot;微软雅黑&quot;;
+
+</string>
             </property>
             <property name="text">
              <string>归零</string>
@@ -1170,8 +1206,8 @@ background-image: url(:/pure2.jpg);</string>
        <widget class="QTextBrowser" name="cloud_textBrowser">
         <property name="geometry">
          <rect>
-          <x>50</x>
-          <y>140</y>
+          <x>40</x>
+          <y>60</y>
           <width>701</width>
           <height>351</height>
          </rect>
@@ -1195,105 +1231,306 @@ background-image: url(:/pure2.jpg);</string>
        <attribute name="title">
         <string>数控和补偿信息</string>
        </attribute>
-       <widget class="QTextBrowser" name="comp_textBrowser">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>150</y>
-          <width>531</width>
-          <height>311</height>
-         </rect>
-        </property>
-       </widget>
-       <widget class="QWidget" name="layoutWidget_2">
-        <property name="geometry">
-         <rect>
-          <x>20</x>
-          <y>20</y>
-          <width>358</width>
-          <height>33</height>
-         </rect>
-        </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_14">
-         <item>
-          <widget class="QLabel" name="label_9">
-           <property name="minimumSize">
-            <size>
-             <width>150</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:18pt;&quot;&gt;#1191示数：&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="_1191_Browserlabel">
-           <property name="minimumSize">
-            <size>
-             <width>200</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="layoutWidget">
-        <property name="geometry">
-         <rect>
-          <x>30</x>
-          <y>70</y>
-          <width>239</width>
-          <height>62</height>
-         </rect>
-        </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_7">
-         <item>
-          <widget class="QPushButton" name="startcomp_pushButton">
-           <property name="minimumSize">
-            <size>
-             <width>75</width>
-             <height>60</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>开启</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="closecomp_pushButton">
-           <property name="minimumSize">
-            <size>
-             <width>75</width>
-             <height>60</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>关闭</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="clearcomp_pushButton">
-           <property name="minimumSize">
-            <size>
-             <width>75</width>
-             <height>60</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>清空</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayout_21">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_16">
+          <item>
+           <widget class="QLCDNumber" name="lcdNumber">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>200</height>
+             </size>
+            </property>
+            <property name="digitCount">
+             <number>8</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTextBrowser" name="comp_textBrowser"/>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_15">
+          <item>
+           <widget class="QGroupBox" name="groupBox_5">
+            <property name="minimumSize">
+             <size>
+              <width>400</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="title">
+             <string>补偿信息展示</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_12">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_18">
+               <item>
+                <widget class="QLabel" name="label_9">
+                 <property name="minimumSize">
+                  <size>
+                   <width>200</width>
+                   <height>50</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:18pt; font-weight:600;&quot;&gt;#1191：&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="_1191_Browserlabel">
+                 <property name="minimumSize">
+                  <size>
+                   <width>80</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_14">
+               <item>
+                <widget class="QLabel" name="label_7">
+                 <property name="minimumSize">
+                  <size>
+                   <width>200</width>
+                   <height>50</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:18pt; font-weight:600;&quot;&gt;选用传感器类型：&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="sensorTypelabel">
+                 <property name="minimumSize">
+                  <size>
+                   <width>80</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_16">
+               <item>
+                <widget class="QLabel" name="label_28">
+                 <property name="minimumSize">
+                  <size>
+                   <width>200</width>
+                   <height>50</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:18pt; font-weight:600;&quot;&gt;输入点数：&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="inputnumlabel">
+                 <property name="minimumSize">
+                  <size>
+                   <width>80</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_17">
+               <item>
+                <widget class="QLabel" name="label_23">
+                 <property name="minimumSize">
+                  <size>
+                   <width>200</width>
+                   <height>50</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:18pt; font-weight:600;&quot;&gt;实际补偿：&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="actualComp">
+                 <property name="minimumSize">
+                  <size>
+                   <width>80</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupBox_6">
+            <property name="minimumSize">
+             <size>
+              <width>400</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="title">
+             <string>数控系统关键信息</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_14">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_19">
+               <item>
+                <widget class="QLabel" name="label_29">
+                 <property name="minimumSize">
+                  <size>
+                   <width>200</width>
+                   <height>50</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:18pt; font-weight:600;&quot;&gt;转速：&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="spinspeedlabel">
+                 <property name="minimumSize">
+                  <size>
+                   <width>80</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_20">
+               <item>
+                <widget class="QLabel" name="label_30">
+                 <property name="minimumSize">
+                  <size>
+                   <width>200</width>
+                   <height>50</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:18pt; font-weight:600;&quot;&gt;进给速度：&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="feedratelabel">
+                 <property name="minimumSize">
+                  <size>
+                   <width>80</width>
+                   <height>40</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_7">
+            <item>
+             <widget class="QPushButton" name="startcomp_pushButton">
+              <property name="minimumSize">
+               <size>
+                <width>90</width>
+                <height>60</height>
+               </size>
+              </property>
+              <property name="autoFillBackground">
+               <bool>false</bool>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">font: 18pt &quot;黑体&quot;;
+color: rgb(255, 255, 255);
+border-color: rgb(255, 255, 255);
+background-color: rgb(85, 170, 127);</string>
+              </property>
+              <property name="text">
+               <string>开启</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="closecomp_pushButton">
+              <property name="minimumSize">
+               <size>
+                <width>90</width>
+                <height>60</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">font: 18pt &quot;黑体&quot;;
+color: rgb(255, 255, 255);
+border-color: rgb(255, 255, 255);
+background-color: rgb(85, 170, 127);</string>
+              </property>
+              <property name="text">
+               <string>关闭</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="clearcomp_pushButton">
+              <property name="minimumSize">
+               <size>
+                <width>90</width>
+                <height>60</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">font: 18pt &quot;黑体&quot;;
+color: rgb(255, 255, 255);
+border-color: rgb(255, 255, 255);
+background-color: rgb(85, 170, 127);</string>
+              </property>
+              <property name="text">
+               <string>清空</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>
@@ -1304,8 +1541,8 @@ background-image: url(:/pure2.jpg);</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>848</width>
-     <height>27</height>
+     <width>884</width>
+     <height>31</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">

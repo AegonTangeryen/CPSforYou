@@ -10,13 +10,7 @@ ThermalErrorCompensation::ThermalErrorCompensation(QString path)
     time2Quit = false;
     uAreFree2Comp = false;
 
-    // 设置关键温度测点
-    ModelParameter foryou0(7,1,NULL),foryou1(7,2,NULL),foryou2(7,3,NULL),foryou3(7,4,NULL);
-    paraVector.append(foryou0);
-    paraVector.append(foryou1);
-    paraVector.append(foryou2);
-    paraVector.append(foryou3);
-
+    paraRegister(); // 录入信息
     QString currentDate = QDateTime::currentDateTime().toString("yyyyMMdd");
     compenPath = compenPath+"/预测和补偿记录"+currentDate+".csv";
     QString csvHeader = "时间,次数,当前预测值,上一次预测值,当前补偿值";
@@ -35,6 +29,7 @@ ThermalErrorCompensation::ThermalErrorCompensation(QString path)
 ThermalErrorCompensation::~ThermalErrorCompensation()
 {
     delete duketimer;
+    delete parameterIni;
 }
 
 void ThermalErrorCompensation::timeisup()
@@ -42,12 +37,67 @@ void ThermalErrorCompensation::timeisup()
     uAreFree2Comp = true;
 }
 
-//模型预测
+// 录入关键温度测点以及参数
+void ThermalErrorCompensation::paraRegister()
+{
+    parameterIni = new QSettings(QDir::currentPath()+"/config.ini", QSettings::IniFormat); // 读取ini文件
+    paraNum = parameterIni->value("/predictionModel/inputNum").toInt();  // 输入点数
+    sensorType = parameterIni->value("/predictionModel/SensorType").toString(); // 使用传感器类型
+    double paraStr0 = parameterIni->value("/predictionModel/Intercept").toDouble();    // 常数项
+    QString paraStr1 = parameterIni->value("/predictionModel/keySensor1").toString();// 线性回归参数1
+    QString paraStr2 = parameterIni->value("/predictionModel/keySensor2").toString();// 线性回归参数2
+    QString paraStr3 = parameterIni->value("/predictionModel/keySensor3").toString();// 线性回归参数3
+    QString paraStr4 = parameterIni->value("/predictionModel/keySensor4").toString();// 线性回归参数4
+
+    paraSet.append(paraStr0); // 首先加入常数项
+
+    /*第一个点*/
+    QStringList solveParaStr = paraStr1.split(QString("_")); // 根据协议按“_”分割
+    int channel = QString(solveParaStr[0]).toInt(); // 通道号，从1开始编号
+    int series = QString(solveParaStr[1]).toInt(); // 序号，从1开始编号
+    QString inputPara = solveParaStr[2]; // 参数，double型
+    ModelParameter foryou0(channel,series,inputPara);
+    paraSet.append(inputPara.toDouble()); // 加入第一个点的参数
+
+    /*第二个点*/
+    solveParaStr.clear();
+    solveParaStr = paraStr2.split(QString("_"));
+    channel = QString(solveParaStr[0]).toInt();
+    series = QString(solveParaStr[1]).toInt();
+    inputPara = solveParaStr[2];
+    ModelParameter foryou1(channel,series,inputPara);
+    paraSet.append(inputPara.toDouble()); // 加入第二个点的参数
+
+    /*第三个点*/
+    solveParaStr.clear();
+    solveParaStr = paraStr3.split(QString("_"));
+    channel = QString(solveParaStr[0]).toInt();
+    series = QString(solveParaStr[1]).toInt();
+    inputPara = solveParaStr[2];
+    ModelParameter foryou2(channel,series,inputPara);
+    paraSet.append(inputPara.toDouble()); // 加入第三个点的参数
+
+    /*第四个点*/
+    solveParaStr.clear();
+    solveParaStr = paraStr4.split(QString("_"));
+    channel = QString(solveParaStr[0]).toInt();
+    series = QString(solveParaStr[1]).toInt();
+    inputPara = solveParaStr[2];
+    ModelParameter foryou3(channel,series,inputPara);
+    paraSet.append(inputPara.toDouble()); // 加入第四个点的参数
+
+    paraVector.append(foryou0);
+    paraVector.append(foryou1);
+    paraVector.append(foryou2);
+    paraVector.append(foryou3);
+}
+
+// 模型预测
 QVector<QString> last_sent_FBG(inputNum);                 // 初次的FBG
 QVector<QString> sent_FBG(inputNum);                        // 本次的FBG
 double ThermalErrorCompensation::predictionModels()
 {
-    int columns = inputNum+1;                           // 参数个数
+    int columns = inputNum+1;                          // 参数个数
     int i = 0;
     for (i = 0; i < paraVector.size(); i++)             // 读取关键温度测点实时温度数据
     {
@@ -69,12 +119,12 @@ double ThermalErrorCompensation::predictionModels()
         delta_FBG[i] = sent_FBG[i].toDouble() - last_sent_FBG[i].toDouble();
     }
 
-    double forU[5]={-0.014174801,0.008462905,0.003952930,-0.002877171,0.001796639};
     QVector<double> Answerz(columns);
     for (i = 0; i < columns; i++)
     {
-        Answerz[i] = forU[i];
+        Answerz[i] = paraSet[i];
     }
+
     double Z = Answerz[0];
     for (int i = 0; i<inputNum; i++)
     {
@@ -135,12 +185,12 @@ void ThermalErrorCompensation::compensationStrategy(double xAxis,double yAxis,do
         if(ZSum<=0) {zComp = abs(ZSum);}
         else {zComp = ZSum +128;}
 
-        if(XSum<=-25) {xComp = 25;}          // 阈值保护一
-        else if(XSum>=25) {xComp = 25+128;}  // 如果累加量超出阈值，按最大阈值算
-        if(YSum<=-25) {yComp = 25;}
-        else if(YSum>=25) {yComp = 25+128;}  // 阈值是正负25um (2017.9.14)
-        if(ZSum<=-25) {zComp = 25;}
-        else if(ZSum>=25) {zComp = 25+128;}
+        if(XSum<=-30) {xComp = 30;}          // 阈值保护一
+        else if(XSum>=30) {xComp = 30+128;}  // 如果累加量超出阈值，按最大阈值算
+        if(YSum<=-30) {yComp = 30;}
+        else if(YSum>=30) {yComp = 30+128;}  // 阈值是正负30um (2018.1.15)
+        if(ZSum<=-30) {zComp = 30;}
+        else if(ZSum>=30) {zComp = 30+128;}
 
         if(xComp>255 || xComp ==128) xComp = 0;            // 阈值保护二
         if(yComp>255 || yComp ==128) yComp = 0;            // 如果累加量超出范围，则此次不补偿
@@ -158,7 +208,7 @@ void ThermalErrorCompensation::compensationStrategy(double xAxis,double yAxis,do
     }
 
     QString currentTime =QDateTime::currentDateTime().toString("yyyy-MM-dd-hh:mm:ss");
-    QString compenContent = currentTime+","+QString::number(compenCnt,10,6)+","+QString::number(LastZPredict,10,6)
+    QString compenContent = currentTime+","+QString::number(compenCnt,10)+","+QString::number(LastZPredict,10,6)
             +","+QString::number(zPredict,10,6)+", ";
     writeFile(compenPath,compenContent);
 }
@@ -184,9 +234,10 @@ void ThermalErrorCompensation::niceNewDay(QString gaintPanda)
 // 子线程
 void ThermalErrorCompensation::run()
 {
+    emit replyInfo(inputNum,sensorType);
     while (1)
     {
-        if(cncWorkingStatus == false || ds18WorkingStatus == false) return;
+        if((!cncWorkingStatus) || (!ds18WorkingStatus)) return;
         if(uAreFree2Comp)                  // 预测，并转化为补偿值
         {
             uAreFree2Comp = false;

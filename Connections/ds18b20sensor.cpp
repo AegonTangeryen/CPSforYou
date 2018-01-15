@@ -189,15 +189,14 @@ DS18b20Sensor::DS18b20Sensor(QString ds18path, QString royalport, QString barcap
     errDS18B20Cnt = 0;
     dslinkport1 = royalport;
     dslinkport2 = barcaport;
-    qDebug()<<"ds"<<dslinkport1<<dslinkport2;
     dsHostIp = getHostIpAddress();  // 获取本地IP
     ds18Dir = new QDir();
     newFullFragment = false;
     addNewFullFragment = false;
     totalRenewed = false;
     addTotalRenewed = false;
-    ds18Server = new QTcpServer(this);
-    ds18Socket = new QTcpSocket(this);
+    ds18Server = new QTcpServer();
+    ds18Socket = new QTcpSocket();
     ds18AddServer = new QTcpServer(this);
     ds18AddSocket = new QTcpSocket(this);
 
@@ -205,7 +204,7 @@ DS18b20Sensor::DS18b20Sensor(QString ds18path, QString royalport, QString barcap
     dailyDir = ds18path+ "/WiFi温度数据"+"("+currentDate+")";
     dsNo1Dir = dailyDir+"/WiFi温度数据一号板"+"("+currentDate+")";
     dsNo2Dir = dailyDir+"/WiFi温度数据二号板"+"("+currentDate+")";
-    // 如果不存在此文件夹
+    // 如果不存在此文件夹,创建
     if(!ds18Dir->exists(dailyDir))   ds18Dir->mkdir(dailyDir);
 
     ds18ErrPath = dailyDir +"/DS18b20错误记录"+currentDate+".csv";
@@ -404,6 +403,7 @@ void DS18b20Sensor::addSocketDisconnected()
 // 单节点字符串解析方法  字符串格式示例：S0,00,28ff7eeda0160301,1,0.00\r
 void DS18b20Sensor::processData(QByteArray a,int clientNo)
 {
+    qDebug()<<"2";
     if(a.size()<30 || a.size()>32)                              // 异常帧
     {
         emit sendMsg("数据帧大小不在正常范围内",clientNo);
@@ -566,12 +566,13 @@ void DS18b20Sensor::deleteTcpServer()
 {
     ds18WorkingStatus = false;
     ds18No2WorkStatus = false;
-    ds18Server->close();
     ds18Socket->close();
-    ds18AddServer->close();
+    ds18Server->close();
     ds18AddSocket->close();
+    ds18AddServer->close();
     delete ds18Server;
     delete ds18AddServer;
+    delete ds18Dir;
     emit sendMsg("电类温度传感器服务端关闭",0);
 }
 

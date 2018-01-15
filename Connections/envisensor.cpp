@@ -17,7 +17,6 @@ EnviSensor::EnviSensor(QString path, QString globalPort)
 {
     envHostIp = getHostIpAddress();  // 获取本地IP
     envPort = globalPort.toInt();
-    qDebug()<<"env:"<<envPort;
     envNewFullFragment = false;
     errCnt = 0;
     envLock = new QMutex();

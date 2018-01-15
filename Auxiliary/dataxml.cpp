@@ -1,11 +1,9 @@
 #include "dataxml.h"
 
-dataXML::dataXML(QObject *parent) : QObject(parent)
+dataXML::dataXML(QObject *parent) : QObject(parent) {}
+
+QMap<QString, QString> dataXML::xmlFindKeyValue(QDomNode _node)
 {
-
-}
-
-QMap<QString, QString> dataXML::xmlFindKeyValue(QDomNode _node){
     QDomElement e;
     QMap<QString, QString> tempMap;
     tempMap.clear();
@@ -20,7 +18,8 @@ QMap<QString, QString> dataXML::xmlFindKeyValue(QDomNode _node){
     return tempMap;
 }
 
-QString dataXML::xmlStrRead(QString xmlstr){
+QString dataXML::xmlStrRead(QString xmlstr)
+{
     QString str;    //信息键值对字符串
     QMap<QString, QString> receiveMap;  //接收键值对
     QDomDocument doc;
@@ -110,7 +109,8 @@ QString dataXML::xmlStrRead(QString xmlstr){
     return str;
 }
 
-QString dataXML::xmlStrCreat(DataInfoTypeDef _dataInfo){
+QString dataXML::xmlStrCreat(DataInfoTypeDef _dataInfo)
+{
     QDomDocument doc;
     QDomText dataText;  //写数据变量
     QDomProcessingInstruction instruction = doc.createProcessingInstruction("xml", "version=\"1.0\" encoding=\"UTF-8\"");

@@ -242,63 +242,63 @@ void Hnc848System::recordCNC(CNCInfoReg CNCInfo)
     // 把各个参数分别写入对应的文件
     QString paraFileName, paraContent;
     paraFileName = cncFileDir+"/通道.csv";
-    paraContent = currentTime+","+QString::number(CNCInfo.ch, 10, 6);
+    paraContent = currentTime+","+QString::number(CNCInfo.ch, 10);
     writeFile(paraFileName,paraContent);
 
     paraFileName = cncFileDir+"/X轴坐标.csv";
-    paraContent = currentTime+","+QString::number(CNCInfo.AXIS_X_POS,10,6);
+    paraContent = currentTime+","+QString::number(CNCInfo.AXIS_X_POS,10,4);
     writeFile(paraFileName,paraContent);
 
     paraFileName = cncFileDir+"/Y轴坐标.csv";
-    paraContent = currentTime+","+QString::number(CNCInfo.AXIS_Y_POS,10,6);
+    paraContent = currentTime+","+QString::number(CNCInfo.AXIS_Y_POS,10,4);
     writeFile(paraFileName,paraContent);
 
     paraFileName = cncFileDir+"/Z轴坐标.csv";
-    paraContent = currentTime+","+QString::number(CNCInfo.AXIS_Z_POS,10,6);
+    paraContent = currentTime+","+QString::number(CNCInfo.AXIS_Z_POS,10,4);
     writeFile(paraFileName,paraContent);
 
     paraFileName = cncFileDir+"/主轴坐标.csv";
-    paraContent = currentTime+","+QString::number(CNCInfo.AXIS_MA_POS,10,6);
+    paraContent = currentTime+","+QString::number(CNCInfo.AXIS_MA_POS,10,4);
     writeFile(paraFileName,paraContent);
 
     paraFileName = cncFileDir+"/进给速度.csv";
-    paraContent = currentTime+","+QString::number(CNCInfo.feedrate, 10,6);
+    paraContent = currentTime+","+QString::number(CNCInfo.feedrate, 10,3);
     writeFile(paraFileName,paraContent);
 
     paraFileName = cncFileDir+"/主轴速度.csv";
-    paraContent = currentTime+","+QString::number(CNCInfo.speed,10,6);
+    paraContent = currentTime+","+QString::number(CNCInfo.speed,10,0);
     writeFile(paraFileName,paraContent);
 
     paraFileName = cncFileDir+"/X轴功率.csv";
-    paraContent = currentTime+","+QString::number(CNCInfo.AXIS_X_PWR,10,6);
+    paraContent = currentTime+","+QString::number(CNCInfo.AXIS_X_PWR,10,4);
     writeFile(paraFileName,paraContent);
 
     paraFileName = cncFileDir+"/Y轴功率.csv";
-    paraContent = currentTime+","+QString::number(CNCInfo.AXIS_Y_PWR,10,6);
+    paraContent = currentTime+","+QString::number(CNCInfo.AXIS_Y_PWR,10,4);
     writeFile(paraFileName,paraContent);
 
     paraFileName = cncFileDir+"/Z轴功率.csv";
-    paraContent = currentTime+","+QString::number(CNCInfo.AXIS_Z_PWR,10,6);
+    paraContent = currentTime+","+QString::number(CNCInfo.AXIS_Z_PWR,10,4);
     writeFile(paraFileName,paraContent);
 
     paraFileName = cncFileDir+"/主轴功率.csv";
-    paraContent = currentTime+","+QString::number(CNCInfo.AXIS_MA_PWR,10,6);
+    paraContent = currentTime+","+QString::number(CNCInfo.AXIS_MA_PWR,10,4);
     writeFile(paraFileName,paraContent);
 
     paraFileName = cncFileDir+"/X轴负荷.csv";
-    paraContent = currentTime+","+QString::number(CNCInfo.AXIS_X_FUHE,10,6);
+    paraContent = currentTime+","+QString::number(CNCInfo.AXIS_X_FUHE,10,3);
     writeFile(paraFileName,paraContent);
 
     paraFileName = cncFileDir+"/Y轴负荷.csv";
-    paraContent = currentTime+","+QString::number(CNCInfo.AXIS_Y_FUHE,10,6);
+    paraContent = currentTime+","+QString::number(CNCInfo.AXIS_Y_FUHE,10,3);
     writeFile(paraFileName,paraContent);
 
     paraFileName = cncFileDir+"/Z轴负荷.csv";
-    paraContent = currentTime+","+QString::number(CNCInfo.AXIS_Z_FUHE,10,6);
+    paraContent = currentTime+","+QString::number(CNCInfo.AXIS_Z_FUHE,10,3);
     writeFile(paraFileName,paraContent);
 
     paraFileName = cncFileDir+"/主轴负荷.csv";
-    paraContent = currentTime+","+QString::number(CNCInfo.AXIS_MA_FUHE,10,6);
+    paraContent = currentTime+","+QString::number(CNCInfo.AXIS_MA_FUHE,10,3);
     writeFile(paraFileName,paraContent);
 
     paraFileName = cncFileDir+"/暂停状态.csv";

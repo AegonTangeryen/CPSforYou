@@ -28,5 +28,12 @@
         <file>img/whut4.jpg</file>
         <file>img/whut5.png</file>
         <file>img/Panda.ico</file>
+        <file>img/home.png</file>
+        <file>img/open.png</file>
+        <file>img/quit.png</file>
+        <file>img/about.png</file>
+        <file>img/help.png</file>
+        <file>img/setting.png</file>
+        <file>img/update.png</file>
     </qresource>
 </RCC>

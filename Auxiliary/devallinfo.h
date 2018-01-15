@@ -9,11 +9,9 @@
 
 #define FBG_CHANNEL 32		//FBG通道个数
 #define FBG_NODE 20         //FBG节点个数
-
 #define CCD_DIMENSION 3     //CCD维度
 #define CNC_DIMENSION 16    //CNC维度
 #define DSB_DIMENSION 126    //DSB维度
-
 #define CLOUD_URLS_DIMENSION 2  //服务器URLS命令维度
 
 typedef struct
@@ -65,7 +63,7 @@ typedef struct
     CloudinfoTypeDef cloudInfo;
 }DataInfoTypeDef;    //所有信息汇总
 
-extern DataInfoTypeDef dataInfo;
+extern DataInfoTypeDef dataInfo;  // 全局变量，信息汇总
 
 class devAllInfo : public QObject
 {

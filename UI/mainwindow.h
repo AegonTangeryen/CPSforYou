@@ -25,6 +25,11 @@
 #include <QLegend>
 #include <QBarCategoryAxis>
 #include <QColor>
+#include <QSystemTrayIcon>   // 系统托盘
+#include <QCloseEvent>
+#include <QMenu>
+#include <QAction>
+#include <QIcon>
 
 #include "ds18tcpthread.h"
 #include "fbgudpthread.h"
@@ -56,6 +61,11 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    void fbgPageInit();
+    void ds18PageInit();
+    void laserPageInit();
+    void createNewFolderWhenAnotherDay();
+    void refreshLaserResult();
     void recordAllFbg();
     void recordAllDs18b20(DS18B20_Node (*a)[DS18B20_Index_Max], int nrow1, DS18B20_Node (*b)[DS18B20_Index_Max], int nrow2);
     void recordNo1Ds18b20(DS18B20_Node (*a)[DS18B20_Index_Max], int nrow);
@@ -67,13 +77,14 @@ public:
     void rePlotDs18No1();
     void rePlotDs18No2();
     void rePlotEnvironment();
-    void rePlotHnc();
     void rePlotLaserSensors();
     void detectConnection();
+    void closeEvent(QCloseEvent *event);
 
 private slots:
     void timeisup();         // 主定时器中断处理函数
     void plotTimePoll();     // 定时重新绘图
+    void trayIsActived(QSystemTrayIcon::ActivationReason reason); // 单击或双击右下角托盘
 
     void on_cnclink_pushButton_clicked();
     void on_cncdislink_pushButton_clicked();
@@ -104,6 +115,7 @@ private slots:
     void on_closecomp_pushButton_clicked();
     void showPreResult(double arya);
     void showCompResult(int robert);
+    void showParaInfo(int a, QString kingslayer);
 
     void on_envlinkpushButton_clicked();
     void showEnvMsg(QString loveU, int loveMe);
@@ -116,8 +128,8 @@ private slots:
     void on_actionmusic_triggered();
     void on_actionTV_Series_triggered();
     void on_actionAnimation_triggered();
-
     void on_actionCustom_triggered();
+    void on_actionWhut_cloudplatrm_triggered();
 
 signals:
     void closeHncSystem();
@@ -158,16 +170,20 @@ private:
     QLabel *statusbarIndicator;
     QString currentday;
     QString currentDate;
-    QTimer *kingTimer;       // 主定时器
-    qint64 taskTimeCnt;      // 各项任务的周期
-    qint16 ds18AllRecordCnt; // 为防止数据未收齐一轮就抽样
+    QTimer *kingTimer;          // 主定时器
+    qint64 taskTimeCnt;         // 各项任务的周期
+    qint16 ds18AllRecordCnt;    // 为防止数据未收齐一轮就抽样
     qint16 ds18No1RecordCnt;
     qint16 ds18No2RecordCnt;
     qint16 envRecordCnt;
-    MMTimer *plotTimer;      // 刷新各个图表的定时器
-    qint16 plotCnt;          // 绘图计数
+    MMTimer *plotTimer;         // 刷新各个图表的定时器
+    qint16 plotCnt;             // 绘图计数
     QMutex *globalLock;
-    QStringList userInputAll;// 用户手动输入的信息
+    QStringList userInputAll;   // 用户手动输入的信息
+    QSystemTrayIcon *systemTray;// 系统托盘
+    QAction *restoreAct;        // 恢复窗口操作
+    QAction *quitAct;           // 退出操作
+    QMenu *trayClickMenu;       // 托盘右键菜单
 
     QChart *fbgChart;
     QSplineSeries *fbgSeriesCh1601;

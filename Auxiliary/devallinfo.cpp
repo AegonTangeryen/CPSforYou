@@ -2,7 +2,8 @@
 
 DataInfoTypeDef dataInfo;
 devAllInfo::devAllInfo(QObject *parent) : QObject(parent)
-{   //信息初始化
+{
+    //信息初始化
     dataInfo.headInfo.time = "2017-12-25-18:00:00";
     dataInfo.headInfo.macId = "54EE75A6E578";
     dataInfo.headInfo.msg = "WuZhong";
