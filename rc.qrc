@@ -35,5 +35,12 @@
         <file>img/help.png</file>
         <file>img/setting.png</file>
         <file>img/update.png</file>
+        <file>img/bridge1.jpg</file>
+        <file>img/whut6.jpg</file>
+        <file>img/wuzhong1.jpg</file>
+        <file>img/wuzhong2.jpg</file>
+        <file>img/wuzhong3.jpg</file>
+        <file>img/whut7.jpg</file>
+        <file>img/wuzhong4.jpg</file>
     </qresource>
 </RCC>

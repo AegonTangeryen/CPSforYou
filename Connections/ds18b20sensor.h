@@ -31,7 +31,7 @@ public:
 
 private:
     QString dailyDir;                                     // 当天数据文件存放路径
-    unsigned long errDS18B20Cnt;                          // 错误计数
+    quint64 errDS18B20Cnt;                                // 错误计数
     QString dslinkport1;                                  // 监听端口1
     QString dslinkport2;                                  // 监听端口2
     QString dsHostIp;                                     // 本机IP地址
@@ -43,8 +43,6 @@ private:
     QByteArray dataAddALL;
     bool newFullFragment;                                 // 是否完整一帧
     bool addNewFullFragment;
-    bool totalRenewed;                                    // 是否全部收到了一轮
-    bool addTotalRenewed;
     QString dsNo1Dir;
     QString dsNo2Dir;
     QString ds18ErrPath;                                  // 错误记录

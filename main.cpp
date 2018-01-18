@@ -28,7 +28,7 @@ void outputMessage(QtMsgType type, const QMessageLogContext &context, const QStr
     QString current_date = QString("(%1)").arg(current_date_time);
     QString message = QString("%1 %2").arg(current_date).arg(msg);
 
-    QFile file("cpslog.txt");
+    QFile file("cpsDiary.log");
     file.open(QIODevice::WriteOnly | QIODevice::Append);
     QTextStream text_stream(&file);
     text_stream << message << "\r\n";

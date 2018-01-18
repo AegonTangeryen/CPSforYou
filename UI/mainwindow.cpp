@@ -19,7 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(restoreAct, SIGNAL(triggered()), this, SLOT(showNormal()));
     quitAct = new QAction("退出", this);
     quitAct->setIcon(QIcon(":/img/quit.png"));
-    connect(quitAct, &QAction::triggered,qApp,&QApplication::quit);
+    connect(quitAct, &QAction::triggered,this,&MainWindow::userQuit);
     trayClickMenu = new QMenu(this);
     trayClickMenu->addAction(restoreAct);
     trayClickMenu->addSeparator();
@@ -79,10 +79,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // 1.选项卡“FBG传感器”页面初始化配置
     fbgPageInit(); // 图表显示
+    ui->FBGseeallpushButton->setEnabled(false);
     connect(ui->FBGseeallpushButton,&QPushButton::clicked,this,&MainWindow::fbgSeeAll);
 
     // 2.选项卡“电类温度传感器”页面初始化配置
     ds18PageInit(); // 图表显示
+    ui->ds18seeallpushButton->setEnabled(false);
     connect(ui->ds18seeallpushButton,&QPushButton::clicked,this,&MainWindow::ds18SeeAll);
 
     // 3.选项卡“数控系统信息”页面初始化配置
@@ -92,8 +94,36 @@ MainWindow::MainWindow(QWidget *parent) :
     laserPageInit(); // 图表显示
 
     // 5.选项卡“云服务平台”页面初始化配置
+    cloudPageImg = new QImage;
+    cloudPageImg->load(":/img/wuzhong1.jpg");
+    ui->cloudpicturelabel->setPixmap(QPixmap::fromImage(*cloudPageImg));
+    ui->cloudpicturelabel->setScaledContents(true);
+
+    updateIni = new QSettings(QDir::currentPath()+"/update.ini", QSettings::IniFormat,this);
+    double currentVersion = updateIni->value("/program/version").toDouble();
+    QString exeUrl = updateIni->value("/update/exeUrl").toString();
+    double latestVersion = updateIni->value("/update/newVersion").toDouble();
+    ui->currentversionlabel->setText(QString::number(currentVersion,10,1));
+    ui->latestversionlabel->setText(QString::number(latestVersion,10,1));
+    ui->updateurl->setText(exeUrl);
+
+    /*如果有更新可用，更新按钮点亮*/
+    if(latestVersion>currentVersion) ui->updateButton->setEnabled(true);
+    else ui->updateButton->setEnabled(false);
+
+    quint8 lastFbgStatus = updateIni->value("/startup/fbg").toInt();
+    quint8 lastDs18Status = updateIni->value("/startup/ds18").toInt();
+    quint8 lastEnvStatus = updateIni->value("/startup/env").toInt();
+    quint8 lastCncStatus = updateIni->value("/startup/cnc").toInt();
+    quint8 lastLaserStatus = updateIni->value("/startup/laser").toInt();
+    quint8 lastCloudStatus = updateIni->value("/startup/cloud").toInt();
 
     // 6.选项卡“热误差补偿”页面初始化配置
+    compMethodGroup = new QButtonGroup(this);
+    compMethodGroup->addButton(ui->selfradioButton, 0);
+    compMethodGroup->addButton(ui->pythonradioButton, 1);
+    ui->selfradioButton->setChecked(true);
+    ui->closecomp_pushButton->setEnabled(false);
     connect(ui->clearcomp_pushButton,&QPushButton::clicked,this,&MainWindow::clearCompBrowser);
 
 /*-------------------------------创建数据存储文件夹-------------------------------------*/
@@ -163,12 +193,13 @@ MainWindow::MainWindow(QWidget *parent) :
         ENV_ALL_Node[i].temperature = "94";
     }
 
-    ccdInfo[0] = "0";
-    ccdInfo[1] = "0";
-    ccdInfo[2] = "0";
+    ccdInfo<<"0";
+    ccdInfo<<"0";
+    ccdInfo<<"0";
 
 /*-----------------------------主线程成员变量初始化-----------------------------------*/
     taskTimeCnt=0;
+    scrollPicCnt=0;
     ds18AllRecordCnt=0;
     ds18No1RecordCnt=0;
     ds18No2RecordCnt=0;
@@ -187,6 +218,13 @@ MainWindow::MainWindow(QWidget *parent) :
     plotTimer = new MMTimer(1000,this);
     connect(plotTimer,&MMTimer::timeout,this,&MainWindow::plotTimePoll);
 //    plotTimer->start();   // 暂不启用图形更新
+
+    if(lastFbgStatus)  on_FBGlink_pushButton_clicked();
+    if(lastDs18Status) on_ds18link_pushButton_clicked();
+    if(lastEnvStatus)  on_envlinkpushButton_clicked();
+    if(lastCncStatus)  on_cnclink_pushButton_clicked();
+    if(lastLaserStatus)on_linkccd_pushButton_clicked();
+    if(lastCloudStatus)on_lincloud_pushButton_clicked();
     qDebug()<<"MainInit";
 }
 
@@ -502,6 +540,10 @@ void MainWindow::timeisup()
         if(laserWorkingStatus) recordAllLaserSensors(ccdInfo);
     }
 
+    if(taskTimeCnt%7==0) // 每7s切换一次图片
+    {
+        scrollCloudPicture();
+    }
     if(taskTimeCnt%8==0) // 每8s检测一次连接状态
     {
         detectConnection();
@@ -1023,7 +1065,7 @@ void MainWindow::recordAllCnc(CNCInfoReg CNCInfo)
 }
 
 // 5.记录激光位移传感器全部数据
-void MainWindow::recordAllLaserSensors(QString *gc)
+void MainWindow::recordAllLaserSensors(QStringList gc)
 {
     QString currentTime = QDateTime::currentDateTime().toString("yyyy-MM-dd-hh:mm:ss");
     QString ccdContent = currentTime;
@@ -1290,7 +1332,58 @@ void MainWindow::detectConnection()
     statusbarIndicator->setText(content);
 }
 
-// 点击关闭窗口之后
+// 滚动切换云平台页面的显示图片
+void MainWindow::scrollCloudPicture()
+{
+    switch (scrollPicCnt) {
+    case 0:
+        cloudPageImg->load(":/img/wuzhong2.jpg");
+        ui->cloudpicturelabel->setPixmap(QPixmap::fromImage(*cloudPageImg));
+        break;
+    case 1:
+        cloudPageImg->load(":/img/wuzhong3.jpg");
+        ui->cloudpicturelabel->setPixmap(QPixmap::fromImage(*cloudPageImg));
+        break;
+    case 2:
+        cloudPageImg->load(":/img/wuzhong4.jpg");
+        ui->cloudpicturelabel->setPixmap(QPixmap::fromImage(*cloudPageImg));
+        break;
+    case 3:
+        cloudPageImg->load(":/img/whut2.jpg");
+        ui->cloudpicturelabel->setPixmap(QPixmap::fromImage(*cloudPageImg));
+        break;
+    case 4:
+        cloudPageImg->load(":/img/whut6.jpg");
+        ui->cloudpicturelabel->setPixmap(QPixmap::fromImage(*cloudPageImg));
+        break;
+    case 5:
+        cloudPageImg->load(":/img/whut7.jpg");
+        ui->cloudpicturelabel->setPixmap(QPixmap::fromImage(*cloudPageImg));
+        break;
+    case 6:
+        cloudPageImg->load(":/img/whut3.jpg");
+        ui->cloudpicturelabel->setPixmap(QPixmap::fromImage(*cloudPageImg));
+        break;
+    case 7:
+        cloudPageImg->load(":/img/whut4.jpg");
+        ui->cloudpicturelabel->setPixmap(QPixmap::fromImage(*cloudPageImg));
+        break;
+    case 8:
+        cloudPageImg->load(":/img/bridge1.jpg");
+        ui->cloudpicturelabel->setPixmap(QPixmap::fromImage(*cloudPageImg));
+        break;
+    case 9:
+        cloudPageImg->load(":/img/wuzhong1.jpg");
+        ui->cloudpicturelabel->setPixmap(QPixmap::fromImage(*cloudPageImg));
+        break;
+    default:
+        break;
+    }
+    scrollPicCnt++;
+    if(scrollPicCnt==9) scrollPicCnt=0;
+}
+
+// 点击右上角关闭窗口之后
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     if(systemTray->isVisible())
@@ -1323,6 +1416,20 @@ void MainWindow::trayIsActived(QSystemTrayIcon::ActivationReason reason)
         }
     }
 }
+
+// 用户手动退出
+void MainWindow::userQuit()
+{
+    updateIni->setValue("/program/userAction",1); // 告诉守护进程这是用户操作
+    updateIni->setValue("/startup/fbg",0);
+    updateIni->setValue("/startup/ds18",0);
+    updateIni->setValue("/startup/env",0);
+    updateIni->setValue("/startup/cnc",0);
+    updateIni->setValue("/startup/laser",0);
+    updateIni->setValue("/startup/cloud",0);
+    QApplication::quit();
+}
+
 /**********************************************************************************************
 
                                           1.FBG传感器部分
@@ -1456,6 +1563,7 @@ void MainWindow::on_FBGclose_pushButton_clicked()
     }
     ui->FBGlink_pushButton->setEnabled(true);
     ui->FBGclose_pushButton->setEnabled(false);
+    ui->FBGseeallpushButton->setEnabled(false);
 }
 
 // 显示
@@ -1463,13 +1571,21 @@ void MainWindow::showFbgResults(int tywin)
 {
     switch (tywin)
     {
-        case -1: ui->fbglinklabel->setText("未连接");
-            break;
-        case 0:  ui->fbglinklabel->setText("未收到");
-            break;
-        case 1:  ui->fbglinklabel->setText("保持连接");
-            break;
-        default: break;
+    case -1:
+        {
+            ui->fbglinklabel->setText("未连接");
+            ui->FBGseeallpushButton->setEnabled(false);
+        }
+        break;
+    case 0:  ui->fbglinklabel->setText("未收到");
+        break;
+    case 1:
+        {
+            ui->fbglinklabel->setText("保持连接");
+            ui->FBGseeallpushButton->setEnabled(true);
+        }
+        break;
+    default: break;
     }
 }
 
@@ -1592,6 +1708,7 @@ void MainWindow::on_ds18link_pushButton_clicked()
 
     ui->ds18link_pushButton->setEnabled(false);
     ui->ds18dislink_pushButton->setEnabled(true);
+    ui->ds18seeallpushButton->setEnabled(true);
     Ds18TcpThread *ds18Thread = new Ds18TcpThread(originalPath,userInputAll[2],userInputAll[3]);
     connect(ds18Thread, &Ds18TcpThread::relayMsg2Ui,this,&MainWindow::showDS18Msg);
     connect(this,&MainWindow::closeDs18Sensors,ds18Thread,&Ds18TcpThread::forceThread2Quit);
@@ -1655,6 +1772,7 @@ void MainWindow::on_ds18dislink_pushButton_clicked()
 
     ui->ds18link_pushButton->setEnabled(true);
     ui->ds18dislink_pushButton->setEnabled(false);
+    ui->ds18seeallpushButton->setEnabled(false);
 }
 
 /**********************************************************************************************
@@ -1922,6 +2040,11 @@ void MainWindow::showCloudInfo(QString tully,int blackfish)
             ui->cloudlinklabel->setText("本次连接尝试失败");
         }
             break;
+        case  3:      // 显示信息
+        {
+
+        }
+            break;
         default:    break;
     }
 }
@@ -1932,6 +2055,76 @@ void MainWindow::on_dislinkcloud_pushButton_clicked()
     emit closeCloudSocket();
 }
 
+// 程序更新按钮
+void MainWindow::on_updateButton_clicked()
+{
+    QProcess updatePro;
+    if(updatePro.startDetached("./CPSforUpdate.exe")) // 如果打开外部更新程序成功
+    {
+        updateIni->setValue("/program/userAction",1); // 告诉守护进程这是用户操作
+        if(fbgWorkingStatus)
+        {
+            updateIni->setValue("/startup/fbg",1);
+        }
+        else
+        {
+            updateIni->setValue("/startup/fbg",0);
+        }
+
+        if(ds18WorkingStatus)
+        {
+            updateIni->setValue("/startup/ds18",1);
+        }
+        else
+        {
+            updateIni->setValue("/startup/ds18",0);
+        }
+
+        if(envWorkingStatus)
+        {
+            updateIni->setValue("/startup/env",1);
+        }
+        else
+        {
+            updateIni->setValue("/startup/env",0);
+        }
+
+        if(cncWorkingStatus)
+        {
+            updateIni->setValue("/startup/cnc",1);
+        }
+        else
+        {
+            updateIni->setValue("/startup/cnc",0);
+        }
+
+        if(laserWorkingStatus)
+        {
+            updateIni->setValue("/startup/laser",1);
+        }
+        else
+        {
+            updateIni->setValue("/startup/laser",0);
+        }
+
+        if(cloudLinkStatus)
+        {
+            updateIni->setValue("/startup/cloud",1);
+        }
+        else
+        {
+            updateIni->setValue("/startup/cloud",0);
+        }
+
+        QApplication::quit(); // 本程序退出
+    }
+    else
+    {
+        ui->cloudcmdBrowser->clear();
+        ui->cloudcmdBrowser->append("更新程序启动失败!");
+        ui->cloudcmdBrowser->append("请检查所在根目录中是否有 CPSforupdate.exe 文件,并稍后重试");
+    }
+}
 /**********************************************************************************************
 
                                                 7.热误差补偿部分
@@ -1940,27 +2133,39 @@ void MainWindow::on_dislinkcloud_pushButton_clicked()
 //开始补偿
 void MainWindow::on_startcomp_pushButton_clicked()
 {
-    ui->comp_textBrowser->clear();
     if(!cncWorkingStatus)
     {
+        ui->comp_textBrowser->clear();
         ui->comp_textBrowser->append("请连接数控系统");
         return;
     }
-    if(cncWorkingStatus && ds18WorkingStatus)
+    switch (compMethodGroup->checkedId())
     {
-        ThermalErrorCompensation *reduceError = new ThermalErrorCompensation(originalPath);
-        reduceError->start();
-        connect(reduceError,&ThermalErrorCompensation::replyPredictionResult,
-                this,&MainWindow::showPreResult);
-        connect(reduceError,&ThermalErrorCompensation::replyAcutalCompensation,
-                this,&MainWindow::showCompResult);
-        connect(reduceError,&ThermalErrorCompensation::replyInfo,this,&MainWindow::showParaInfo);
-        connect(this,&MainWindow::closeCompensation,reduceError,&ThermalErrorCompensation::forceThread2Quit);
-        connect(this,&MainWindow::createNewDayFolder,reduceError,&ThermalErrorCompensation::niceNewDay);
-        connect(reduceError,&ThermalErrorCompensation::finished,
-                reduceError,&ThermalErrorCompensation::deleteLater);
-        ui->startcomp_pushButton->setEnabled(false);
+        case 0: // 选择自主预测计算方式，利用.cpp文件计算
+        {
+            ThermalErrorCompensation *reduceError = new ThermalErrorCompensation(originalPath);
+            connect(reduceError,&ThermalErrorCompensation::replyPredictionResult,
+                    this,&MainWindow::showPreResult);
+            connect(reduceError,&ThermalErrorCompensation::replyAcutalCompensation,
+                    this,&MainWindow::showCompResult);
+            connect(reduceError,&ThermalErrorCompensation::replyInfo,
+                    this,&MainWindow::showParaInfo);
+            connect(this,&MainWindow::closeCompensation,
+                    reduceError,&ThermalErrorCompensation::forceThread2Quit);
+            connect(this,&MainWindow::createNewDayFolder,
+                    reduceError,&ThermalErrorCompensation::niceNewDay);
+            connect(reduceError,&ThermalErrorCompensation::finished,
+                    reduceError,&ThermalErrorCompensation::deleteLater);
+            reduceError->start();
+        } break;
+        case 1: // 选择Python计算方式，调用控制台程序
+        {
+
+        } break;
+        default: break;
     }
+    ui->startcomp_pushButton->setEnabled(false);
+    ui->closecomp_pushButton->setEnabled(true);
 }
 
 //关闭补偿
@@ -1968,6 +2173,7 @@ void MainWindow::on_closecomp_pushButton_clicked()
 {
     emit closeCompensation();
     ui->startcomp_pushButton->setEnabled(true);
+    ui->closecomp_pushButton->setEnabled(false);
 }
 
 //清空显示
@@ -2120,8 +2326,4 @@ void MainWindow::on_actionAnimation_triggered()
     if(onePiece.exec() == QDialog::Accepted) {}
 }
 
-// 点击“云上的日子”
-void MainWindow::on_actionWhut_cloudplatrm_triggered()
-{
 
-}

@@ -6,11 +6,11 @@ CloudPlatform::CloudPlatform(QString skyIP, QString sunPort)
 {
     ticToc = 0;
     cloudServerIP = skyIP;             // 正式连接
-    //cloudServerIP = getHostIpAddress();          // 本地连接测试
+    //cloudServerIP = getHostIpAddress();  // 本地连接测试
     cloudServerPort = sunPort.toInt();
     cloudSocket = new QTcpSocket();
-    cloudTimer = new QTimer(this);          // 5s一次发送传感器信息
-    hncPrivateTimer = new QTimer(this);     // 200ms一次单独发送hnc信息
+    cloudTimer = new QTimer(this);
+    hncPrivateTimer = new QTimer(this);
     userOperation = false;
     connect(cloudSocket,&QTcpSocket::connected,this,&CloudPlatform::afterConnected);
     cloudSocket->connectToHost(QHostAddress(cloudServerIP), cloudServerPort);
@@ -21,13 +21,13 @@ CloudPlatform::CloudPlatform(QString skyIP, QString sunPort)
 
     connect(cloudTimer,&QTimer::timeout, this,&CloudPlatform::onTimeIsUp);
     cloudTimer->setTimerType(Qt::PreciseTimer);
-    cloudTimer->setInterval(5000);
+    cloudTimer->setInterval(5000); // 5s一次发送传感器信息
     cloudTimer->start();
 
     connect(hncPrivateTimer,&QTimer::timeout,this,&CloudPlatform::onPrivateTimeUp);
     hncPrivateTimer->setTimerType(Qt::PreciseTimer);
-    hncPrivateTimer->setInterval(200);
-    //hncPrivateTimer->start();
+    hncPrivateTimer->setInterval(200); // 200ms一次单独发送hnc信息
+    hncPrivateTimer->start();
 }
 
 CloudPlatform::~CloudPlatform() {}
@@ -46,9 +46,17 @@ void CloudPlatform::receiveFromCloud()
 {
     QByteArray recBuff;
     recBuff = cloudSocket->readAll();
-    QString lxd = dataXML::xmlStrRead(QString(recBuff));
-    QString cloudUrls = dataInfo.cloudInfo.cloudURLS.value("MODELBIN");
-    QString cloudCmds = dataInfo.cloudInfo.cloudCMDS;
+    dataXML::xmlStrRead(QString(recBuff));
+    updateIni = new QSettings((QDir::currentPath()+"/update.ini", QSettings::IniFormat,this));
+    QString cloudUrls = dataInfo.cloudInfo.cloudURLS.value("MODELBIN"); // 下载的URL地址
+    double cloudCmds = dataInfo.cloudInfo.cloudCMDS.toDouble(); // 新版本号
+    QStringList urlList = cloudUrls.split(",");
+    if(urlList.size()==2) // url地址写入ini文件中
+    {
+        updateIni->setValue("/update/exeUrl",urlList[0]);
+        updateIni->setValue("/update/exeUrl",urlList[1]);
+    }
+    updateIni->setValue("/update/newVersion",cloudCmds); // 新版本号写入ini文件中
 }
 
 // 云平台单方面断开连接
@@ -58,7 +66,7 @@ void CloudPlatform::afterDisconnected()
     if(userOperation) return;
     cloudSocket->abort();
     cloudSocket->connectToHost(QHostAddress(cloudServerIP), cloudServerPort);
-    if(!cloudSocket->waitForConnected(5000))
+    if(!cloudSocket->waitForConnected(2000))
     {
         emit sendMsg("云平台已断开",-1);
     }
@@ -103,10 +111,10 @@ void CloudPlatform::onTimeIsUp()
 void CloudPlatform::onPrivateTimeUp()
 {
     qDebug()<<"6.5";
-    if(!cncWorkingStatus) // 如果已连接云平台，每200ms发送一次机床信息包
+    if((!cncWorkingStatus) && cloudLinkStatus) // 如果已连接云平台和数控机床，每200ms发送一次机床信息包
     {
         packageHncData();
-        QString xmlOutStr = dataXML::xmlStrCreat(dataInfo);
+        QString xmlOutStr = dataXML::xmlHncCreat(hncInfo);
         xmlOutStr += "end\n";
         cloudSocket->write(xmlOutStr.toLatin1());
         cloudSocket->flush();
@@ -119,7 +127,7 @@ void CloudPlatform::linkOnceAgain()
     qDebug()<<"6.4";
     ticToc = 0;
     cloudSocket->connectToHost(QHostAddress(cloudServerIP), cloudServerPort);
-    if(cloudSocket->waitForConnected(5000))  // 如果连上了
+    if(cloudSocket->waitForConnected(2000))  // 如果连上了
     {
         cloudLinkStatus = true;
     }
@@ -135,29 +143,30 @@ void CloudPlatform::packageHncData()
     // 包头信息
     QDateTime current_date_time =QDateTime::currentDateTime();
     QString currentTime =current_date_time.toString("yyyyMMddhhmmsszzz");
-    dataInfo.headInfo.time = currentTime;
-    dataInfo.headInfo.macId = getHostMacAddress();// 获取本机Mac地址
-    dataInfo.headInfo.macId.replace(QString("-"),QString(""));
-    dataInfo.headInfo.macId.replace(QString(":"),QString(""));
-    dataInfo.headInfo.msg = "Wuhan Heavy-duty machine tool ZK5540A";
+    hncInfo.headInfo.time = currentTime;
+    QString hostMac = getHostMacAddress();// 获取本机Mac地址
+    hostMac.replace(QString("-"),QString(""));
+    hostMac.replace(QString(":"),QString(""));
+    hncInfo.headInfo.macId = hostMac;
+    hncInfo.headInfo.msg = "Wuhan Heavy-duty machine tool ZK5540A";
 
     // 数控系统信息
-    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[0], QString::number(CNCInfo.ch,10));
-    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[1], QString::number(CNCInfo.AXIS_X_POS,10,4));
-    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[2], QString::number(CNCInfo.AXIS_Y_POS,10,4));
-    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[3], QString::number(CNCInfo.AXIS_Z_POS,10,4));
-    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[4], QString::number(CNCInfo.AXIS_MA_POS,10,4));
-    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[5], QString::number(CNCInfo.AXIS_X_PWR,10,4));
-    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[6], QString::number(CNCInfo.AXIS_Y_PWR,10,4));
-    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[7], QString::number(CNCInfo.AXIS_Z_PWR,10,4));
-    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[8], QString::number(CNCInfo.AXIS_MA_PWR,10,4));
-    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[9], QString::number(CNCInfo.AXIS_X_FUHE,10,4));
-    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[10],QString::number(CNCInfo.AXIS_Z_FUHE,10,4));
-    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[11],QString::number(CNCInfo.AXIS_Y_FUHE,10,4));
-    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[12],QString::number(CNCInfo.AXIS_MA_FUHE,10,4));
-    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[13],QString::number(CNCInfo.feedrate,10,3));
-    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[14],QString::number(CNCInfo.speed,10,0));
-    dataInfo.cncInfo.CNCdata.insert(dataInfo.cncInfo.CNCkey[15],CNCInfo.PauseStatus);
+    hncInfo.cncInfo.CNCdata.insert(hncInfo.cncInfo.CNCkey[0], QString::number(CNCInfo.ch,10));
+    hncInfo.cncInfo.CNCdata.insert(hncInfo.cncInfo.CNCkey[1], QString::number(CNCInfo.AXIS_X_POS,10,4));
+    hncInfo.cncInfo.CNCdata.insert(hncInfo.cncInfo.CNCkey[2], QString::number(CNCInfo.AXIS_Y_POS,10,4));
+    hncInfo.cncInfo.CNCdata.insert(hncInfo.cncInfo.CNCkey[3], QString::number(CNCInfo.AXIS_Z_POS,10,4));
+    hncInfo.cncInfo.CNCdata.insert(hncInfo.cncInfo.CNCkey[4], QString::number(CNCInfo.AXIS_MA_POS,10,4));
+    hncInfo.cncInfo.CNCdata.insert(hncInfo.cncInfo.CNCkey[5], QString::number(CNCInfo.AXIS_X_PWR,10,4));
+    hncInfo.cncInfo.CNCdata.insert(hncInfo.cncInfo.CNCkey[6], QString::number(CNCInfo.AXIS_Y_PWR,10,4));
+    hncInfo.cncInfo.CNCdata.insert(hncInfo.cncInfo.CNCkey[7], QString::number(CNCInfo.AXIS_Z_PWR,10,4));
+    hncInfo.cncInfo.CNCdata.insert(hncInfo.cncInfo.CNCkey[8], QString::number(CNCInfo.AXIS_MA_PWR,10,4));
+    hncInfo.cncInfo.CNCdata.insert(hncInfo.cncInfo.CNCkey[9], QString::number(CNCInfo.AXIS_X_FUHE,10,4));
+    hncInfo.cncInfo.CNCdata.insert(hncInfo.cncInfo.CNCkey[10],QString::number(CNCInfo.AXIS_Z_FUHE,10,4));
+    hncInfo.cncInfo.CNCdata.insert(hncInfo.cncInfo.CNCkey[11],QString::number(CNCInfo.AXIS_Y_FUHE,10,4));
+    hncInfo.cncInfo.CNCdata.insert(hncInfo.cncInfo.CNCkey[12],QString::number(CNCInfo.AXIS_MA_FUHE,10,4));
+    hncInfo.cncInfo.CNCdata.insert(hncInfo.cncInfo.CNCkey[13],QString::number(CNCInfo.feedrate,10,3));
+    hncInfo.cncInfo.CNCdata.insert(hncInfo.cncInfo.CNCkey[14],QString::number(CNCInfo.speed,10,0));
+    hncInfo.cncInfo.CNCdata.insert(hncInfo.cncInfo.CNCkey[15],CNCInfo.PauseStatus);
 }
 
 // 所有传感器数据整理成XML格式
@@ -167,10 +176,11 @@ void CloudPlatform::packageSensorsData()
     QDateTime current_date_time =QDateTime::currentDateTime();
     QString currentTime =current_date_time.toString("yyyyMMddhhmmsszzz");
     dataInfo.headInfo.time = currentTime;
-    dataInfo.headInfo.macId = getHostMacAddress(); // 获取本机Mac地址
-    dataInfo.headInfo.macId.replace(QString("-"),QString(""));
-    dataInfo.headInfo.macId.replace(QString(":"),QString(""));
-    dataInfo.headInfo.msg = "Wuhan Heavy-duty machine tool ZK5540A";
+    QString hostMac = getHostMacAddress();// 获取本机Mac地址
+    hostMac.replace(QString("-"),QString(""));
+    hostMac.replace(QString(":"),QString(""));
+    dataInfo.headInfo.macId = hostMac;
+    dataInfo.headInfo.msg = "WHUT CPS Sensors";
 
     // FBG传感器
     QString temp1;

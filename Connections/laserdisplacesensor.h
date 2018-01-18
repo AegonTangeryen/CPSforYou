@@ -6,7 +6,7 @@
 
 extern bool time2ClearDispalcement;
 extern bool laserWorkingStatus;
-extern QString ccdInfo[];
+extern QStringList ccdInfo;
 
 class LaserDisplaceSensor: public QThread
 {
@@ -30,7 +30,7 @@ public:
 
     bool link2Displacement();
     void getDisplaceData();
-    void recordDisplacements(QString *wyl);
+    void recordDisplacements(QStringList wyl);
     void clearDisplays();
     void closeDisplacementSensor();
     QString getStringFromFloatValue(LKIF_FLOATVALUE_OUT value);

@@ -27,6 +27,7 @@ private:
     QTcpSocket *cloudSocket;
     QTimer *cloudTimer;
     QTimer *hncPrivateTimer;
+    QSettings *updateIni;
     QString xmlInStr;
     bool userOperation;
     quint16 ticToc;

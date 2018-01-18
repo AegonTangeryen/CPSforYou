@@ -2,7 +2,7 @@
 
 bool time2ClearDispalcement = false;            // 是时候清零一波位移传感器了
 bool laserWorkingStatus = false;
-QString ccdInfo[3];
+QStringList ccdInfo;
 
 LaserDisplaceSensor::LaserDisplaceSensor() {}
 
@@ -75,7 +75,7 @@ void LaserDisplaceSensor::getDisplaceData()
 {
     qDebug()<<"5.1";
     time2ReadDispalcement = false;
-    int outNo = 0;      //轴号
+    int outNo = 0;      // 轴号
     for(int i=0;i<3;i++)
     {
         outNo = i;
@@ -89,7 +89,7 @@ void LaserDisplaceSensor::getDisplaceData()
 }
 
 // 记录示数
-void LaserDisplaceSensor::recordDisplacements(QString *wyl)
+void LaserDisplaceSensor::recordDisplacements(QStringList wyl)
 {
     QString currentTime =QDateTime::currentDateTime().toString("yyyy-MM-dd-hh:mm:ss");
     QString ccdContent, ccdfilename;

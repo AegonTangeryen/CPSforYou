@@ -193,19 +193,22 @@ DS18b20Sensor::DS18b20Sensor(QString ds18path, QString royalport, QString barcap
     ds18Dir = new QDir();
     newFullFragment = false;
     addNewFullFragment = false;
-    totalRenewed = false;
-    addTotalRenewed = false;
+    dataALL.clear();
+    dataAddALL.clear();
     ds18Server = new QTcpServer();
     ds18Socket = new QTcpSocket();
-    ds18AddServer = new QTcpServer(this);
-    ds18AddSocket = new QTcpSocket(this);
+    ds18AddServer = new QTcpServer();
+    ds18AddSocket = new QTcpSocket();
 
     QString currentDate = QDateTime::currentDateTime().toString("yyyy-MM-dd hh：mm：ss");
     dailyDir = ds18path+ "/WiFi温度数据"+"("+currentDate+")";
     dsNo1Dir = dailyDir+"/WiFi温度数据一号板"+"("+currentDate+")";
     dsNo2Dir = dailyDir+"/WiFi温度数据二号板"+"("+currentDate+")";
-    // 如果不存在此文件夹,创建
-    if(!ds18Dir->exists(dailyDir))   ds18Dir->mkdir(dailyDir);
+
+    if(!ds18Dir->exists(dailyDir)) // 如果不存在此文件夹,创建
+    {
+        ds18Dir->mkdir(dailyDir);
+    }
 
     ds18ErrPath = dailyDir +"/DS18b20错误记录"+currentDate+".csv";
     QString errHeader = "时间,设备号,通道号,传感器号,ID号,当前温度,上次温度,错误计数,错误原因";
@@ -271,7 +274,7 @@ void DS18b20Sensor::newClientConnection()
 void DS18b20Sensor::readDS18Data()
 {
     qDebug()<<"2.1";
-    ds18WorkingStatus = true;                      // 在此判定一号板已连接
+    ds18WorkingStatus = true;                        // 在此判定一号板已连接
     QByteArray buffer;
     buffer = ds18Socket->readAll();                  // 读取本次全部数据
     dataALL+=buffer;                                 // 存入数据队列
@@ -288,14 +291,13 @@ void DS18b20Sensor::readDS18Data()
             {
                 newFullFragment = true;
                 dataALL = dataALL.mid(headerIndex);    // 丢弃“S0,00”之前的部分
-                totalRenewed = true;
             }
         }
     }
 
     QList<QByteArray> nodeList = dataALL.split('\n');// 按‘\n’拆分
     int itemNum = nodeList.size();                   // 拆分后的项数
-    if(itemNum == 1) return;                         // 不足一帧（没有'\n'）,退出，下次再来
+    if((itemNum==0) || (itemNum==1)) return;         // 不足一帧（没有'\n'）,退出
     if(itemNum == 2)                                 // 一帧多一点
     {
         processData(nodeList[0],1);                  // 处理一次
@@ -374,7 +376,7 @@ void DS18b20Sensor::readDS18AddData()
 
     QList<QByteArray> nodeList = dataAddALL.split('\n');    // 按‘\n’拆分
     int itemNum = nodeList.size();                          // 拆分后的项数
-    if(itemNum == 1) return;                                // 不足一帧（没有'\n'）,退出，下次再来
+    if((itemNum==0) || (itemNum==1)) return;                // 不足一帧（没有'\n'）,退出，下次再来
     if(itemNum == 2)                                        // 一帧多一点
     {
         processData(nodeList[0],2);
@@ -404,7 +406,7 @@ void DS18b20Sensor::addSocketDisconnected()
 void DS18b20Sensor::processData(QByteArray a,int clientNo)
 {
     qDebug()<<"2";
-    if(a.size()<30 || a.size()>32)                              // 异常帧
+    if(a.size()<30 || a.size()>31)                              // 异常帧
     {
         emit sendMsg("数据帧大小不在正常范围内",clientNo);
         return;
@@ -416,9 +418,14 @@ void DS18b20Sensor::processData(QByteArray a,int clientNo)
     }
     a = a.mid(1);                                               // 去除首部'S'
     QList<QByteArray> paragraph = a.split(',');                 // 按','分割
+    if(paragraph.size()!=5)  // 异常帧,退出，防止崩溃
+    {
+        qDebug()<<"ds18Falut";
+        return;
+    }
+
     QString ID, temperature;								    // ID和温度
     unsigned int channel = 0, indx = 0, sign = 0;				// 通道,序列号，正负号
-
     channel = paragraph[0].toInt();                             // 通道号:0~7
     indx = paragraph[1].toInt();                                // 序列号:00~08
     ID = paragraph[2];                                          // id号
@@ -433,54 +440,66 @@ void DS18b20Sensor::processData(QByteArray a,int clientNo)
         if (IDseries == -1)  return;                            // 如果数据库中找不到此ID，退出
         else
         {
-            if(clientNo == 1)
-            {
-                DS18B20_ALL_Node[channel][IDseries].temperature = temperature;
-                DS18B20_ALL_Node[channel][IDseries].ID = ID;
-                recordSingleSensor(1,channel,ID,temperature);
-            }
-            else if(clientNo == 2)
-            {
-                if(IDseries==8)   // 记录多出来的那一个，记完就跑
-                {
-                   recordSingleSensor(2,channel,ID,temperature);
-                   return;
-                }
-                DS18B20_ADD_Node[channel][IDseries].temperature = temperature;
-                DS18B20_ADD_Node[channel][IDseries].ID = ID;
-                recordSingleSensor(2,channel,ID,temperature);
-            }
-
-            double nowdat = temperature.toDouble();
+            bool ok; // 判断是否能转换为double型
+            double nowdat = temperature.toDouble(&ok);
             unsigned int errtype;
-            if ( (nowdat<-10) || (nowdat>80) ) 	                // 异常情况
+            if(!ok) // 转换失败，说明温度部分乱码
             {
                 errDS18B20Cnt++;
-                if(clientNo == 1)
-                {
-                    if(abs(nowdat-DS18B20_ALL_Node[channel][IDseries].temperature.toDouble())>=20)
-                    {
-                        errtype=2;
-                    }
-                    else
-                    {
-                        errtype=1;
-                    }
-                }
-                else if(clientNo == 2)
-                {
-                    if(abs(nowdat-DS18B20_ADD_Node[channel][IDseries].temperature.toDouble())>=20)
-                    {
-                        errtype=2;
-                    }
-                    else
-                    {
-                        errtype=1;
-                    }
-                }
+                errtype=3;
                 recordErrors(clientNo,channel,IDseries,temperature,ID,errDS18B20Cnt,errtype);
-                if (errDS18B20Cnt >= 19941008){ errDS18B20Cnt = 0;}
             }
+            else // 转换成功
+            {
+                if ( (nowdat<-10) || (nowdat>85) ) // 异常情况
+                {
+                    errDS18B20Cnt++;
+                    if(clientNo == 1)
+                    {
+                        if(abs(nowdat-DS18B20_ALL_Node[channel][IDseries].temperature.toDouble())>=20)
+                        {
+                            errtype=2;
+                        }
+                        else
+                        {
+                            errtype=1;
+                        }
+                    }
+                    else if(clientNo == 2)
+                    {
+                        if(abs(nowdat-DS18B20_ADD_Node[channel][IDseries].temperature.toDouble())>=20)
+                        {
+                            errtype=2;
+                        }
+                        else
+                        {
+                            errtype=1;
+                        }
+                    }
+                    recordErrors(clientNo,channel,IDseries,temperature,ID,errDS18B20Cnt,errtype);
+                }
+                else // 正常情况
+                {
+                    if(clientNo == 1)
+                    {
+                        DS18B20_ALL_Node[channel][IDseries].temperature = temperature;
+                        DS18B20_ALL_Node[channel][IDseries].ID = ID;
+                        recordSingleSensor(1,channel,ID,temperature);
+                    }
+                    else if(clientNo == 2)
+                    {
+                        if(IDseries==8)   // 记录多出来的那一个，记完就跑
+                        {
+                           recordSingleSensor(2,channel,ID,temperature);
+                           return;
+                        }
+                        DS18B20_ADD_Node[channel][IDseries].temperature = temperature;
+                        DS18B20_ADD_Node[channel][IDseries].ID = ID;
+                        recordSingleSensor(2,channel,ID,temperature);
+                    }
+                }
+            }
+            if (errDS18B20Cnt >= 19941008){ errDS18B20Cnt = 0;}
         }
     }
 }
@@ -544,6 +563,9 @@ void DS18b20Sensor::recordErrors(int client,unsigned int chan, unsigned int ind,
         case 1: errHint = "温度不在正常范围";
                break;
         case 2: errHint = "温度跳变过大";
+               break;
+        case 3: errHint = "温度乱码";
+               break;
         default: break;
     }
 

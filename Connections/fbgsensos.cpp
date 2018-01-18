@@ -9,8 +9,7 @@ FBGSensos::FBGSensos(QString path, QString IP, QString HARRYPORTER)
 {
     fbgIp = IP;
     fbgPort = HARRYPORTER.toInt();
-//    fbgIp = getHostIpAddress();
-//    fbgPort = 1994;
+    //fbgIp = getHostIpAddress();
     fbgfileDir = path;
     fbgSocket = new QUdpSocket(this);
     fbgLock = new QMutex();
@@ -24,12 +23,13 @@ FBGSensos::FBGSensos(QString path, QString IP, QString HARRYPORTER)
 // 连接FBG解调仪
 void FBGSensos::linkFbg()
 {
+    char stopOrder[4] = {0x01,0x0a,0x00,0x00};    // 特定断开指令
     char connectOrder[2] = {0x01,0x02};           // 特定连接指令
     char startOrder[4] = {0x01,0x0a,0x55,0x00};   // 特定开始指令
-    char stopOrder[4] = {0x01,0x0a,0x00,0x00};    // 特定断开指令
-    fbgSocket->writeDatagram(stopOrder,4,QHostAddress(fbgIp),fbgPort);        // 关闭解调仪
-    fbgSocket->writeDatagram(connectOrder,2,QHostAddress(fbgIp),fbgPort);     // 连接解调仪
-    fbgSocket->writeDatagram(startOrder,4,QHostAddress(fbgIp),fbgPort);       // 启动解调仪
+
+    fbgSocket->writeDatagram(stopOrder,4,QHostAddress(fbgIp),fbgPort);     // 关闭解调仪
+    fbgSocket->writeDatagram(connectOrder,2,QHostAddress(fbgIp),fbgPort);  // 连接解调仪
+    fbgSocket->writeDatagram(startOrder,4,QHostAddress(fbgIp),fbgPort);    // 启动解调仪
 
     QString currentDate = QDateTime::currentDateTime().toString("yyyy-MM-dd hh：mm：ss");
     fbgfileDir = fbgfileDir+"/FBG波长数据"+"("+currentDate+")";

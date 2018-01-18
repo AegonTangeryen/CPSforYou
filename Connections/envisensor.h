@@ -27,7 +27,7 @@ public:
     QString environmentPath;
     QString envHostIp;
     unsigned int envPort;
-    unsigned long errCnt;
+    quint64 errCnt;
     QTcpServer  *envServer;
     QTcpSocket *envSocket;
     QByteArray EnvDataALL;

@@ -35,7 +35,6 @@ SOURCES += \
         Connections/cloudplatform.cpp \
         Connections/cloudtcpthread.cpp \
         Auxiliary/dataxml.cpp \
-        Auxiliary/devallinfo.cpp \
         Connections/ds18b20sensor.cpp \
         Connections/ds18tcpthread.cpp \
         Connections/fbgsensos.cpp \
@@ -65,7 +64,6 @@ HEADERS += \
         Connections/cloudplatform.h \
         Connections/cloudtcpthread.h \
         Auxiliary/dataxml.h \
-        Auxiliary/devallinfo.h \
         Connections/ds18b20sensor.h \
         Connections/ds18tcpthread.h \
         Connections/fbgsensos.h \

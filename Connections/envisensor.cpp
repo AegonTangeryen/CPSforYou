@@ -21,8 +21,8 @@ EnviSensor::EnviSensor(QString path, QString globalPort)
     errCnt = 0;
     envLock = new QMutex();
     envDir = new QDir();
-    envServer = new QTcpServer(this);
-    envSocket = new QTcpSocket(this);
+    envServer = new QTcpServer();
+    envSocket = new QTcpSocket();
 
     QString currentDate = QDateTime::currentDateTime().toString("yyyy-MM-dd hh：mm：ss");
     environmentPath = path+"/环境温度总集"+"("+currentDate+")";
@@ -120,7 +120,7 @@ void EnviSensor::socketDisconnected()
 // 解析每个通道
 void EnviSensor::processData(QByteArray a)
 {
-    if(a.size()<30 || a.size()>32)                              // 异常帧
+    if(a.size()<30 || a.size()>31)                              // 异常帧
     {
         sendMsg("数据帧大小不在正常范围内",3);
         return;
@@ -132,6 +132,11 @@ void EnviSensor::processData(QByteArray a)
     }
     a = a.mid(1);                                               // 去除首部'S'
     QList<QByteArray> paragraph = a.split(',');                 // 按','分割
+    if(paragraph.size()!=5)  // 异常帧,退出，防止崩溃
+    {
+        qDebug()<<"envFalut";
+        return;
+    }
     QString ID, temperature;								    // ID和温度
     unsigned int channel = 0, indx = 0, sign = 0;				// 通道,序列号，正负号
 
@@ -146,23 +151,27 @@ void EnviSensor::processData(QByteArray a)
     if(((channel >= 0) && (channel <= 1)) && ((indx >= 0) && (indx <= 1)))
     {
         int IDseries = checkDchIDInList(ID);
-        if (IDseries == -1)  return;            // 如果数据库中找不到ID，退出
+        if (IDseries == -1)  return;            // 如果列表中找不到ID，退出
         else
         {
-            double nowdat = temperature.toDouble();
-            if (nowdat >= -10 && nowdat <= 80) 	                    // 正常情况
+            bool ok;
+            double nowdat = temperature.toDouble(&ok);
+            if(ok) // 转换成功
             {
-                ENV_ALL_Node[IDseries].temperature = temperature;
-                ENV_ALL_Node[IDseries].ID = ID;
-                recordSingleSensor(ID,temperature);
-            }
-            else                                                    // 异常情况
-            {
-                errCnt++;
-                if (errCnt >= 100000){errCnt = 0;}
-                temperature = QString::number(85,10);               // 异常值默认为85度
-                ENV_ALL_Node[IDseries].ID = ID;
-                ENV_ALL_Node[IDseries].temperature = temperature;
+                if (nowdat >= -10 && nowdat <= 85) // 正常情况
+                {
+                    ENV_ALL_Node[IDseries].temperature = temperature;
+                    ENV_ALL_Node[IDseries].ID = ID;
+                    recordSingleSensor(ID,temperature);
+                }
+                else                               // 异常情况
+                {
+                    errCnt++;
+                    if (errCnt >= 19941008){errCnt = 0;}
+                    temperature = QString::number(85,10); // 异常值默认为85度
+                    ENV_ALL_Node[IDseries].ID = ID;
+                    ENV_ALL_Node[IDseries].temperature = temperature;
+                }
             }
         }
     }

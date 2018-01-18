@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QMessageBox>
+#include <QButtonGroup>
 #include <QFont>
 #include <QChart>
 #include <QChartView>
@@ -29,6 +30,7 @@
 #include <QCloseEvent>
 #include <QMenu>
 #include <QAction>
+#include <QImage>
 #include <QIcon>
 
 #include "ds18tcpthread.h"
@@ -66,13 +68,14 @@ public:
     void laserPageInit();
     void createNewFolderWhenAnotherDay();
     void refreshLaserResult();
+    void scrollCloudPicture(); // 云平台页面的图片切换
     void recordAllFbg();
     void recordAllDs18b20(DS18B20_Node (*a)[DS18B20_Index_Max], int nrow1, DS18B20_Node (*b)[DS18B20_Index_Max], int nrow2);
     void recordNo1Ds18b20(DS18B20_Node (*a)[DS18B20_Index_Max], int nrow);
     void recordNo2Ds18b20(DS18B20_Node (*b)[DS18B20_Index_Max], int nrow);
     void recordAllEnvironmentt(Env_Node *a, int nrow);
     void recordAllCnc(CNCInfoReg CNCInfo);
-    void recordAllLaserSensors(QString *gc);
+    void recordAllLaserSensors(QStringList gc);
     void rePlotFbg();
     void rePlotDs18No1();
     void rePlotDs18No2();
@@ -82,9 +85,10 @@ public:
     void closeEvent(QCloseEvent *event);
 
 private slots:
-    void timeisup();         // 主定时器中断处理函数
-    void plotTimePoll();     // 定时重新绘图
+    void timeisup();     // 主定时器中断处理函数
+    void plotTimePoll(); // 定时重新绘图
     void trayIsActived(QSystemTrayIcon::ActivationReason reason); // 单击或双击右下角托盘
+    void userQuit();     // 用户手动退出
 
     void on_cnclink_pushButton_clicked();
     void on_cncdislink_pushButton_clicked();
@@ -129,7 +133,8 @@ private slots:
     void on_actionTV_Series_triggered();
     void on_actionAnimation_triggered();
     void on_actionCustom_triggered();
-    void on_actionWhut_cloudplatrm_triggered();
+
+    void on_updateButton_clicked();
 
 signals:
     void closeHncSystem();
@@ -166,6 +171,10 @@ private:
     QString envSamplePath;
     QString hncSamplePath;
     QString laserSamplePath;
+    QButtonGroup *compMethodGroup;
+    QImage *cloudPageImg;
+    quint8 scrollPicCnt;
+    QSettings *updateIni;
 
     QLabel *statusbarIndicator;
     QString currentday;
