@@ -2200,12 +2200,12 @@ void MainWindow::showParaInfo(int a, QString kingslayer)
     ui->inputnumlabel->setText(QString::number(a));
     ui->sensorTypelabel->setText(kingslayer);
 }
+
 /**********************************************************************************************
 
                                                 8.菜单栏显示界面部分
 
 ***********************************************************************************************/
-
 // 点击菜单栏“设置”->“Configure”,弹出配置页面，可以手动输入相关参数
 void MainWindow::on_actionConfigure_triggered()
 {

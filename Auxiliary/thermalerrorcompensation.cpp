@@ -10,7 +10,6 @@ ThermalErrorCompensation::ThermalErrorCompensation(QString path)
     time2Quit = false;
     uAreFree2Comp = false;
 
-    paraRegister(); // 录入信息
     QString currentDate = QDateTime::currentDateTime().toString("yyyyMMdd");
     compenPath = compenPath+"/预测和补偿记录"+currentDate+".csv";
     QString csvHeader = "时间,次数,当前预测值,上一次预测值,当前补偿值";
@@ -21,7 +20,7 @@ ThermalErrorCompensation::ThermalErrorCompensation(QString path)
 
     duketimer = new QTimer(this);
     connect(duketimer,&QTimer::timeout, this,&ThermalErrorCompensation::timeisup);
-    duketimer->setInterval(5000);         // 5s计算一次补偿值
+    duketimer->setInterval(3000);         // 3s计算一次补偿值
     duketimer->setTimerType(Qt::PreciseTimer);
     duketimer->start();
 }
@@ -29,7 +28,7 @@ ThermalErrorCompensation::ThermalErrorCompensation(QString path)
 ThermalErrorCompensation::~ThermalErrorCompensation()
 {
     delete duketimer;
-    delete parameterIni;
+    if(!parameterIni) delete parameterIni;
 }
 
 void ThermalErrorCompensation::timeisup()
@@ -234,10 +233,16 @@ void ThermalErrorCompensation::niceNewDay(QString gaintPanda)
 // 子线程
 void ThermalErrorCompensation::run()
 {
-    emit replyInfo(inputNum,sensorType);
+    paraRegister(); // 录入信息
+    emit replyInfo(paraNum,sensorType); // 返回输入点数和传感器类型到界面
+    emit replyPredictionResult(paraSet[0]);
+    emit replyPredictionResult(paraSet[1]);
+    emit replyPredictionResult(paraSet[2]);
+    emit replyPredictionResult(paraSet[3]);
+    emit replyPredictionResult(paraSet[4]);
     while (1)
     {
-        if((!cncWorkingStatus) || (!ds18WorkingStatus)) return;
+        if(!ds18WorkingStatus) return;  // 如果电类传感器一号板没有连接，退出
         if(uAreFree2Comp)                  // 预测，并转化为补偿值
         {
             uAreFree2Comp = false;

@@ -113,6 +113,7 @@ private slots:
     void on_lincloud_pushButton_clicked();
     void on_dislinkcloud_pushButton_clicked();
     void showCloudInfo(QString tully, int blackfish);
+    void on_updateButton_clicked();
 
     void on_startcomp_pushButton_clicked();
     void clearCompBrowser();
@@ -134,7 +135,7 @@ private slots:
     void on_actionAnimation_triggered();
     void on_actionCustom_triggered();
 
-    void on_updateButton_clicked();
+
 
 signals:
     void closeHncSystem();
