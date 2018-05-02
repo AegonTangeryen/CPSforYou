@@ -86,6 +86,21 @@ MainWindow::MainWindow(QWidget *parent) :
     ds18PageInit(); // 图表显示
     ui->ds18seeallpushButton->setEnabled(false);
     connect(ui->ds18seeallpushButton,&QPushButton::clicked,this,&MainWindow::ds18SeeAll);
+    ui->DSmaxtemplabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    ui->DSmaxtemplabel->setFont(QFont("Timers",20,QFont::Bold));
+    ui->DSmaxtemplabel->setStyleSheet("color:red");
+
+    ui->DSmintemplabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    ui->DSmintemplabel->setFont(QFont("Timers",20,QFont::Bold));
+    ui->DSmintemplabel->setStyleSheet("color:skyBlue");
+
+    ui->DSchan7mean->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    ui->DSchan7mean->setFont(QFont("Timers",20,QFont::Bold));
+    ui->DSchan7mean->setStyleSheet("color:cyan");
+
+    ui->DSenvmean->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    ui->DSenvmean->setFont(QFont("Timers",20,QFont::Bold));
+    ui->DSenvmean->setStyleSheet("color:green");
 
     // 3.选项卡“数控系统信息”页面初始化配置
     ui->lcdNumber->setSegmentStyle(QLCDNumber::Flat);
@@ -217,7 +232,7 @@ MainWindow::MainWindow(QWidget *parent) :
     plotCnt = 0;
     plotTimer = new MMTimer(1000,this);
     connect(plotTimer,&MMTimer::timeout,this,&MainWindow::plotTimePoll);
-//    plotTimer->start();   // 暂不启用图形更新
+    plotTimer->start();   // 暂不启用图形更新
 
     if(lastFbgStatus)  on_FBGlink_pushButton_clicked();
     if(lastDs18Status) on_ds18link_pushButton_clicked();
@@ -274,7 +289,7 @@ void MainWindow::fbgPageInit()
     fbgXaxis->setLabelFormat("g");
     fbgXaxis->setLabelsAngle(20);
     fbgXaxis->setTitleFont(QFont("Timers",10,QFont::Bold));
-    fbgXaxis->setTitleText("时间轴还没有研究清楚");
+    fbgXaxis->setTitleText("时间轴");
 
     fbgYaxis = new QValueAxis();
     fbgYaxis->setTickCount(10);
@@ -284,7 +299,19 @@ void MainWindow::fbgPageInit()
     fbgYaxis->setTitleText("Wave length(um)");
     fbgYaxis->setTitleFont(QFont("Timers",10,QFont::Bold));
 
-    fbgChart->addSeries(fbgSeriesCh1601);                   // 添加这一条线到图中
+    /*fake数据填充*/
+    *fbgSeriesCh1601<<QPointF(0,1542.12)<<QPointF(1,1542.121)<<QPointF(2,1542.121)<<QPointF(3,1542.119)<<QPointF(4,1542.12);
+    *fbgSeriesCh1601<<QPointF(5,1542.12)<<QPointF(6,1542.121)<<QPointF(7,1542.12)<<QPointF(8,1542.12)<<QPointF(9,1542.12);
+
+    /*fake数据填充*/
+    *fbgSeriesCh1701<<QPointF(0,1536.041)<<QPointF(1,1536.041)<<QPointF(2,1536.041)<<QPointF(3,1536.041)<<QPointF(4,1536.041);
+    *fbgSeriesCh1701<<QPointF(5,1536.039)<<QPointF(6,1536.039)<<QPointF(7,1536.039)<<QPointF(8,1536.039)<<QPointF(9,1536.039);
+
+    /*fake数据填充*/
+    *fbgSeriesCh1801<<QPointF(0,1553.98)<<QPointF(1,1553.98)<<QPointF(2,1553.979)<<QPointF(3,1553.978)<<QPointF(4,1553.978);
+    *fbgSeriesCh1801<<QPointF(5,1553.979)<<QPointF(6,1553.979)<<QPointF(7,1553.98)<<QPointF(8,1553.98)<<QPointF(9,1553.98);
+
+    fbgChart->addSeries(fbgSeriesCh1601); // 添加这一条线到图中
     fbgChart->addSeries(fbgSeriesCh1701);
     fbgChart->addSeries(fbgSeriesCh1801);
     fbgChart->createDefaultAxes();
@@ -295,7 +322,7 @@ void MainWindow::fbgPageInit()
     fbgChart->setAxisX(fbgXaxis, fbgSeriesCh1801);
     fbgChart->setAxisY(fbgYaxis, fbgSeriesCh1801);
 
-    maxFbgSize=50;
+    maxFbgSize = 10;
     ui->fbgchartview->setRenderHint(QPainter::Antialiasing); // 抗锯齿
     ui->fbgchartview->setChart(fbgChart);
 }
@@ -330,9 +357,9 @@ void MainWindow::ds18PageInit()
     ds18No1Xaxis->setTickCount(10);
     ds18No1Xaxis->setLabelFormat("g");
     ds18No1Xaxis->setLabelsAngle(20);
-    ds18No1Xaxis->setRange(0,100);
+    ds18No1Xaxis->setRange(0,30);
     ds18No1Xaxis->setTitleFont(QFont("Timers",8,QFont::Bold));
-    ds18No1Xaxis->setTitleText("时间轴还没有研究清楚");
+    ds18No1Xaxis->setTitleText("哆啦A梦的时光机");
 
     ds18No1Yaxis = new QValueAxis();
     ds18No1Yaxis->setTickCount(10);
@@ -341,6 +368,38 @@ void MainWindow::ds18PageInit()
     ds18No1Yaxis->setRange(-5,40);
     ds18No1Yaxis->setTitleText("摄氏温度(℃)");
     ds18No1Yaxis->setTitleFont(QFont("Timers",8,QFont::Bold));
+
+    /*fake数据填充*/
+    *ds18seriesCh0701<<QPointF(0,15.75)<<QPointF(1,15.75)<<QPointF(2,15.75)<<QPointF(3,15.75)<<QPointF(4,15.75);
+    *ds18seriesCh0701<<QPointF(5,15.68)<<QPointF(6,15.68)<<QPointF(7,15.68)<<QPointF(8,15.68)<<QPointF(9,15.68);
+    *ds18seriesCh0701<<QPointF(10,15.62)<<QPointF(11,15.62)<<QPointF(12,15.62)<<QPointF(13,15.62)<<QPointF(14,15.62);
+    *ds18seriesCh0701<<QPointF(15,15.56)<<QPointF(16,15.58)<<QPointF(17,15.56)<<QPointF(18,15.57)<<QPointF(19,15.60);
+    *ds18seriesCh0701<<QPointF(20,15.5)<<QPointF(21,15.5)<<QPointF(22,15.5)<<QPointF(23,15.5)<<QPointF(24,15.5);
+    *ds18seriesCh0701<<QPointF(25,15.5)<<QPointF(26,15.5)<<QPointF(27,15.5)<<QPointF(28,15.5)<<QPointF(29,15.5);
+
+    /*fake数据填充*/
+    *ds18seriesCh0702<<QPointF(0,13.93)<<QPointF(1,13.93)<<QPointF(2,13.93)<<QPointF(3,13.93)<<QPointF(4,13.93);
+    *ds18seriesCh0702<<QPointF(5,14)<<QPointF(6,14)<<QPointF(7,14)<<QPointF(8,14)<<QPointF(9,14);
+    *ds18seriesCh0702<<QPointF(10,13.87)<<QPointF(11,13.87)<<QPointF(12,13.87)<<QPointF(13,13.87)<<QPointF(14,13.87);
+    *ds18seriesCh0702<<QPointF(15,13.68)<<QPointF(16,13.68)<<QPointF(17,13.68)<<QPointF(18,13.68)<<QPointF(19,13.68);
+    *ds18seriesCh0702<<QPointF(20,13.56)<<QPointF(21,13.56)<<QPointF(22,13.56)<<QPointF(23,13.56)<<QPointF(24,13.56);
+    *ds18seriesCh0702<<QPointF(25,13.5)<<QPointF(26,13.5)<<QPointF(27,13.5)<<QPointF(28,13.5)<<QPointF(29,13.5);
+
+    /*fake数据填充*/
+    *ds18seriesCh0703<<QPointF(0,16.43)<<QPointF(1,16.43)<<QPointF(2,16.43)<<QPointF(3,16.43)<<QPointF(4,16.43);
+    *ds18seriesCh0703<<QPointF(5,16.43)<<QPointF(6,16.43)<<QPointF(7,16.43)<<QPointF(8,16.43)<<QPointF(9,16.43);
+    *ds18seriesCh0703<<QPointF(10,16.43)<<QPointF(11,16.43)<<QPointF(12,16.43)<<QPointF(13,16.43)<<QPointF(14,16.43);
+    *ds18seriesCh0703<<QPointF(15,16.43)<<QPointF(16,16.43)<<QPointF(17,16.43)<<QPointF(18,16.43)<<QPointF(19,16.43);
+    *ds18seriesCh0703<<QPointF(20,16.43)<<QPointF(21,16.43)<<QPointF(22,16.43)<<QPointF(23,16.43)<<QPointF(24,16.43);
+    *ds18seriesCh0703<<QPointF(25,16.43)<<QPointF(26,16.43)<<QPointF(27,16.43)<<QPointF(28,16.43)<<QPointF(29,16.43);
+
+    /*fake数据填充*/
+    *ds18seriesCh0704<<QPointF(0,14.56)<<QPointF(1,14.56)<<QPointF(2,14.56)<<QPointF(3,14.56)<<QPointF(4,14.56);
+    *ds18seriesCh0704<<QPointF(5,14.56)<<QPointF(6,14.56)<<QPointF(7,14.56)<<QPointF(8,14.56)<<QPointF(9,14.56);
+    *ds18seriesCh0704<<QPointF(10,14.56)<<QPointF(11,14.56)<<QPointF(12,14.56)<<QPointF(13,14.56)<<QPointF(14,14.56);
+    *ds18seriesCh0704<<QPointF(15,14.56)<<QPointF(16,14.56)<<QPointF(17,14.56)<<QPointF(18,14.56)<<QPointF(19,14.56);
+    *ds18seriesCh0704<<QPointF(20,14.56)<<QPointF(21,14.56)<<QPointF(22,14.56)<<QPointF(23,14.56)<<QPointF(24,14.56);
+    *ds18seriesCh0704<<QPointF(25,14.56)<<QPointF(26,14.56)<<QPointF(27,14.56)<<QPointF(28,14.56)<<QPointF(29,14.56);
 
     ds18No1Chart->addSeries(ds18seriesCh0701); // 添加4条线到图中
     ds18No1Chart->addSeries(ds18seriesCh0702);
@@ -355,7 +414,7 @@ void MainWindow::ds18PageInit()
     ds18No1Chart->setAxisY(ds18No1Yaxis, ds18seriesCh0703);
     ds18No1Chart->setAxisX(ds18No1Xaxis, ds18seriesCh0704);
     ds18No1Chart->setAxisY(ds18No1Yaxis, ds18seriesCh0704);
-    maxds18No1Size = 50;
+    maxds18No1Size = 30;
     ui->ds18no1chartview->setRenderHint(QPainter::Antialiasing);
     ui->ds18no1chartview->setChart(ds18No1Chart);
 
@@ -386,9 +445,9 @@ void MainWindow::ds18PageInit()
     ds18No2Xaxis->setTickCount(10);
     ds18No2Xaxis->setLabelFormat("g");
     ds18No2Xaxis->setLabelsAngle(20);
-    ds18No2Xaxis->setRange(0,100);
+    ds18No2Xaxis->setRange(0,30);
     ds18No2Xaxis->setTitleFont(QFont("Timers",8,QFont::Bold));
-    ds18No2Xaxis->setTitleText("时间轴还没有研究清楚");
+    ds18No2Xaxis->setTitleText("时光姬");
 
     ds18No2Yaxis = new QValueAxis();
     ds18No2Yaxis->setTickCount(10);
@@ -411,7 +470,7 @@ void MainWindow::ds18PageInit()
     ds18No2Chart->setAxisY(ds18No2Yaxis, ds18seriesCh1301);
     ds18No2Chart->setAxisX(ds18No2Xaxis, ds18seriesCh1501);
     ds18No2Chart->setAxisY(ds18No2Yaxis, ds18seriesCh1501);
-    maxds18No2Size = 50;
+    maxds18No2Size = 30;
     ui->ds18no2chartview->setRenderHint(QPainter::Antialiasing);
     ui->ds18no2chartview->setChart(ds18No2Chart);
 
@@ -427,10 +486,11 @@ void MainWindow::ds18PageInit()
     rightSet = new QBarSet("右方");
     leftSet  = new QBarSet("左方");
 
-    *frontSet << 7.00;
-    *backSet << 8.52;
-    *rightSet << 10.6;
-    *leftSet << 9.8;
+    *frontSet << 26.00;
+    *backSet << 28.52;
+    *rightSet << 30.6;
+    *leftSet << 29.8;
+
     envBarSeries = new QBarSeries(envBarChart);
     envBarSeries->append(frontSet);
     envBarSeries->append(backSet);
@@ -476,7 +536,7 @@ void MainWindow::laserPageInit()
     laserSensorX = new QSplineSeries(laserSensorChart);
     lineType.setColor(Qt::red);
     laserSensorX->setPen(lineType);
-    laserSensorX->setUseOpenGL(true);
+    laserSensorX->setUseOpenGL(true); // 采用openGL加速，绘图速度加快
     laserSensorX->setName("X轴");
     laserSensorY = new QSplineSeries(laserSensorChart);
     lineType.setColor(Qt::cyan);
@@ -484,16 +544,40 @@ void MainWindow::laserPageInit()
     laserSensorY->setUseOpenGL(true);
     laserSensorY->setName("Y轴");
     laserSensorZ = new QSplineSeries(laserSensorChart);
-    lineType.setColor(Qt::black);
+    lineType.setColor(Qt::darkYellow);
     laserSensorZ->setPen(lineType);
     laserSensorZ->setUseOpenGL(true);
     laserSensorZ->setName("Z轴");
+
+    /*X轴填充fake数据*/
+    *laserSensorX<<QPointF(0,0.006)<<QPointF(1,0.007)<<QPointF(2,0.009)<<QPointF(3,0.008)<<QPointF(4,0.008);
+    *laserSensorX<<QPointF(5,0.008)<<QPointF(6,0.008)<<QPointF(7,0.009)<<QPointF(8,0.008)<<QPointF(9,0.008);
+    *laserSensorX<<QPointF(10,0.007)<<QPointF(11,0.008)<<QPointF(12,0.009)<<QPointF(13,0.008)<<QPointF(14,0.008);
+    *laserSensorX<<QPointF(15,0.010)<<QPointF(16,0.011)<<QPointF(17,0.009)<<QPointF(18,0.012)<<QPointF(19,0.011);
+    *laserSensorX<<QPointF(20,0.010)<<QPointF(21,0.012)<<QPointF(22,0.009)<<QPointF(23,0.011)<<QPointF(24,0.012);
+    *laserSensorX<<QPointF(25,0.009)<<QPointF(26,0.008)<<QPointF(27,0.009)<<QPointF(28,0.011)<<QPointF(29,0.010);
+
+    /*Y轴填充fake数据*/
+    *laserSensorY<<QPointF(0,-0.006)<<QPointF(1,-0.007)<<QPointF(2,-0.009)<<QPointF(3,-0.008)<<QPointF(4,-0.008);
+    *laserSensorY<<QPointF(5,-0.008)<<QPointF(6,-0.008)<<QPointF(7,-0.009)<<QPointF(8,-0.008)<<QPointF(9,-0.008);
+    *laserSensorY<<QPointF(10,-0.007)<<QPointF(11,-0.008)<<QPointF(12,-0.009)<<QPointF(13,-0.008)<<QPointF(14,-0.008);
+    *laserSensorY<<QPointF(15,-0.010)<<QPointF(16,-0.011)<<QPointF(17,-0.009)<<QPointF(18,-0.012)<<QPointF(19,-0.011);
+    *laserSensorY<<QPointF(20,-0.010)<<QPointF(21,-0.012)<<QPointF(22,-0.009)<<QPointF(23,-0.011)<<QPointF(24,-0.012);
+    *laserSensorY<<QPointF(25,-0.010)<<QPointF(26,-0.010)<<QPointF(27,-0.009)<<QPointF(28,-0.011)<<QPointF(29,-0.010);
+
+    /*Z轴填充fake数据*/
+    *laserSensorZ<<QPointF(0,-0.091)<<QPointF(1,-0.091)<<QPointF(2,-0.091)<<QPointF(3,-0.091)<<QPointF(4,-0.091);
+    *laserSensorZ<<QPointF(5,-0.092)<<QPointF(6,-0.092)<<QPointF(7,-0.092)<<QPointF(8,-0.095)<<QPointF(9,-0.095);
+    *laserSensorZ<<QPointF(10,-0.094)<<QPointF(11,-0.094)<<QPointF(12,-0.092)<<QPointF(13,-0.092)<<QPointF(14,-0.092);
+    *laserSensorZ<<QPointF(15,-0.093)<<QPointF(16,-0.093)<<QPointF(17,-0.096)<<QPointF(18,-0.095)<<QPointF(19,-0.094);
+    *laserSensorZ<<QPointF(20,-0.096)<<QPointF(21,-0.092)<<QPointF(22,-0.094)<<QPointF(23,-0.093)<<QPointF(24,-0.095);
+    *laserSensorZ<<QPointF(25,-0.096)<<QPointF(26,-0.095)<<QPointF(27,-0.095)<<QPointF(28,-0.095)<<QPointF(29,-0.096);
 
     laserSensorXaxis = new QValueAxis();
     laserSensorXaxis->setTickCount(10);
     laserSensorXaxis->setMinorTickCount(3);
     laserSensorXaxis->setLabelFormat("g");
-    laserSensorXaxis->setRange(0,100);
+    laserSensorXaxis->setRange(0,30);
     laserSensorXaxis->setTitleFont(QFont("Timers",10,QFont::Bold));
     laserSensorXaxis->setTitleText("横轴原本设想应该是时间，但是时间轴没有处理好，现在横轴代表什么我也不知道");
 
@@ -501,7 +585,7 @@ void MainWindow::laserPageInit()
     laserSensorYaxis->setTickCount(10);
     laserSensorYaxis->setLabelFormat("%g");
     laserSensorYaxis->setMinorTickCount(3);
-    laserSensorYaxis->setRange(-0.05,0.05);
+    laserSensorYaxis->setRange(-0.1,0.05);
     laserSensorYaxis->setTitleText("位移(mm)");
     laserSensorYaxis->setTitleFont(QFont("Timers",10,QFont::Bold));
 
@@ -509,11 +593,14 @@ void MainWindow::laserPageInit()
     laserSensorChart->addSeries(laserSensorY);
     laserSensorChart->addSeries(laserSensorZ);
     laserSensorChart->createDefaultAxes();
-    laserSensorChart->setAxisX(laserSensorXaxis, laserSensorZ);
-    laserSensorChart->setAxisY(laserSensorYaxis, laserSensorZ);
     laserSensorChart->setAxisX(laserSensorXaxis, laserSensorX);
     laserSensorChart->setAxisY(laserSensorYaxis, laserSensorX);
-    maxLaserSize = 50;
+    laserSensorChart->setAxisX(laserSensorXaxis, laserSensorY);
+    laserSensorChart->setAxisY(laserSensorYaxis, laserSensorY);
+    laserSensorChart->setAxisX(laserSensorXaxis, laserSensorZ);
+    laserSensorChart->setAxisY(laserSensorYaxis, laserSensorZ);
+
+    maxLaserSize = 30;
     ui->laserchartview->setRenderHint(QPainter::Antialiasing); // 抗锯齿
     ui->laserchartview->setChart(laserSensorChart);
 }
@@ -533,9 +620,24 @@ void MainWindow::timeisup()
         qDebug()<<"Total Memory/Avaliable:"+getSysMemory()[0]+"/"+getSysMemory()[1]+"MB";
         if(fbgWorkingStatus) recordAllFbg();
         if(ds18WorkingStatus && ds18No2WorkStatus) recordAllDs18b20(DS18B20_ALL_Node,DS18B20_Channel_Max,DS18B20_ADD_Node,DS18B20_Channel_Max);
-        if(ds18WorkingStatus) recordNo1Ds18b20(DS18B20_ALL_Node,DS18B20_Channel_Max);
+        if(!ds18WorkingStatus)
+        {
+            recordNo1Ds18b20(DS18B20_ALL_Node,DS18B20_Channel_Max);
+            QList<double> tempList;
+            tempList<<DS18B20_ALL_Node[6][0].temperature.toDouble()<<DS18B20_ALL_Node[6][1].temperature.toDouble()<<DS18B20_ALL_Node[6][2].temperature.toDouble()<<DS18B20_ALL_Node[6][3].temperature.toDouble();
+            qSort(tempList.begin(),tempList.end());
+            ui->DSmaxtemplabel->setText(QString::number(tempList[3],10,2));
+            ui->DSmintemplabel->setText(QString::number(tempList[0],10,2));
+            double average = (tempList[0]+tempList[1]+tempList[2]+tempList[3])/4;
+            ui->DSchan7mean->setText(QString::number(average,10,2));
+        }
         if(ds18No2WorkStatus) recordNo2Ds18b20(DS18B20_ADD_Node,DS18B20_Channel_Max);
-        if(envWorkingStatus) recordAllEnvironmentt(ENV_ALL_Node,Env_Number_Max);
+        if(!envWorkingStatus)
+        {
+            recordAllEnvironmentt(ENV_ALL_Node,Env_Number_Max);
+            double meanValue = (ENV_ALL_Node[0].temperature.toDouble()+ENV_ALL_Node[1].temperature.toDouble()+ENV_ALL_Node[2].temperature.toDouble()+ENV_ALL_Node[3].temperature.toDouble())/4;
+            ui->DSenvmean->setText(QString::number(meanValue,10,2));
+        }
         if(cncWorkingStatus) recordAllCnc(CNCInfo);
         if(laserWorkingStatus) recordAllLaserSensors(ccdInfo);
     }
@@ -1080,15 +1182,21 @@ void MainWindow::plotTimePoll()
     switch (plotCnt)
     {
         case 1:
-            if(fbgWorkingStatus) rePlotFbg(); break;
+//            if(fbgWorkingStatus) rePlotFbg();
+            break;
         case 2:
-            if(ds18WorkingStatus) rePlotDs18No1(); break;
+            if(!ds18WorkingStatus) rePlotDs18No1();
+            break;
         case 3:
-            if(ds18No2WorkStatus) rePlotDs18No2(); break;
+            if(!ds18No2WorkStatus) rePlotDs18No2();
+            break;
         case 4:
-            if(envWorkingStatus) rePlotEnvironment(); break;
+            if(!envWorkingStatus) rePlotEnvironment();
+            break;
         case 5:
-            if(laserWorkingStatus) rePlotLaserSensors(); plotCnt=0; break;
+//            if(laserWorkingStatus) rePlotLaserSensors();
+            plotCnt=0;
+            break;
         default: break;
     }
 }
@@ -2325,5 +2433,3 @@ void MainWindow::on_actionAnimation_triggered()
     onePiece.setWindowTitle("动漫推荐");
     if(onePiece.exec() == QDialog::Accepted) {}
 }
-
-

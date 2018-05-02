@@ -6,18 +6,13 @@ CloudPlatform::CloudPlatform(QString skyIP, QString sunPort)
 {
     ticToc = 0;
     cloudServerIP = skyIP;             // 正式连接
-    //cloudServerIP = getHostIpAddress();  // 本地连接测试
+//    cloudServerIP = getHostIpAddress();  // 本地连接测试
     cloudServerPort = sunPort.toInt();
     cloudSocket = new QTcpSocket();
     cloudTimer = new QTimer(this);
     hncPrivateTimer = new QTimer(this);
     userOperation = false;
     connect(cloudSocket,&QTcpSocket::connected,this,&CloudPlatform::afterConnected);
-    cloudSocket->connectToHost(QHostAddress(cloudServerIP), cloudServerPort);
-    if(cloudSocket->errorString() != "Unknown error")
-    {
-        qDebug()<<cloudSocket->errorString();
-    }
 
     connect(cloudTimer,&QTimer::timeout, this,&CloudPlatform::onTimeIsUp);
     cloudTimer->setTimerType(Qt::PreciseTimer);
@@ -63,15 +58,57 @@ void CloudPlatform::receiveFromCloud()
 void CloudPlatform::afterDisconnected()
 {
     qDebug()<<"6.1";
-    if(userOperation) return;
-    cloudSocket->abort();
-    cloudSocket->connectToHost(QHostAddress(cloudServerIP), cloudServerPort);
-    if(!cloudSocket->waitForConnected(2000))
-    {
-        emit sendMsg("云平台已断开",-1);
-    }
+    if(userOperation) return; // 如果是用户操作，直接返回
+    cloudSocket->abort(); // 如果是云平台单方面断开
+    emit sendMsg("云平台已断开",-1);
     cloudLinkStatus = false;
-    ticToc=0;  // 开始计时
+    ticToc = 0;  // 开始计时
+}
+
+// 主定时器中断
+void CloudPlatform::onTimeIsUp()
+{
+    ticToc++;
+    if(cloudLinkStatus) // 如果连接上了云平台，发送信息
+    {
+        qDebug()<<"6.3";
+        packageSensorsData();
+        QString xmlOutStr = dataXML::xmlStrCreat(dataInfo);
+        xmlOutStr += "end\n";
+        cloudSocket->write(xmlOutStr.toLatin1());
+        cloudSocket->flush();
+    }
+    else // 如果与云平台断开，定时10s重连
+    {
+        if(ticToc == 2) linkOnceAgain();
+    }
+}
+
+// 数控系统专属定时器中断
+void CloudPlatform::onPrivateTimeUp()
+{
+    // 如果已连接云平台和数控机床，每200ms发送一次机床信息包
+    if((!cncWorkingStatus) && cloudLinkStatus) // 此处！号为调试用，正式使用需要去掉
+    {
+        qDebug()<<"6.5";
+        packageHncData();
+        QString xmlOutStr = dataXML::xmlHncCreat(hncInfo);
+        xmlOutStr += "end\n";
+        cloudSocket->write(xmlOutStr.toLatin1());
+        cloudSocket->flush();
+    }
+}
+
+ // 重新连接云平台
+void CloudPlatform::linkOnceAgain()
+{
+    qDebug()<<"6.4";
+    ticToc = 0;
+    cloudSocket->connectToHost(QHostAddress(cloudServerIP), cloudServerPort);
+    if(cloudSocket->errorString() != "Unknown error")
+    {
+        qDebug()<<cloudSocket->errorString();
+    }
 }
 
 // 清除内存
@@ -86,55 +123,6 @@ void CloudPlatform::deleteTcpClient()
     delete hncPrivateTimer;
     delete cloudSocket;
     emit sendMsg("已删除cloudsocket",0);
-}
-
-// 主定时器中断
-void CloudPlatform::onTimeIsUp()
-{
-    qDebug()<<"6.3";
-    ticToc++;
-    if(cloudLinkStatus) // 如果连接上了云平台，发送信息
-    {
-        packageSensorsData();
-        QString xmlOutStr = dataXML::xmlStrCreat(dataInfo);
-        xmlOutStr += "end\n";
-        cloudSocket->write(xmlOutStr.toLatin1());
-        cloudSocket->flush();
-    }
-    else // 如果与云平台断开，定时重连
-    {
-        if(ticToc==6) linkOnceAgain();
-    }
-}
-
-// 数控系统专属定时器中断
-void CloudPlatform::onPrivateTimeUp()
-{
-    qDebug()<<"6.5";
-    if((!cncWorkingStatus) && cloudLinkStatus) // 如果已连接云平台和数控机床，每200ms发送一次机床信息包
-    {
-        packageHncData();
-        QString xmlOutStr = dataXML::xmlHncCreat(hncInfo);
-        xmlOutStr += "end\n";
-        cloudSocket->write(xmlOutStr.toLatin1());
-        cloudSocket->flush();
-    }
-}
-
- // 定时30s重新连接云平台
-void CloudPlatform::linkOnceAgain()
-{
-    qDebug()<<"6.4";
-    ticToc = 0;
-    cloudSocket->connectToHost(QHostAddress(cloudServerIP), cloudServerPort);
-    if(cloudSocket->waitForConnected(2000))  // 如果连上了
-    {
-        cloudLinkStatus = true;
-    }
-    else // 如果连接失败
-    {
-        emit sendMsg("本次云平台尝试连接失败",2);
-    }
 }
 
 // 数控系统信息单独打包成XML格式

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>884</width>
-    <height>642</height>
+    <width>944</width>
+    <height>698</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -37,7 +37,7 @@
        <string notr="true">font: 75 12pt &quot;微软雅黑&quot;;</string>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab">
        <property name="styleSheet">
@@ -751,7 +751,7 @@ font: 75 20pt &quot;微软雅黑&quot;;</string>
                 </size>
                </property>
                <property name="text">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:18pt; font-style:italic; color:#ff0000;&quot;&gt;To be&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:18pt; font-style:italic; color:#ff0000;&quot;&gt;29.35&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
               </widget>
              </item>
@@ -777,7 +777,7 @@ font: 75 20pt &quot;微软雅黑&quot;;</string>
                 </size>
                </property>
                <property name="text">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:18pt; font-style:italic; color:#00557f;&quot;&gt;updated&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:18pt; font-style:italic; color:#00557f;&quot;&gt;25.24&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
               </widget>
              </item>
@@ -803,7 +803,7 @@ font: 75 20pt &quot;微软雅黑&quot;;</string>
                 </size>
                </property>
                <property name="text">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:18pt; font-style:italic; color:#4f9f76;&quot;&gt;sooooon!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:18pt; font-style:italic; color:#4f9f76;&quot;&gt;27.38&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
               </widget>
              </item>
@@ -1723,7 +1723,7 @@ background-color: rgb(85, 170, 127);</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>884</width>
+     <width>944</width>
      <height>31</height>
     </rect>
    </property>

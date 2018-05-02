@@ -31,7 +31,7 @@
         <string notr="true">font: 9pt &quot;楷体&quot;;</string>
        </property>
        <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:20pt; font-weight:600;&quot;&gt;FBG ALL DATA &lt;/span&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; color:#55007f;&quot;&gt;欲寄彩笺兼尺素，山长水阔知何处&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:20pt; font-weight:600;&quot;&gt;光纤光栅传感器全通道节点展示&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
       </widget>
      </item>

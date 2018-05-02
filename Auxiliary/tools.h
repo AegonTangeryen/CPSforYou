@@ -1,6 +1,7 @@
 #ifndef TOOLS_H
 #define TOOLS_H
 
+#include <QObject>
 #include <QList>
 #include <QString>
 #include <QVector>
@@ -8,7 +9,6 @@
 #include <QDir>
 #include <QDebug>
 #include <QDateTime>
-#include <QObject>
 #include <QtNetwork>
 #include <QMutexLocker>
 #include <QTimer>

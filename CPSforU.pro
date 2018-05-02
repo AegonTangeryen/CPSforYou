@@ -58,7 +58,8 @@ SOURCES += \
         UI/animationintroductionui.cpp \
         UI/loginui.cpp \
         UI/inquireupdateui.cpp \
-        UI/customui.cpp
+        UI/customui.cpp \
+        Auxiliary/execdoscmd.cpp
 
 HEADERS += \
         Connections/cloudplatform.h \
@@ -133,6 +134,7 @@ HEADERS += \
         IncludesRely/temp.h \
         IncludesRely/trspack.h \
         UI/inquireupdateui.h \
+        Auxiliary/execdoscmd.h
 
 FORMS += \
         mainwindow.ui \

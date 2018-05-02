@@ -72,8 +72,7 @@ void FBGSensos::readFbgData()
             unsigned char highInfo = recBuf[startIdx + j * 2];				// 高八位
             unsigned char lowInfo = recBuf[startIdx + j * 2 + 1];			// 低八位
             double fbgw = 1520.0 + (256.0 * lowInfo + highInfo) / 1000.0;	// fbg转换公式
-//            if (fbgw<1500) // 异常检测
-//            {}
+
             if (j < FBG_Index_Max)											// 只保存20个点
             {
                 if (j >= idxNum) fbgw = 0.0;
